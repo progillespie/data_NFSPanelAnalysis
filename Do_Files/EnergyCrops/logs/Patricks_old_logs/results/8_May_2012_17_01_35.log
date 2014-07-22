@@ -1,0 +1,98 @@
+-----------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /home/patrickgillespie/Documents/lin_forpatrick/Task 4/Data_Analysis/analysis/logs/resul
+> ts/8_May_2012_17_01_35.log
+  log type:  text
+ opened on:   8 May 2012, 17:01:35
+
+. 
+. *xtreg osrape_prop energydum sizeclass setasideuaa ln_labour  specialise osrprice i.year, fe
+. 
+. *xtreg oilseedrapeuaa energydum sizeclass setasideuaa ln_labour specialise osrprice i.year, fe
+. 
+. xtreg osrape_prop energydum sizeclass setasideuaa ln_labour ln_ffi solvency specialise intensity i.
+> year, fe
+note: 2007.year omitted because of collinearity
+
+Fixed-effects (within) regression               Number of obs      =     78181
+Group variable: pid                             Number of groups   =     10863
+
+R-sq:  within  = 0.0149                         Obs per group: min =         2
+       between = 0.0460                                        avg =       7.2
+       overall = 0.0166                                        max =         9
+
+                                                F(15,67303)        =     67.78
+corr(u_i, Xb)  = -0.2728                        Prob > F           =    0.0000
+
+------------------------------------------------------------------------------
+ osrape_prop |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   energydum |  -.0109219   .0009896   -11.04   0.000    -.0128615   -.0089823
+   sizeclass |  -.0023994   .0004983    -4.81   0.000    -.0033761   -.0014226
+ setasideuaa |  -.0003975   .0000266   -14.94   0.000    -.0004496   -.0003453
+   ln_labour |  -.0017442   .0009779    -1.78   0.075    -.0036609    .0001726
+      ln_ffi |  -.0000844   .0000857    -0.98   0.325    -.0002523    .0000836
+    solvency |  -.0006021   .0015247    -0.39   0.693    -.0035905    .0023864
+  specialise |   .0015837   .0008145     1.94   0.052    -.0000127    .0031801
+   intensity |  -.0178239     .00674    -2.64   0.008    -.0310343   -.0046135
+             |
+        year |
+       2000  |  -.0135027   .0009536   -14.16   0.000    -.0153717   -.0116337
+       2001  |  -.0148553   .0009285   -16.00   0.000    -.0166752   -.0130355
+       2002  |  -.0203091   .0009211   -22.05   0.000    -.0221144   -.0185038
+       2003  |  -.0181217    .000929   -19.51   0.000    -.0199425   -.0163009
+       2004  |  -.0065451   .0008934    -7.33   0.000    -.0082962    -.004794
+       2005  |  -.0050198    .000892    -5.63   0.000    -.0067681   -.0032716
+       2006  |   .0024256   .0009098     2.67   0.008     .0006425    .0042087
+       2007  |  (omitted)
+             |
+       _cons |   .1214705   .0081248    14.95   0.000      .105546    .1373951
+-------------+----------------------------------------------------------------
+     sigma_u |  .09483449
+     sigma_e |  .05650196
+         rho |  .73802249   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+F test that all u_i=0:     F(10862, 67303) =    17.26        Prob > F = 0.0000
+
+. 
+. *xtreg oilseedrapeuaa energydum sizeclass setasideuaa ln_labour ln_ffi solvency specialise intensit
+> y ln_c_ret_ha i.year year#mscode, fe
+. 
+. /*
+> *************************************************************
+> *** POST-ESTIMATION TESTS *
+> ***************************
+> ****************
+> *** Chow test
+> ****************
+> *xtreg osrape_prop energydum edum_adop adopter farmsrepresented  sizeclass setasideuaa ln_labour ln
+> _ffi solvency specialise intensity ln_c_ret_ha i.year year#mscode
+> xtreg osrape_prop energydum edum_adop adopter sizeclass setasideuaa ln_labour specialise i.year, fe
+> 
+> test _b[edum_adop]=0, notest
+> test _b[adopter]=0, accum
+> 
+> *xtreg oilseedrapeuaa energydum edum_adop adopter farmsrepresented  sizeclass setasideuaa ln_labour
+>  ln_ffi solvency specialise intensity ln_c_ret_ha i.year year#mscode
+> xtreg oilseedrapeuaa energydum edum_adop adopter sizeclass setasideuaa ln_labour specialise i.year
+> test _b[edum_adop]=0, notest
+> test _b[adopter]=0, accum
+> 
+> 
+> *************************************************************
+> *** CLEAN UP              *
+> ***************************
+> */
+. tsset, clear
+
+. clear
+
+. clear matrix
+
+. log close
+      name:  <unnamed>
+       log:  /home/patrickgillespie/Documents/lin_forpatrick/Task 4/Data_Analysis/analysis/logs/resul
+> ts/8_May_2012_17_01_35.log
+  log type:  text
+ closed on:   8 May 2012, 17:01:42
+-----------------------------------------------------------------------------------------------------

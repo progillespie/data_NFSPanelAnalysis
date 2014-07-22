@@ -1,0 +1,176 @@
+% Template for homework obtained from http://jedward706.wordpress.com/2008/11/03/format-for-math-and-science-homework-latex/
+\documentclass[openany, article, a4paper]{memoir}
+% Modification added by P.R. Gillespie
+
+
+%preamble
+\usepackage{calc}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{amsmath}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%The following modifications added by P.R. Gillespie from D:\MikTeX 2.9\doc\latex\memoir\memman.pdf starting on pg 26.
+
+%Suppose you want a page that will fit on both A4 and US letterpaper stock, wanting to do the least amount of trimming. The layout requirements are as follows. The width of the typeblock should be such that there are the optimum number of characters per line, and the ratio of the height to the width of the typeblock should equal the golden section. The text has to start []pt below the top of the page. We will use the default \headheight and \footskip. The ratio of the outer margin to the inner margin should equal the golden section, as should the space above and below the header. There is no interest at all in marginal notes, so we can ignore any settings for these. We can either do the maths ourselves or get LaTeX to do it for us. Let’s use LaTeX. First we will work out the size of the largest sheet that can be cut from A4 and letterpaper, whose sizes are 297×210 mm and 11×8.5 in; A4 is taller and narrower than letterpaper.
+\settrimmedsize{11in}{210mm}{*}
+%The stocksize is defined by the class option, which could be either letterpaper or a4paper,but we have to work out the trims to reduce the stock to the page. To make life easier,we will only trim the fore-edge and the bottom of the stock, so the \trimtop is zero. The\trimtop and \trimedge are easily specified by
+%\setlength{\trimtop}{0pt}
+%\setlength{\trimedge}{\stockwidth}
+%\addtolength{\trimedge}{-\paperwidth}
+%Or if you are using the calc package, perhaps:
+\settrims{0pt}{\stockwidth - \paperwidth}
+%Specification of the size of the typeblock is also easy
+\settypeblocksize{8.5in}{5.5in}{*}
+%and now the upper and lower margins are specified by
+\setulmargins{*}{*}{1}
+%The spine and fore-edge margins are specified just by the value of the golden section, via
+\setlrmargins{*}{*}{1}
+%The only remaining calculation to be done is the \headmargin and \headsep. Again this just involves using a ratio
+\setheaderspaces{*}{*}{1.618}
+%To finish off we have to make sure that the layout is changed
+\checkandfixthelayout
+\fixpdflayout
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%define title and other basic document info
+%the title should reflect the style and give a foretaste of the document
+%work on making a stylized title page — or title on a page as in ARTICLE class
+\title{\huge \textbf{App. B Sums, Products, and Induction}}
+\author{Patrick R. Gillespie}
+\date{\today}                    % could use \today  , but I like this date format better
+%\publisher{}                            %one day I’ll need this  
+%\thanks{Big shout out to God for allowing me to think}        %produces a footnote to the title
+
+\definecolor{shadecolor}{gray}{0.9}
+\definecolor{ared}{rgb}{.647,.129,.149}
+\renewcommand\colorchapnum{\color{ared}}
+\renewcommand\colorchaptitle{\color{ared}}
+\chapterstyle{bringhurst}
+%one of a number of chapter styles available…this one doesn’t use the ared color
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+%title
+\thispagestyle{empty}
+%\begin{minipage}{300pt}
+\begin{center}{
+	\begin{shaded}
+	\hrule \vspace{30pt}
+	\hspace{10pt} \thetitle  \vspace{30pt}
+	\theauthor   \hspace{0.5 in}\thedate \vspace{26pt}
+	\hrule
+	\end{shaded}
+	}
+\end{center}
+%\end{minipage}
+
+\clearpage
+
+%\frontmatter    %use if needed –page numbers as lower case roman numerals i, ii,…
+
+%\mainmatter
+%%other declarations
+\pagestyle{Ruled}                    %one of a number of possible page styles
+\midsloppy                             %to minimize overfull lines
+
+%Layout the page
+%%Try this manual golden ratio layout or…           default seems better for now
+%\settypeblocksize{*}{\lxvchars}{1.618}
+%\setulmargins{50pt}{*}{*}
+%\setlrmargins{*}{*}{1.618}
+%\setheaderspaces{*}{*}{1.618}
+%\semiisopage[12]
+%try this predefined layout — others predefined ones are options in MEMOIR…
+%this one looked best but did not work
+
+\checkandfixthelayout          %make the layout happen and provide details in log during build
+
+\chapter{App. B Sums, Products, and Induction}
+\section{Example B.11, pg. 862}
+%\subsection{Given}
+%A 6m x 12m swimming pool which slopes linearly from a 1.0m depth at one end to a 3.0m depth at the other end.
+\subsection{Find}
+Prove by induction that, for all positive integers $n$, 
+	\begin{align}
+		f(x)&=x^n \Longrightarrow f'(x)=nx^{n-1}
+	\label{find}
+	\end{align}
+\subsection{Plan}
+ Formula \ref{find} is correct for $n=1$, because $f(x) = x \Longrightarrow f'(x) = x \cdot x^{1-1} = x \cdot 1 = x$. \emph{Suppose} that \ref{find} is valid for $n=k$. Then prove that \ref{find} is valid for $n=k+1$ as well. 
+
+\subsection{Proof}
+\begin{align}
+f(x) &=x^k \Longrightarrow f'(x)=kx^{k-1}
+\label{suppose}
+\intertext{ Now multiply both sides by x} f(x) &= x ^{k+1} \Longrightarrow f'(x) = (k+1)x^k 
+\intertext{But this is the same as if we substitute $k+1$ into Equation \ref{suppose} as in}
+f(x) &=x^k \Longrightarrow f'(x)=kx^{k-1}
+\end{align}
+
+\subsection{Solution}
+\begin{minipage}{300pt}
+\begin{center}{
+\begin{shaded}
+\hrule
+\vspace{20pt}
+The mass of water in the pool is $1.44 \times 10^5 kg$         %nicely written sentence solution goes here
+\vspace{16pt}
+\hrule
+\end{shaded}
+}
+\end{center}
+\end{minipage}
+
+%\section{Problem 5}
+%\subsection{Given}
+%The deepest point in the ocean is 11 km below sea level.
+%\subsection{Find}
+%The pressure in atmospheres at this depth.
+%\subsection{Plan}
+%The hydrostatic pressure at a depth, d is $P = P_o + \rho g d$. I just need take care with the units.
+%\subsection{Calculations}
+%$P = 1 atm + 1030 \frac{kg}{m^3} \times 9.8 \frac{N}{kg} \times 11000 m \times \frac{1 atm}{1.013 \times 10^5 Pa}$
+%\subsection{Solution}
+%\begin{minipage}{300pt}
+%\begin{center}{
+%\begin{shaded}
+%\hrule
+%\vspace{20pt}
+%The pressure at 11 km below sea level is ~1097 atmospheres.   %nicely written sentence solution goes here
+%\vspace{16pt}
+%\hrule
+%\end{shaded}
+%}
+%\end{center}
+%\end{minipage}
+%
+%\section{Problem 9}
+%\subsection{Given}
+%A submarine with a 20 cm diameter window which is 8.0 cm thick.  The manufacturer says it can stand forces up to $1.0 \times 10^6 N$. The pressure inside the submarine is maintained at 1.0 atm.
+%\subsection{Find}
+%The maximum safe depth for the submarine.
+%\subsection{Plan}
+%Since $P = \frac{F}{A}$, I can just find the depth at which the pressure will reach the manufacturers maximum force for the area of the given window.  Again, paying close attention to the units. The fact that the inside of the submarine is maintained at 1.0 atm allows me to use $P_{max} = \frac{F_{max}}{A}=\rho g d$ and solve for $d$.
+%\subsection{Calculations}
+%The area of the window is,\\
+%\[ \pi \times (0.10 m)^2 = \frac{\pi}{100} m^2 \]\\
+%So the maximum pressure for this window is, \\
+%\[ \frac{(1.0 \times 10^6 N)}{\frac{\Pi}{100} m^2} = 3.183099 \times 10^7 Pa\]\\
+%The depth at which this pressure is reached is,\\
+%\[ \frac{3.183099 \times 10^7 Pa}{1030 \frac{kg}{m^3} \times 9.8 \frac{N}{kg}} = 3153.5 m \]
+%\subsection{Solution}
+%\begin{minipage}{300pt}
+%\begin{center}{
+%\begin{shaded}
+%\hrule
+%\vspace{20pt}
+%The submarine can descend to a depth of ~3150 meters.                %nicely written sentence solution goes here
+%\vspace{16pt}
+%\hrule
+%\end{shaded}
+%}
+%\end{center}
+%\end{minipage}
+%
+\end{document}

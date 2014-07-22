@@ -1,0 +1,129 @@
+Econometric Software, Inc. - 
+End-User License Agreement
+
+This is a contract between you and 
+Econometric Software, Inc. The software 
+product refers to the computer software 
+and documentation as well as any upgrades, 
+modified versions, copies or supplements 
+supplied by Econometric Software. By 
+installing, downloading, accessing or 
+otherwise using the software product, you 
+agree to be bound by the terms and 
+conditions of this agreement.  
+
+Copyright, Trademark, and Intellectual 
+Property
+This software product is copyrighted by, 
+and all rights are reserved by Econometric 
+Software, Inc. No part of this software 
+product, either the software or the 
+documentation, may be reproduced, 
+distributed, downloaded, stored in a 
+retrieval system, transmitted in any form 
+or by any means, sold or transferred without 
+prior written permission of Econometric 
+Software. You may not modify, adapt, 
+translate, or change the software product. 
+You may not reverse engineer, decompile, 
+dissemble, or otherwise attempt to discover 
+the source code of the software product.
+
+LIMDEP(TM) and NLOGIT(TM) are trademarks 
+of Econometric Software, Inc. The software 
+product is licensed, not sold. Your 
+possession, installation and use of the 
+software product does not transfer to 
+you any title and intellectual property 
+rights, nor does this license grant 
+you any rights in connection with 
+software product trademarks. 
+
+Use of the Software Product 
+You have only the non-exclusive right to 
+use this software product. A single user 
+license is registered to one specific 
+individual, and is not intended for access 
+by multiple users on one machine, or for 
+installation on a network or in a computer 
+laboratory. For a single user license only, 
+the registered single user may install 
+the software on a primary stand alone 
+computer and one home or portable secondary 
+computer for his or her exclusive use. 
+However, the software may not be used on 
+the primary computer by another person 
+while the secondary computer is in use. 
+For a multi-user site license, the specific 
+terms of the site license agreement apply 
+for scope of use and installation.
+
+Limited Warranty
+Econometric Software warrants that the 
+software product will perform substantially 
+in accordance with the documentation for 
+a period of ninety (90) days from the date 
+of the original purchase. To make a warranty 
+claim, you must notify Econometric Software 
+in writing within ninety (90) days from the 
+date of the original purchase and return 
+the defective software to Econometric 
+Software. If the software does not perform 
+substantially in accordance with the 
+documentation, the entire liability and your 
+exclusive remedy shall be limited to, 
+at Econometric Software’s option, the 
+replacement of the software product or 
+refund of the license fee paid to Econometric 
+Software for the software product. Proof of 
+purchase from an authorized source is 
+required. This limited warranty is void if 
+failure of the software product has resulted 
+from accident, abuse, or misapplication. 
+Some states and jurisdictions do not 
+allow limitations on the duration of an 
+implied warranty, so the above limitation 
+may not apply to you. To the extent 
+permissible, any implied warranties on 
+the software product are limited to 
+ninety (90) days.
+
+Econometric Software does not warrant 
+the performance or results you may obtain 
+by using the software product. To the 
+maximum extent permitted by applicable law, 
+Econometric Software disclaims all other 
+warranties and conditions, either express 
+or implied, including, but not limited 
+to, implied warranties of merchantability, 
+fitness for a particular purpose, title, 
+and non-infringement with respect to the 
+software product. This limited warranty 
+gives you specific legal rights. You 
+may have others, which vary from state 
+to state and jurisdiction to jurisdiction.
+
+Limitation of Liability
+Under no circumstances will Econometric 
+Software be liable to you or any other 
+person for any indirect, special, 
+incidental, or consequential damages 
+whatsoever (including, without limitation,
+damages for loss of business profits, 
+business interruption, computer failure 
+or malfunction, loss of business 
+information, or any other pecuniary 
+loss) arising out of the use or inability 
+to use the software product, even if 
+Econometric Software has been advised 
+of the possibility of such damages. In 
+any case, Econometric Software’s entire 
+liability under any provision of this 
+agreement shall not exceed the amount 
+paid to Econometric Software for the 
+software product. Some states or 
+jurisdictions do not allow the exclusion 
+or limitation of liability for incidental 
+or consequential damages, so the above 
+limitation may not apply to you.
+

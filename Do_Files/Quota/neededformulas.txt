@@ -1,0 +1,10 @@
+
+svy_cattle           @ dairy_cows_sh_bulls_subsidies_eu
+svy_subsidies_grants @ slaughter_premium_dairy_payment_received_ty_eu
+svy_subsidies_grants @ protein_payments_total_eu
+svy_subsidies_grants @ sheep_welfare_scheme_total_eu
+svy_subsidies_grants @ other_subsidies_payments_total_eu
+svy_subsidies_grants @ single_farm_payment_net_value_eu
+SVY_CROP_DERIVED     @ D_OUTPUT_FROM_CURRENT_MISC_CASH_CROP
+svy_crop_derived     @ d_cash_crops_fed_eu
+svy_crop_expenses    @ home_grown_seed_value_eu

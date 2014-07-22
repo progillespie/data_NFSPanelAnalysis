@@ -1,0 +1,2110 @@
+----------------------------------------------------------------------
+       log:  d:\pglocal\data\data_NFSPanelAnalysis\OutData\dychap\dych
+> ap.log
+  log type:  text
+ opened on:  18 Jul 2011, 17:16:00
+
+. di  "Job  Started  at  $S_TIME  on $S_DATE"
+Job  Started  at  17:16:00  on 18 Jul 2011
+
+. 
+. cd d:\pglocal
+d:\pglocal
+
+. *cd `dodir'
+. 
+. *****************************************************
+. *****************************************************
+. **Import NFS Data
+. *****************************************************
+. *****************************************************
+. 
+. 
+. use `nfsdatadir'\nfs_data.dta, clear
+
+. sort farmcode year
+
+. merge farmcode year using `Regional_outdatadir'\regional_weights.dta
+year was int now float
+variables farmcode year do not uniquely identify observations in
+    data\data_NFSPanelAnalysis\OutData\RegionalAnalysis\regional_weigh
+    > ts.dta
+
+. drop _merge
+
+. 
+. drop if year == .
+(42 observations deleted)
+
+. 
+. gen age_holder = ogagehld
+(52 missing values generated)
+
+. gen familyfarmincome = farmffi 
+(52 missing values generated)
+
+. capture drop standardmandays
+
+. gen standardmandays = flabsmds
+(52 missing values generated)
+
+. gen sizeoffarm = fsizuaa
+(52 missing values generated)
+
+. *gen wave = year - 1982
+. gen noofhouseholds = oanohshm
+(52 missing values generated)
+
+. gen npers04 = oanolt5y
+(52 missing values generated)
+
+. gen npers515 = oano515y
+(52 missing values generated)
+
+. gen npers1519 = oano1619
+(52 missing values generated)
+
+. gen npers2024 = oano2024
+(52 missing values generated)
+
+. gen npers2544 = oano2544
+(52 missing values generated)
+
+. gen npers4564 = oano4564
+(52 missing values generated)
+
+. gen npers65 = oanoge65
+(52 missing values generated)
+
+. capture drop grossoutput
+
+. gen grossoutput = farmgo
+(52 missing values generated)
+
+. capture drop directcosts
+
+. gen directcosts = farmdc
+(52 missing values generated)
+
+. *append using \data\data_NFSPanelAnalysis\OutData\InequalityAnalysis
+> \NFS1995small.dta
+. 
+. * next 5 lines extracts the last digit in the sizesystem variable. T
+> his gives the farm system
+. gen sizesystem = ffszsyst
+(52 missing values generated)
+
+. gen s = sizesystem/10
+(52 missing values generated)
+
+. gen intsys = int(s)
+(52 missing values generated)
+
+. gen t = (s - intsys)*10
+(52 missing values generated)
+
+. gen sys = round(t)
+(52 missing values generated)
+
+. drop s intsys t
+
+. gen system_old = system
+(16270 missing values generated)
+
+. replace system = 0 
+(18672 real changes made)
+
+. replace system = 0 if sys == 1
+(0 real changes made)
+
+. replace system = 1 if sys == 2
+(2912 real changes made)
+
+. replace system = 2 if sys == 4
+(3535 real changes made)
+
+. replace system = 3 if sys == 5
+(3438 real changes made)
+
+. replace system = 4 if sys == 6
+(2187 real changes made)
+
+. replace system = 5 if sys == 7
+(1542 real changes made)
+
+. 
+. * system definitions
+. * 0 - dairying
+. * 1 - dairying + other
+. * 2 - cattle rearing
+. * 3 - cattle other
+. * 4 - mainly sheep
+. * 5 - tillage
+. 
+. gen ageoperator = 0
+
+. replace ageoperator = 1 if  age_holder <= 25
+(232 real changes made)
+
+. replace ageoperator = 2 if  (age_holder > 25 &  age_holder <= 35)
+(1837 real changes made)
+
+. replace ageoperator = 3 if  (age_holder > 35 &  age_holder <= 45)
+(4258 real changes made)
+
+. replace ageoperator = 4 if  (age_holder > 45 &  age_holder <= 55)
+(5285 real changes made)
+
+. replace ageoperator = 5 if  (age_holder > 55 &  age_holder <= 65)
+(4325 real changes made)
+
+. replace ageoperator = 6 if age_holder >= 66
+(2735 real changes made)
+
+. * generates age bands: <25, 25-35, 35-45, 45-55, 55-65, >66
+.  
+. * Dayly Earnings = familyfarmincome/(Number of Months Worked * Weeks
+>  per Month * Hours per Week)
+. gen dearns = 0
+
+. replace dearns = familyfarmincome/ standardmandays/8
+(18672 real changes made, 67 to missing)
+
+. gen farmsize = 0
+
+. replace farmsize = 1 if sizeoffarm < 10
+(650 real changes made)
+
+. replace farmsize = 2 if sizeoffarm >= 10 & sizeoffarm < 20
+(2582 real changes made)
+
+. replace farmsize = 3 if sizeoffarm > 20 & sizeoffarm < 30
+(3009 real changes made)
+
+. replace farmsize = 4 if sizeoffarm > 30 & sizeoffarm < 50
+(5626 real changes made)
+
+. replace farmsize = 5 if sizeoffarm > 50 & sizeoffarm < 100
+(5063 real changes made)
+
+. replace farmsize = 6 if sizeoffarm >= 100
+(1711 real changes made)
+
+. 
+. gen ffiperhectare = familyfarmincome/sizeoffarm
+(60 missing values generated)
+
+. 
+. * log of income variables
+. gen lndearns = ln(dearns)
+(1107 missing values generated)
+
+. gen lnffi = ln(familyfarmincome)
+(1094 missing values generated)
+
+. 
+. gen total_labour_hours = standardmandays*8
+(52 missing values generated)
+
+. gen  fulltime = 1 if total_labour_hours > 1350
+(7052 missing values generated)
+
+. replace  fulltime = 0 if total_labour_hours < 1350
+(7051 real changes made)
+
+. * 1350 is 0.75 labour units whereas 1800 hours worked on the farm is
+>  considered to be 1 standard labour unit.
+. *In the NFS full time farms are defined as farms which require at le
+> ast 0.75 standard labour units to operate.
+. 
+. *this generates real earnings year on year. Base year is  Nov 1996
+. * 94-95.1
+. *95-97.6
+. *96-99.3
+. *97-100.7
+. *98-103.1
+. *99-104.8
+. *2000-110.7
+. *2001-116.1
+. 
+. sort year
+
+. by year: egen av_ffi = mean(familyfarmincome)
+
+. gen tav_ffi2005 = av_ffi if year  == 2005
+(17495 missing values generated)
+
+. replace tav_ffi2005 = 0 if tav_ffi2005 ==. 
+(17495 real changes made)
+
+. egen av_ffi2005 = max(tav_ffi2005)
+
+. 
+. gen index = av_ffi2005/av_ffi2005*familyfarmincome
+(52 missing values generated)
+
+. 
+. gen rfarmy = index 
+(52 missing values generated)
+
+. 
+. **Number of Persons in Household
+. capture drop npers
+
+. rename noofhouseholds npers
+
+. 
+. **Equivalence Scale - npers^x
+. gen es5 = npers^0.5
+(52 missing values generated)
+
+. gen es7 = npers^0.7
+(52 missing values generated)
+
+. gen es9 = npers^0.9
+(52 missing values generated)
+
+. gen es10 = npers
+(52 missing values generated)
+
+. 
+. **Equivalised Income 
+. gen rfarmyes0 = rfarmy
+(52 missing values generated)
+
+. gen rfarmyes5 = rfarmy/es5
+(239 missing values generated)
+
+. gen rfarmyes7 = rfarmy/es7
+(239 missing values generated)
+
+. gen rfarmyes9 = rfarmy/es9
+(239 missing values generated)
+
+. gen rfarmyes10 = rfarmy/es10
+(239 missing values generated)
+
+. 
+. **Off Farm Income
+. gen isoff_farmy = 0
+
+. *replace isoff_farmy = 1 if 
+. 
+. 
+. **Age Squared
+. gen age2 = ageoperator^2
+
+. 
+. 
+. **costs
+. gen cost_per_output = 0
+
+. replace cost_per_output = directcosts/grossoutput
+(18672 real changes made, 52 to missing)
+
+. 
+. gen farmsize2 = farmsize*farmsize
+
+. gen cost_per_out2 =  cost_per_output^2
+(52 missing values generated)
+
+. gen labour2 =  total_labour_hours^2
+(52 missing values generated)
+
+. *xi: regress  familyfarmincome i.system i.fulltime  farmsize  ageope
+> rator  age2 i.year  total_labour_hours  landowned landrented landlet
+>  totalforagearea feedacres  totalcropsandpasture hayadjustedacreage 
+>  silageadjustedacreage roughgrazing remainderoffarm acresrented_fami
+> ly_retirementsch acresrented_non_family_retiremen grazing_areatreate
+> d nongrazing pongrazing kongrazing grassland_areatreated nongrasslan
+> d pongrassland kongrassland labourunitsunpaid_family_ labourunitspai
+> d totallabourunits standardmandays directcosts i.soilcode
+. 
+. *gen dirpayts = fsubhors + fsubtbco + fsubforh + fsubesag + fsubyfig
+>  + fsubreps + fsub10tp + fsub22tp + fsubastp + fsubcatp + fsubchtp +
+>  fsubeptp + fsubextp + fsubgpcm + fsublitp + fsubmztp + fsubpbtp + f
+> subrptp + fsubsctp + fsubshtp + fsubsptp + fsubtups + fsubvstp
+. 
+. gen lfa = fsubchen
+(52 missing values generated)
+
+. * Create Residual from Grants and subsidies
+. gen fgrntsub_resid = max(0,fgrntsub - (fsubesag + fsubreps))
+
+. * Single farm payment
+. gen sfp = 0
+
+. replace sfp = fsubchpp if year >= 2005
+(5601 real changes made)
+
+. replace fgrntsub_resid = fgrntsub_resid - sfp if year >= 2005
+(5601 real changes made)
+
+. replace fgrntsub_resid = 0 if fgrntsub_resid == .
+(0 real changes made)
+
+. * Single farm payment
+. 
+. replace fgrntsub_resid = max(0,fgrntsub_resid - fsubchen)
+(6842 real changes made)
+
+. 
+. * Total Subsidies
+. gen dirpayts = 0
+
+. 
+. *Cattle Subsidy
+. replace dirpayts = dirpayts + cssuckcw + cs10mtbf + cs22mtbf + cssla
+> ugh + csextens + csheadag + csmctopu
+(12752 real changes made, 52 to missing)
+
+. *Suckler Welfare
+. gen suckler_welfare = 0
+
+. replace suckler_welfare = cosubsid if year >= 2008
+(316 real changes made)
+
+. replace dirpayts = dirpayts + suckler_welfare
+(316 real changes made)
+
+. *Sheep and Poultry Subsidy
+. replace dirpayts = dirpayts + sosubsid + posubsid
+(5026 real changes made)
+
+. * Other grants and subsidies 
+. replace dirpayts = dirpayts + fgrntsub_resid + (fsubesag + fsubyfig 
+> + fsubreps)
+(6902 real changes made)
+
+. *Cattle Head current year entitlemen(?)
+. replace dirpayts = dirpayts + fsubchen 
+(7347 real changes made)
+
+. *SFP
+. replace dirpayts = dirpayts + sfp 
+(5601 real changes made)
+
+. 
+. *Other subsidies
+. replace dirpayts = dirpayts  + fsubhors + fsubtbco + fsubforh 
+(2531 real changes made)
+
+. *Tillage and Dairy Subsidy
+. replace dirpayts = dirpayts + dogpcomp + fsubastp + fsubcatp + fsubr
+> ptp + fsubpbtp + fsublitp + fsubmztp+ fsubvstp
+(3521 real changes made)
+
+. 
+. replace dirpayts = dirpayts + dqcomlrd if year >= 2005 
+(208 real changes made)
+
+. replace dirpayts = dirpayts + dosubsvl if year >= 2002 & year < 2005
+(1014 real changes made)
+
+. replace dirpayts = dirpayts + dosubsvl if year < 2001
+(563 real changes made)
+
+. * Cow Protein Payment
+. replace dirpayts = dirpayts + fsubsctp if year >= 2008
+(316 real changes made)
+
+. 
+. 
+. *2008 change to include suckler cow & protein payments
+. gen     rdirpaym = cosubsid + sosubsid + posubsid + fgrntsub + fsubh
+> ors + fsubtbco + fsubforh + dogpcomp + fsubastp + fsubcatp + fsubrpt
+> p + fsubpbtp + fsublitp +fsubmztp + fsubvstp + dqcomlrd + fsubsctp i
+> f year >= 2008
+(16541 missing values generated)
+
+. 
+. *2005 change to include slaughter prem but exclude dairy support pay
+> ments as already included in sfp
+. replace rdirpaym = cosubsid + sosubsid + posubsid + fgrntsub + fsubh
+> ors + fsubtbco + fsubforh + dogpcomp + fsubastp + fsubcatp + fsubrpt
+> p + fsubpbtp + fsublitp +fsubmztp + fsubvstp + dqcomlrd if year >= 2
+> 005 & year < 2008
+(3487 real changes made)
+
+. 
+. * dosubsvl - as per below - this includes dairy slaughter prem + dai
+> ry support payment
+. *  2002- 2004
+. replace rdirpaym = cosubsid + sosubsid + posubsid + fgrntsub + fsubh
+> ors + fsubtbco + fsubforh + dogpcomp + fsubastp + fsubcatp + fsubrpt
+> p + fsubpbtp + fsublitp +fsubmztp + fsubvstp + dosubsvl if year >= 2
+> 002 & year < 2005
+(3612 real changes made)
+
+. 
+. *2001
+. replace rdirpaym = cosubsid + sosubsid + posubsid + fgrntsub + fsubh
+> ors + fsubtbco + fsubforh + dogpcomp + fsubastp + fsubcatp + fsubrpt
+> p + fsubpbtp + fsublitp +fsubmztp + fsubvstp if year == 2001
+(1184 real changes made)
+
+. 
+. *<2001
+. replace rdirpaym = cosubsid + sosubsid + posubsid + fgrntsub + fsubh
+> ors + fsubtbco + fsubforh + dogpcomp + fsubastp + fsubcatp + fsubrpt
+> p + fsubpbtp + fsublitp +fsubmztp + fsubvstp + dosubsvl if year < 20
+> 01
+(8206 real changes made)
+
+. 
+. 
+. quietly gen marketgo = grossoutput - dirpayts
+
+. quietly gen marketffi = farmffi - dirpayts
+
+. 
+. 
+. 
+. tab system, gen(system)
+
+     system |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      5,058       27.09       27.09
+          1 |      2,912       15.60       42.68
+          2 |      3,535       18.93       61.62
+          3 |      3,438       18.41       80.03
+          4 |      2,187       11.71       91.74
+          5 |      1,542        8.26      100.00
+------------+-----------------------------------
+      Total |     18,672      100.00
+
+. tab region, gen(region)
+
+     region |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |      2,433       17.42       17.42
+          2 |        148        1.06       18.48
+          3 |      1,418       10.15       28.63
+          4 |      1,362        9.75       38.39
+          5 |      1,483       10.62       49.00
+          6 |      2,080       14.89       63.90
+          7 |      2,898       20.75       84.65
+          8 |      2,144       15.35      100.00
+------------+-----------------------------------
+      Total |     13,966      100.00
+
+. tab year, gen(year)
+
+       year |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       1994 |      1,279        6.85        6.85
+       1995 |      1,216        6.51       13.36
+       1996 |      1,166        6.24       19.61
+       1997 |      1,199        6.42       26.03
+       1998 |      1,111        5.95       31.98
+       1999 |      1,116        5.98       37.96
+       2000 |      1,129        6.05       44.00
+       2001 |      1,184        6.34       50.34
+       2002 |      1,218        6.52       56.87
+       2003 |      1,210        6.48       63.35
+       2004 |      1,226        6.57       69.91
+       2005 |      1,177        6.30       76.22
+       2006 |      1,159        6.21       82.42
+       2007 |      1,151        6.16       88.59
+       2008 |      1,102        5.90       94.49
+       2009 |      1,029        5.51      100.00
+------------+-----------------------------------
+      Total |     18,672      100.00
+
+. 
+. capture generate soil1=0
+
+. replace soil1=1 if ffsolcod<300
+(9117 real changes made)
+
+. 
+. capture generate soil2=0
+
+. replace soil2=1 if ffsolcod<500
+(16591 real changes made)
+
+. replace soil2=0 if ffsolcod<300
+(9117 real changes made)
+
+. 
+. capture generate soil3=0
+
+. replace soil3=1 if ffsolcod<700
+(18620 real changes made)
+
+. replace soil3=0 if ffsolcod<500
+(16591 real changes made)
+
+. 
+. 
+. capture gen isofffarmy = oojobhld==1 | oojobhld==2
+
+. capture gen isspofffarmy = oojobsps == 1 | oojobsps == 2
+
+. capture gen bothwork = isspofffarmy == 1 & isofffarmy == 1
+
+. capture gen teagasc = foadvfee > 0
+
+. 
+. capture gen age_holder10 = int(max(20,min(70,age_holder))/10)*10
+
+. tab age_holder10, gen(age_holder10_)
+
+age_holder1 |
+          0 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+         20 |        662        3.55        3.55
+         30 |      2,768       14.82       18.37
+         40 |      4,932       26.41       44.78
+         50 |      5,218       27.95       72.73
+         60 |      3,411       18.27       91.00
+         70 |      1,681        9.00      100.00
+------------+-----------------------------------
+      Total |     18,672      100.00
+
+. tab farmsize, gen(farmsize_)
+
+   farmsize |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |         31        0.17        0.17
+          1 |        650        3.48        3.65
+          2 |      2,582       13.83       17.48
+          3 |      3,009       16.12       33.59
+          4 |      5,626       30.13       63.72
+          5 |      5,063       27.12       90.84
+          6 |      1,711        9.16      100.00
+------------+-----------------------------------
+      Total |     18,672      100.00
+
+. 
+. 
+. *****************************************************
+. * Share of Margins
+. *****************************************************
+. 
+. gen dairypgo = fdairygo/fcplivgo
+(53 missing values generated)
+
+. gen dairypgm = fdairygm/fcplivgm
+(52 missing values generated)
+
+. 
+. gen catlepgo = fcatlego/fcplivgo
+(53 missing values generated)
+
+. gen catlepgm = fcatlegm/fcplivgm
+(52 missing values generated)
+
+. 
+. gen sheeppgm = fsheepgm/fcplivgm
+(52 missing values generated)
+
+. 
+. gen othergm = fpigsgm + fpoultgm + fhorsegm + fothergm
+(52 missing values generated)
+
+. 
+. gen cropspgm = fcropsgm/fcplivgm
+(52 missing values generated)
+
+. gen otherpgm = othergm/fcplivgm
+(52 missing values generated)
+
+. 
+. gen ncattle = cpavnocw + cpavnohc + cpavno06 + cpavno61 + cpavno12 +
+>  cpavno2p + cpavnobl
+(52 missing values generated)
+
+. 
+. * exclude those that have left the survey by 1996
+. 
+. gen in1994 = year == 1994
+
+. gen in1995 = year == 1995
+
+. gen in1996 = year == 1996
+
+. sort farmcode year
+
+. by farmcode: egen isin1994 = max(in1994)
+
+. by farmcode: egen isin1995 = max(in1995)
+
+. by farmcode: egen isin1996 = max(in1996)
+
+. 
+. gen droporig = (isin1994 == 1 | isin1995 == 1) & isin1996 == 0
+
+. tabstat dairypgm catlepgm sheeppgm otherpgm cropspgm ncattle cpavnoc
+> w cpavnohc cpavno06 -cpavno2p if fsizesu >= 2 & droporig == 0 & year
+>  == 2008 & fcplivgm > 0 [weight = wt], by(system) stats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: system 
+
+  system |  dairypgm  catlepgm  sheeppgm  otherpgm  cropspgm   ncattle
+---------+------------------------------------------------------------
+       0 |  .9065631  .0829842  .0033567 -.0000253  .0071213  62.94782
+       1 |  .7081655  .1598455  .1207251 -.0735149  .0847784  77.64471
+       2 | -.0000913  .9030538  .0179511  .0050004   .074086  49.17299
+       3 | -.0001749  .8579693  .1110605  -.060534  .0916795  55.18745
+       4 |         0 -.0911267  1.024942 -.0299272  .0961122  22.31839
+       5 |  .0018044  .1629838  .0458069  .0056162  .7837887  33.53491
+---------+------------------------------------------------------------
+   Total |  .2077827  .5019834   .204893 -.0305793  .1159204  50.98459
+----------------------------------------------------------------------
+
+  system |  cpavnocw  cpavnohc  cpavno06  cpavno61  cpavno12  cpavno2p
+---------+------------------------------------------------------------
+       0 |  1.373935  7.552455  17.51604  17.08269  17.14691  2.073277
+       1 |  8.974285  3.290267  14.82735  17.68214  27.29944  5.159976
+       2 |  20.65157  1.499197  10.55494  8.086922  6.517901  1.132372
+       3 |  8.400866  .8079918  5.717857  8.943518  22.51235  8.486437
+       4 |  7.231854  .4917234  3.900789  3.592851    5.2118  1.623978
+       5 |  6.265123  .4953102   3.18479  5.213878  11.58261  6.574069
+---------+------------------------------------------------------------
+   Total |  9.200373  2.210482  8.889358  9.823989    15.821  4.671709
+----------------------------------------------------------------------
+
+. 
+. 
+. 
+. 
+. 
+. tabstat farmcode year cptotcno cpavnocw cpavnohc cpavno06 cpavno61 c
+> pavno12 cpavno2p cpavn12m cpavn12f cpavn2pm cpavn2pf cpavnobl cpdthc
+> ow cpdthclf cpdthbir cpdthc6m cpopinvc cpclinvc cpopinvb cpclinvb cp
+> opinvt cpclinvt cosalesv copurval cotftdvl cotffdvl cotftdno cotffdn
+> o copurcno cosalcno coprcfno coslcfno coprwnno coslwnno coprstno cos
+> lstno coprmsno coprfsno coslmsno coslfsno coslfcno coslmfno coslffno
+>  coslffno coprbhno coslbhno coprocno coslocno coocidno [weight=wt] i
+> f ncattle > 0 & fsizesu >= 2 & droporig == 0, by (year) stats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: year 
+
+    year |  farmcode      year  cptotcno  cpavnocw  cpavnohc  cpavno06
+---------+------------------------------------------------------------
+    1994 |  7603.139      1994  63.57018  7.890536  2.364964  9.512477
+    1995 |  8352.663      1995  64.07434  7.899214  2.654699  9.437064
+    1996 |  10181.09      1996  58.26624  8.827427  2.384029  8.856628
+    1997 |  11694.05      1997  61.25981  9.226439  2.416764   9.17534
+    1998 |  12591.79      1998  62.55352  9.547471  2.322483  9.123241
+    1999 |  13095.17      1999  60.87659  9.738138  1.939024  8.689827
+    2000 |  13475.68      2000  60.16044    9.7242  2.004063  8.701286
+    2001 |  14271.45      2001  63.25856  10.77095  2.256699  9.832568
+    2002 |  15317.25      2002   63.6953  10.48938  2.303727  9.812486
+    2003 |  15840.23      2003  62.48358  10.69804  2.186587  9.384447
+    2004 |  16532.17      2004  61.69618  10.33236  2.338043  9.285246
+    2005 |  17244.03      2005  65.95263  10.70319  2.559837  9.888622
+    2006 |  17908.67      2006  60.73136   10.2174  2.295941  8.893918
+    2007 |  18067.08      2007  61.46203  10.29945  2.401488   9.11368
+    2008 |  18830.15      2008  63.67287   9.75727  2.218922    9.1117
+    2009 |  19074.41      2009  63.61888  9.192524  2.118371  8.846324
+---------+------------------------------------------------------------
+   Total |   14422.8  2001.462   62.2025  9.761482  2.289815  9.215961
+----------------------------------------------------------------------
+
+    year |  cpavno61  cpavno12  cpavno2p  cpavn12m  cpavn12f  cpavn2pm
+---------+------------------------------------------------------------
+    1994 |   10.3899  14.70068  5.481234   9.05616  5.650315  4.435215
+    1995 |  10.50218  14.66226  5.508454  8.965212  5.702904  4.523954
+    1996 |  9.478617  13.18105  4.428507  7.930498  5.255854  3.610772
+    1997 |  10.22025  14.55755  4.592367  8.968128  5.595108  3.603474
+    1998 |  10.25873  15.06815  5.033838  9.209276  5.864827  3.976083
+    1999 |  9.664829  14.77467  5.128037  9.056943  5.723404  4.022427
+    2000 |   9.28769   14.6521  4.678923  9.516212  5.141634  3.808436
+    2001 |   10.0117  14.66592  4.424743  9.145711  5.526039  3.496627
+    2002 |  10.22785  15.55485   4.09983  9.855354   5.70546  3.194437
+    2003 |  9.989453  15.00536  3.976029   9.41848  5.592965  3.110349
+    2004 |  10.01255   14.6058  3.851126  8.969533   5.64204  3.039158
+    2005 |  10.68036   15.9234  4.442422  9.722735  6.206947  3.568906
+    2006 |  9.658234  15.09628  4.000999  9.304763   5.79748  3.047328
+    2007 |   9.40467  14.93777  4.367517   8.82796   6.11567  3.298351
+    2008 |  10.04816  16.40257  5.110361  9.826696  6.582407  3.909056
+    2009 |  9.943568  16.71405  5.324082  9.878171  6.835747  3.992564
+---------+------------------------------------------------------------
+   Total |  9.966049  14.99485  4.620317  9.213955  5.786444  3.638373
+----------------------------------------------------------------------
+
+    year |  cpavn2pf  cpavnobl  cpdthcow  cpdthclf  cpdthbir  cpdthc6m
+---------+------------------------------------------------------------
+    1994 |  1.048236  .2110341  .4698482  1.160942  .3928493  4379.921
+    1995 |  .9866654  .2768289  .4406997  .9753301   .484889  3999.858
+    1996 |  .8194451  .2916244  .3619932  .8896619  .4269021   3726.87
+    1997 |  .9905395  .2924888  .3942436  .8526561  .3911314  3669.168
+    1998 |  1.059784  .2899988  .4559091  1.020777  .4566025  4139.342
+    1999 |  1.107312  .3144265  .5183507  .9455458   .357871   .474854
+    2000 |   .872357  .3030927  .4522995  .8847017  .3913315  .3334257
+    2001 |    .92971  .3167732  .5187277  .8283865  .4357846   4020.19
+    2002 |  .9067872  .3296178  .4905375  .9126085  .3522521  4184.772
+    2003 |  .8670768  .3726477  .5084138   .787892  .3617152   .468779
+    2004 |  .8131814  .3822937  .5345494  .8665277   .357973  .3822507
+    2005 |  .8752554  .4094337  .5992521  .9859442  .3484729  .3710516
+    2006 |  .9551427  .3972824  .6112297  .9311463  .2529357  .3438482
+    2007 |  1.070586  .4162805  .5534481  .9415853   .246037  .3444853
+    2008 |  1.203159  .3894882  .6143749  1.005157  .3459049  .3499655
+    2009 |  1.331373  .3497864   .628176  .9598949   .240418  .4004884
+---------+------------------------------------------------------------
+   Total |  .9835232  .3346009  .5061606  .9276775   .366515  1759.276
+----------------------------------------------------------------------
+
+    year |  cpopinvc  cpclinvc  cpopinvb  cpclinvb  cpopinvt  cpclinvt
+---------+------------------------------------------------------------
+    1994 |  21806.86  23199.34  6515.237  7088.652  15275.06  16097.19
+    1995 |   23000.5  23642.35  6970.646  7422.066  16011.33   16204.3
+    1996 |  20959.51  19939.15  7218.564  7416.124  13740.95  12523.03
+    1997 |  20361.58  20963.71  7241.291  7509.639  13120.29  13454.07
+    1998 |   20812.8  18135.91  7382.189  6286.701  13430.61  11849.21
+    1999 |  23260.13  22200.48  8161.504  7825.761  15098.63  14374.72
+    2000 |  23734.64  24306.42  8182.898  8278.371  15551.74  16028.05
+    2001 |  26222.33  26577.49  9275.859  9650.923  16946.47  16926.57
+    2002 |  26978.06  27561.76  9591.125  9655.125  17386.94  17906.63
+    2003 |  27279.74  27083.67  9690.557  9656.533  17589.18  17427.13
+    2004 |  26873.36  27324.36  9526.642  9809.951  17346.72  17514.41
+    2005 |  29420.02  30043.22  10319.32  10494.17   19100.7  19549.05
+    2006 |  28169.29  28573.18  10045.53  10235.13  18123.76  18338.04
+    2007 |  29467.79  30161.86  10365.58  10914.75  19102.21   19247.1
+    2008 |  31464.87  32102.32  10474.19  10340.67  20990.67  21761.65
+    2009 |  32188.79  31151.51  10226.71   9907.63  21962.08  21243.88
+---------+------------------------------------------------------------
+   Total |  25595.13  25587.28  8818.308  8876.712  16775.21  16709.22
+----------------------------------------------------------------------
+
+    year |  cosalesv  copurval  cotftdvl  cotffdvl  cotftdno  cotffdno
+---------+------------------------------------------------------------
+    1994 |   14855.3  5268.162  1839.073  1586.038  2.156637  9.262422
+    1995 |  15124.94  5374.675  2211.601  1580.146  2.501398  9.260853
+    1996 |  11373.73  3830.586  1680.517  1148.726  2.055252  7.859257
+    1997 |  11935.16  4585.757  1721.005  1129.104  2.179652  8.371178
+    1998 |  10997.21  3389.055  1633.263  1002.443  2.255142  8.153799
+    1999 |   15592.5  4567.996  1887.682  1132.227  2.042347  7.641153
+    2000 |  17902.33  5978.523  1907.803  1348.348  1.986748  7.688577
+    2001 |  16594.68  4971.459  1928.245  1538.692  1.885552  9.053815
+    2002 |  17341.59  6544.831  1975.842  1445.892  1.933263  8.152467
+    2003 |  17123.07  5996.578  2087.499  1471.556  2.008504  7.890723
+    2004 |  18148.25  6249.548  2191.857   1462.36  2.122641   7.89672
+    2005 |  19113.31  6492.402  2426.506  1556.857  2.325087  8.016705
+    2006 |  19551.42  6086.484  2152.098  1314.749  2.047621  6.960241
+    2007 |  20640.13  6978.275  2228.922  1446.424   2.07663  7.324084
+    2008 |  24264.12  8816.583  2340.299  1234.639  2.091137  6.876668
+    2009 |  22022.49  7394.462   2388.98  1303.532  2.149429  7.540818
+---------+------------------------------------------------------------
+   Total |  16840.12  5699.829  2019.968  1341.223  2.105227  7.971821
+----------------------------------------------------------------------
+
+    year |  copurcno  cosalcno  coprcfno  coslcfno  coprwnno  coslwnno
+---------+------------------------------------------------------------
+    1994 |  11.60842  23.19592  2.975111  .1484369  1.326167  1.814338
+    1995 |  11.71353   23.8172  2.993936  .2509049  1.698414   1.92725
+    1996 |  9.431795  20.81613  2.198522  .2337856  1.420543  2.388093
+    1997 |  11.41085  22.94936  2.072676   .237118  2.268462  2.603826
+    1998 |  9.313848  22.41504  2.051367  .2185788  1.736811  2.517974
+    1999 |  10.14399  26.67512  1.727714   .375525  1.985341  3.355752
+    2000 |  10.97669  26.55401  1.766902  .3113753  2.756551  3.611476
+    2001 |  9.437405  25.35253  1.364278  .5280878  3.060731  3.181694
+    2002 |   12.3059  26.66471  2.034925  .4338928  3.388692   3.73804
+    2003 |   10.6838  26.35016  1.451118  .3846401  3.188761  3.482411
+    2004 |  10.84162  25.38096  1.715621  .2596287  3.383388  3.422297
+    2005 |  11.97101  25.68764  2.131427  .2336373  3.295374  3.326593
+    2006 |  10.59064  25.03424  1.586248  .2488147  3.044052  3.501364
+    2007 |  12.05015  25.93099  1.912888  .4033583  3.303342   3.60907
+    2008 |  14.26604  26.68997  2.183449  .2499447  3.396561  3.169486
+    2009 |  13.08659  26.62616  2.017708  .3545437  3.555333  3.296047
+---------+------------------------------------------------------------
+   Total |  11.13839  24.97558  1.973871  .3076965  2.675385  3.085999
+----------------------------------------------------------------------
+
+    year |  coprstno  coslstno  coprmsno  coprfsno  coslmsno  coslfsno
+---------+------------------------------------------------------------
+    1994 |  6.770422  10.62627  5.368027  1.402395  7.564947  3.061327
+    1995 |  6.482944   10.5736  5.597875  .8850692   7.58492  2.988684
+    1996 |  5.211031  8.090634  4.282345  .9286862  5.734015  2.356619
+    1997 |  6.344573  9.207874  5.223786  1.120787   6.41221  2.795665
+    1998 |  4.835739  7.824212  4.097839  .7379005  5.552433  2.271779
+    1999 |  5.764538  8.993036  5.042657  .7218803  6.400116   2.59292
+    2000 |  5.614893  8.934698  5.055972  .5589213  6.699672  2.235026
+    2001 |  4.430223  6.096576  3.845888   .584335  4.433707   1.66287
+    2002 |  6.079742  7.117492  5.100116  .9796267  5.123249  1.994243
+    2003 |  5.410851   7.45859  4.596507  .8143433   5.21935  2.239241
+    2004 |  5.138834  6.729984  4.365972  .7728615  4.678976  2.051008
+    2005 |  5.890917   7.21479  4.946615  .9443012   4.93997   2.27482
+    2006 |  5.233975  7.384258  4.426098  .8078771  5.149413  2.234845
+    2007 |  6.050667  7.196891  4.630809  1.419858  4.679291  2.517599
+    2008 |  7.955666  7.522812  6.281968  1.673698  5.211063  2.311749
+    2009 |  6.876788  7.357253  5.187821  1.688968  4.831377  2.525876
+---------+------------------------------------------------------------
+   Total |    5.8126  7.955536  4.834752  .9778481  5.597302  2.358234
+----------------------------------------------------------------------
+
+    year |  coslfcno  coslmfno  coslffno  coslffno  coprbhno  coslbhno
+---------+------------------------------------------------------------
+    1994 |  8.817323  6.170561  2.646762  2.646762  .4016011  1.249292
+    1995 |  9.066146  6.412734  2.653412  2.653412  .3656726  1.191027
+    1996 |  8.444723  6.386958  2.057765  2.057765  .4989673  1.051706
+    1997 |  9.042953  6.836777  2.206177  2.206177  .5772121  1.092948
+    1998 |  9.408586  7.112746   2.29584   2.29584  .4860458   1.38185
+    1999 |  11.34856  8.414236  2.934319  2.934319  .5243341  1.669924
+    2000 |  10.92052   8.07237   2.84815   2.84815  .5995278  1.770147
+    2001 |  12.88905  9.669214  3.219838  3.219838  .4248177   1.85062
+    2002 |  12.58408  9.325736  3.258346  3.258346  .5602413  2.164654
+    2003 |  12.42622  9.384317  3.041906  3.041906  .4736721  2.011828
+    2004 |  12.28861   9.31363  2.974984  2.974984  .4892124  2.131819
+    2005 |  12.10799  9.327182  2.780812  2.780812  .5820439  2.295512
+    2006 |  11.14982   8.37391  2.775912  2.775912  .7100363  2.414327
+    2007 |  12.03459  8.915325   3.11926   3.11926  .6823327  2.418017
+    2008 |  13.18991  9.651203  3.538709  3.538709  .5691668  2.338583
+    2009 |  13.20187  9.398575    3.8033    3.8033  .5232643  2.216758
+---------+------------------------------------------------------------
+   Total |  11.17534  8.311395  2.863944  2.863944  .5327773  1.820511
+----------------------------------------------------------------------
+
+    year |  coprocno  coslocno  coocidno
+---------+------------------------------
+    1994 |  .1351203   .466505  .5305618
+    1995 |  .1725667  .7319806  .3331915
+    1996 |  .1027317  .5065288  .8006163
+    1997 |  .1479305  .6712748  .6757598
+    1998 |  .2038848  .9894079  .4789827
+    1999 |  .1420652  .8259507 -.0726925
+    2000 |   .238817  .9365924 -.0433607
+    2001 |  .1573547   .719836  .2082408
+    2002 |  .2422947  .5462112   .191513
+    2003 |  .1594005   .516389  .1303187
+    2004 |  .1145642  .4816512   .182958
+    2005 |  .0712529  .4676242  .3930304
+    2006 |   .016329  .2961723  .1204529
+    2007 |   .100921  .2305429  .4054325
+    2008 |  .1611966  .1814447  .1794017
+    2009 |  .1134928  .1585526 -.1807749
+---------+------------------------------
+   Total |   .143761  .5606745  .2745908
+----------------------------------------
+
+. 
+. local cattle_vlist = "cptotcno cpavnocw cpavnohc cpavno06 cpavno61 c
+> pavno12 cpavno2p cpavn12m cpavn12f cpavn2pm cpavn2pf cpavnobl cpdthc
+> ow cpdthclf cpdthbir cpdthc6m cpopinvc cpclinvc cpopinvb cpclinvb cp
+> opinvt cpclinvt cosalesv copurval cotftdvl cotffdvl cotftdno "
+
+. local cattle1_vlist = "cotffdno copurcno cosalcno coprcfno coslcfno 
+> coprwnno coslwnno coprstno coslstno coprmsno coprfsno coslmsno coslf
+> sno coslfcno coslmfno coslffno coprbhno coslbhno coprocno coslocno c
+> oocidno"
+
+. 
+. 
+. sort year farmcode
+
+. foreach var in `cattle_vlist' {
+  2. 
+.         gen `var'_wt = wt*`var'
+  3.         by year: egen `var'_t = sum(`var'_wt)   
+  4.         drop `var'_wt
+  5. }
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+
+. foreach var in `cattle1_vlist' {
+  2. 
+.         gen `var'_wt = wt*`var'
+  3.         by year: egen `var'_t = sum(`var'_wt)   
+  4.         drop `var'_wt
+  5. }
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+
+. 
+. tabstat farmcode year *_t if ncattle > 0 & fsizesu >= 2 & droporig =
+> = 0, by (year) stats(mean)
+
+Summary statistics: mean
+  by categories of: year 
+
+    year |  farmcode      year  cptotc~t  cpav~w_t  cpav~c_t  cpav~6_t
+---------+------------------------------------------------------------
+    1994 |  7335.749      1994   7183013  939859.7    260710   1057131
+    1995 |  8060.731      1995   6691529  901208.1  271386.2  987121.5
+    1996 |  9782.069      1996   7018647   1062808  287033.3   1066324
+    1997 |  11688.13      1997   7365319   1105679  289122.6   1099592
+    1998 |  12900.21      1998   7684025   1170080  284460.5   1117639
+    1999 |  13421.56      1999   7086438   1130477  225229.3   1009461
+    2000 |  14043.03      2000   6912366   1114788  229790.9  997702.9
+    2001 |  14992.62      2001   7116768   1210253  253766.2   1105598
+    2002 |  15763.82      2002   6881575   1131330  248650.8   1059566
+    2003 |  16335.06      2003   6670280   1141082  233176.4   1000671
+    2004 |  16567.08      2004   6508221   1088716  246474.6  978635.1
+    2005 |  17114.27      2005   6725423   1090525  261330.4   1008436
+    2006 |  17538.09      2006   6270654   1053333  237046.7  917679.1
+    2007 |  17806.87      2007   6136004   1027757  239597.7    910295
+    2008 |  18386.74      2008   6013168  920663.5  209405.4  860512.5
+    2009 |  18507.53      2009   5880247  848663.5  195529.5  816531.8
+---------+------------------------------------------------------------
+   Total |  14630.61  2001.711   6760153   1067072  248306.7   1001038
+----------------------------------------------------------------------
+
+    year |  cpav~1_t  cpav~2_t  cpav~p_t  cpa~2m_t  cpa~2f_t  cpa~pm_t
+---------+------------------------------------------------------------
+    1994 |   1147571   1660803  674542.6  995544.8  665888.6  536826.9
+    1995 |   1090124   1535351  591457.6  915253.4  620688.8    483684
+    1996 |   1141210   1586978  533185.3  954819.3  632796.5  434731.2
+    1997 |   1226821   1755776  559287.7   1086791  669672.4  441223.6
+    1998 |   1261399   1853162  625673.1   1135597  718298.4  496125.9
+    1999 |   1122695   1725154  601867.9   1061285  664531.4  473532.3
+    2000 |   1064535   1688492  539085.6   1099652  589502.3  439167.3
+    2001 |   1125376   1651298  500006.8   1030635  621318.8  395766.9
+    2002 |   1103843   1681045  443176.8   1065522  616168.7    345422
+    2003 |   1065231   1601706  424727.6   1005540  596817.3  332296.3
+    2004 |   1055231   1539540  405583.6  945405.3  594742.3  319959.8
+    2005 |   1089046   1623683  452803.5  991340.8  632984.1  363768.7
+    2006 |  996802.8   1557885  412859.8  959870.1  598630.8  314180.4
+    2007 |  939212.9   1491570  436960.2  881225.1  610929.7  329920.5
+    2008 |  949260.8   1550578  482716.3  928081.5  623114.4  369138.5
+    2009 |  918564.3   1546735  494600.9  912639.9  634083.4  369555.5
+---------+------------------------------------------------------------
+   Total |   1081403   1629454  504927.3   1000455  629604.5  397692.5
+----------------------------------------------------------------------
+
+    year |  cpa~pf_t  cpav~l_t  cpdt~w_t  cpdt~f_t  cpdthb~t  cpdt~m_t
+---------+------------------------------------------------------------
+    1994 |  137978.7  22659.06  53791.35  127431.1  41227.22  5.38e+08
+    1995 |  107993.9  27644.52  45034.19  99151.75   44471.3  4.05e+08
+    1996 |  98659.89  35111.12  43809.55    107340  51398.33  4.49e+08
+    1997 |  118268.5  34963.83  47048.94  102270.1  46816.62  4.40e+08
+    1998 |  129800.1  35506.56   55752.5  125060.7  55787.23  5.09e+08
+    1999 |  128535.8  36450.71  60091.16  109614.9  41552.15  55153.34
+    2000 |  100134.2  34705.79  51890.18  102316.5  44859.32  38255.11
+    2001 |    104420  35542.54  58202.21  92946.51  48985.39  4.53e+08
+    2002 |  97905.39  35516.05  52963.29  98441.09  38063.14  4.55e+08
+    2003 |  92580.41  39702.92  54261.76  84038.14  38585.11  50015.79
+    2004 |  85751.54  40247.53  56327.98  91431.68  37687.07  40294.11
+    2005 |  89212.11   41714.9  61054.44  100452.3  35503.95  37859.94
+    2006 |  98831.17  40956.66   63556.9  96298.56  26195.26  35448.01
+    2007 |  107182.1  41508.79  55186.25  93967.01  24533.21  34349.84
+    2008 |  113752.7  36745.64  57962.22  94894.62  32633.84  33016.94
+    2009 |  125032.1  32285.92   57981.8  88600.05  22191.02  37077.65
+---------+------------------------------------------------------------
+   Total |  107408.2  36198.61  54811.62  100273.7  39431.37  1.95e+08
+----------------------------------------------------------------------
+
+    year |  cpop~c_t  cpcl~c_t  cpop~b_t  cpcl~b_t  cpop~t_t  cpcl~t_t
+---------+------------------------------------------------------------
+    1994 |  2.48e+09  2.62e+09  7.52e+08  8.14e+08  1.72e+09  1.80e+09
+    1995 |  2.44e+09  2.48e+09  7.76e+08  8.04e+08  1.67e+09  1.68e+09
+    1996 |  2.52e+09  2.40e+09  8.69e+08  8.93e+08  1.65e+09  1.51e+09
+    1997 |  2.45e+09  2.52e+09  8.68e+08  9.00e+08  1.58e+09  1.62e+09
+    1998 |  2.56e+09  2.23e+09  9.05e+08  7.70e+08  1.65e+09  1.46e+09
+    1999 |  2.71e+09  2.58e+09  9.48e+08  9.09e+08  1.77e+09  1.67e+09
+    2000 |  2.72e+09  2.79e+09  9.38e+08  9.49e+08  1.79e+09  1.84e+09
+    2001 |  2.95e+09  2.99e+09  1.04e+09  1.08e+09  1.91e+09  1.90e+09
+    2002 |  2.91e+09  2.98e+09  1.04e+09  1.04e+09  1.88e+09  1.93e+09
+    2003 |  2.91e+09  2.89e+09  1.03e+09  1.03e+09  1.88e+09  1.86e+09
+    2004 |  2.83e+09  2.88e+09  1.00e+09  1.03e+09  1.83e+09  1.85e+09
+    2005 |  3.00e+09  3.06e+09  1.05e+09  1.07e+09  1.95e+09  1.99e+09
+    2006 |  2.91e+09  2.95e+09  1.04e+09  1.06e+09  1.87e+09  1.89e+09
+    2007 |  2.94e+09  3.01e+09  1.03e+09  1.09e+09  1.91e+09  1.92e+09
+    2008 |  2.97e+09  3.03e+09  9.88e+08  9.76e+08  1.98e+09  2.06e+09
+    2009 |  2.98e+09  2.88e+09  9.44e+08  9.14e+08  2.03e+09  1.96e+09
+---------+------------------------------------------------------------
+   Total |  2.78e+09  2.78e+09  9.60e+08  9.66e+08  1.82e+09  1.81e+09
+----------------------------------------------------------------------
+
+    year |  cosale~t  copurv~t  c~tdvl_t  c~fdvl_t  c~tdno_t  c~fdno_t
+---------+------------------------------------------------------------
+    1994 |  1.73e+09  6.31e+08  1.92e+08  1.70e+08  226133.7  996397.8
+    1995 |  1.66e+09  5.95e+08  2.14e+08  1.57e+08  243828.5  924873.6
+    1996 |  1.37e+09  4.61e+08  2.02e+08  1.38e+08  247449.1  946242.1
+    1997 |  1.45e+09  5.64e+08  2.06e+08  1.35e+08  261301.4   1002770
+    1998 |  1.36e+09  4.25e+08  2.00e+08  1.23e+08  276142.7  999619.1
+    1999 |  1.83e+09  5.40e+08  2.19e+08  1.32e+08  237349.5  887362.4
+    2000 |  2.06e+09  6.95e+08  2.19e+08  1.55e+08  228040.3  882571.3
+    2001 |  1.87e+09  5.62e+08  2.17e+08  1.73e+08  212278.9   1019616
+    2002 |  1.87e+09  7.06e+08  2.14e+08  1.56e+08  209065.4  881886.2
+    2003 |  1.83e+09  6.40e+08  2.22e+08  1.57e+08  214085.5  842014.8
+    2004 |  1.91e+09  6.58e+08  2.31e+08  1.54e+08  223725.3  833097.1
+    2005 |  1.95e+09  6.61e+08  2.48e+08  1.59e+08  237390.3  818611.1
+    2006 |  2.02e+09  6.28e+08  2.22e+08  1.36e+08  211691.4  718920.8
+    2007 |  2.06e+09  6.97e+08  2.22e+08  1.46e+08  207068.1  732265.9
+    2008 |  2.29e+09  8.32e+08  2.21e+08  1.16e+08  197284.9  648768.3
+    2009 |  2.04e+09  6.83e+08  2.21e+08  1.20e+08  198396.2  696031.3
+---------+------------------------------------------------------------
+   Total |  1.83e+09  6.23e+08  2.18e+08  1.45e+08  226882.9  862923.3
+----------------------------------------------------------------------
+
+    year |  copurc~t  cosalc~t  coprcf~t  coslcf~t  coprwn~t  coslwn~t
+---------+------------------------------------------------------------
+    1994 |   1377819   2729320  323052.7  20657.27  162802.4  245179.6
+    1995 |   1285118   2636642  308068.7  23302.86  165325.6  241639.7
+    1996 |   1135573   2506229  264698.6  28147.42  171031.1  287522.6
+    1997 |   1396854   2773378  249640.9  28398.11  270717.8  311659.8
+    1998 |   1160685   2767871  251114.5  26705.73  212301.8  307643.5
+    1999 |   1194665   3126935    200472  43533.72  230520.3    390304
+    2000 |   1274189   3058606  202319.9  35654.19  315640.3  414340.5
+    2001 |   1065658   2861170  153074.5  59252.43  343419.7  357395.3
+    2002 |   1327788   2879331  219261.6  46859.86  365128.8  402770.8
+    2003 |   1140680   2811294  155075.8  40980.62  339739.3  371208.2
+    2004 |   1141396   2674654  180619.1  27333.47    356200  360784.5
+    2005 |   1219771   2618171  217270.3  23803.99  335747.2    338928
+    2006 |   1091990   2581788  163708.9  25650.81  313817.5  360962.8
+    2007 |   1204770   2590286  192461.9  40220.27  330874.2    359873
+    2008 |   1347977   2520093  207611.4  23580.63  320443.1  299020.1
+    2009 |   1207916   2461894  186238.2  32725.03  328163.7  304231.2
+---------+------------------------------------------------------------
+   Total |   1218278   2728888    213103  33476.81  290515.8  338952.2
+----------------------------------------------------------------------
+
+    year |  coprst~t  coslst~t  coprms~t  coprfs~t  coslms~t  coslfs~t
+---------+------------------------------------------------------------
+    1994 |  829670.9   1195479  635209.8  194461.1  855656.7  339822.2
+    1995 |  749350.5   1126716  595930.1  153420.4  800323.1  326393.1
+    1996 |  627399.8  974099.4  515587.5  111812.3  690366.3  283733.2
+    1997 |    789555   1100125  655800.5  133754.5  766290.4  333834.9
+    1998 |    612974  958483.6  522818.1  90155.93  679898.4  278585.2
+    1999 |  686418.3   1044484  602732.5  83685.87  743893.3  300591.1
+    2000 |  660233.4   1023122  596233.8  63999.56  767149.3  255972.4
+    2001 |  503843.3  684450.4  438279.8  65563.48  497873.4  186577.1
+    2002 |  656925.2  767668.6  551371.3    105554  552462.4  215206.2
+    2003 |  578415.1  796015.8  491652.8  86762.38  556929.5  239086.3
+    2004 |  541011.8  709730.2  459645.6  81366.16  493476.6  216253.6
+    2005 |  600192.5  735852.6  503982.9  96209.56  504083.9  231768.7
+    2006 |  539581.2  761975.8  456295.5   83285.7  531581.1  230394.7
+    2007 |  603333.3  718096.6  461754.2  141579.1  466588.5  251508.1
+    2008 |  751017.4  709727.7  592985.7  158031.8  491629.4  218098.3
+    2009 |  634740.1  680206.3  478845.3  155894.8  445944.9  234261.3
+---------+------------------------------------------------------------
+   Total |  640919.9  862870.2  531350.5  109569.4    607124  255746.2
+----------------------------------------------------------------------
+
+    year |  coslfc~t  coslmf~t  coslff~t  coprbh~t  coslbh~t  coproc~t
+---------+------------------------------------------------------------
+    1994 |   1055096  706048.6  349047.3  47564.09  147462.4  14729.19
+    1995 |  985947.9  668001.9    317946  44835.53  161505.8  17537.29
+    1996 |   1016731  768979.6  247751.7  60074.86  126623.7  12368.73
+    1997 |   1111032    846163  264868.8  69286.36  130911.4  17653.99
+    1998 |   1175883  894430.8  281452.4  59384.58  169176.2  24910.44
+    1999 |   1346549   1005756  340793.2   60784.8  193980.4  16469.28
+    2000 |   1267129  940552.8  326576.2  68649.23  203191.4  27345.86
+    2001 |   1461222   1099772  361450.9  47665.34  208359.4  17655.49
+    2002 |   1360902   1008626  352275.1  60365.55  233620.4  26107.06
+    2003 |   1325660   1001426    324234  50466.34  214945.7  16982.97
+    2004 |   1294245  980683.8  313561.4  51503.84  224803.1  12061.21
+    2005 |   1233727  950405.5  283321.4  59301.19    233988  7259.561
+    2006 |   1149697  863522.7  286174.5  73199.09    248898  1683.386
+    2007 |   1201888  890230.1  311658.2  68037.78  243377.7  10063.19
+    2008 |   1246451  911821.3  334630.2  53697.13  220629.9  15207.84
+    2009 |   1221353  867505.6  353847.5  48298.25  204946.4  10475.59
+---------+------------------------------------------------------------
+   Total |   1224452  910018.6  314433.7  58194.03  199713.6  15545.64
+----------------------------------------------------------------------
+
+    year |  cosloc~t  coocid~t
+---------+--------------------
+    1994 |  57644.99  69280.19
+    1995 |  90322.64  18526.51
+    1996 |  60985.26  96392.93
+    1997 |  80109.78  81162.77
+    1998 |  120884.9  58396.14
+    1999 |  95750.51 -8427.074
+    2000 |    107245 -4965.035
+    2001 |  80766.94   23544.1
+    2002 |  58853.81  20527.11
+    2003 |  55017.51  13842.93
+    2004 |   50707.8  19322.15
+    2005 |  47643.61  40043.66
+    2006 |  30533.01  12417.73
+    2007 |  22988.24   40427.1
+    2008 |  17118.11  17119.45
+    2009 |  14634.69 -17021.37
+---------+--------------------
+   Total |  61870.17  29892.84
+------------------------------
+
+. 
+. 
+. 
+. 
+. 
+. *****************************************************
+. *****************************************************
+. * Thesis Tables
+. *****************************************************
+. *****************************************************
+. 
+. *****************************************************
+. * Production related fixed costs
+. *****************************************************
+. 
+. gen new_fc = fdnotalt + forntcon + focarelp + fohirlab + fointpay + 
+> fomacdpr + fomacopt + foblddpr + fobldmnt + fodprlim + foupkpld + fo
+> annuit + fortfmer + fomiscel
+(52 missing values generated)
+
+. gen prod_fc = forntcon + focarelp + fohirlab
+(52 missing values generated)
+
+. gen oth_fc = fdnotalt + fointpay + fomacdpr + fomacopt + foblddpr + 
+> fobldmnt + fodprlim + foupkpld + foannuit + fortfmer + fomiscel
+(52 missing values generated)
+
+. 
+. 
+. tabstat farmcode year cptotcno cpavnocw cpavnohc cpavno06 cpavno61 c
+> pavno12 cpavno2p cpavn12m cpavn12f cpavn2pm cpavn2pf cpavnobl cpdthc
+> ow cpdthclf cpdthbir cpdthc6m cpopinvc cpclinvc cpopinvb cpclinvb cp
+> opinvt cpclinvt cosalesv copurval cotftdvl cotffdvl cotftdno cotffdn
+> o copurcno cosalcno coprcfno coslcfno coprwnno coslwnno coprstno cos
+> lstno coprmsno coprfsno coslmsno coslfsno coslfcno coslmfno coslffno
+>  coslffno coprbhno coslbhno coprocno coslocno coocidno [weight=wt] i
+> f ncattle > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system
+>  == 3), by (year) stats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: year 
+
+    year |  farmcode      year  cptotcno  cpavnocw  cpavnohc  cpavno06
+---------+------------------------------------------------------------
+    1994 |  7066.581      1994  37.20415  9.417686  1.053148  6.208601
+    1995 |   8607.19      1995  54.23035  12.76507  1.211099  7.483356
+    1996 |  10580.87      1996  43.55785  12.07854  1.145549  6.556222
+    1997 |  11774.59      1997  46.36037  12.20991  1.019036  6.749138
+    1998 |  12328.08      1998  47.55788  12.67623  .9707977  6.790595
+    1999 |  13039.47      1999  46.28931  12.90856  .7960024  6.621843
+    2000 |  13564.84      2000  44.97785  12.55619  .8065627  6.432569
+    2001 |  14192.98      2001   47.0904   14.1554   1.11822  7.050558
+    2002 |  15744.97      2002  46.52297  13.53217   1.11919  7.169065
+    2003 |  16212.91      2003  46.46269  13.70734  1.011309  6.939381
+    2004 |  16901.81      2004  46.12403  13.13659  1.082707  6.915087
+    2005 |  17617.16      2005  49.55957  13.32428  1.171289  7.384453
+    2006 |  18056.28      2006  47.81729  12.83961  1.049487  6.848898
+    2007 |  18067.19      2007  47.91158  12.83138  1.174304  6.892279
+    2008 |  18967.77      2008  50.94364  11.95207  .9874705  6.993722
+    2009 |  19162.31      2009  49.07129  11.22395  .8242817  6.240974
+---------+------------------------------------------------------------
+   Total |  15010.82  2002.012  47.23361  12.74886  1.025203  6.839502
+----------------------------------------------------------------------
+
+    year |  cpavno61  cpavno12  cpavno2p  cpavn12m  cpavn12f  cpavn2pm
+---------+------------------------------------------------------------
+    1994 |  6.166293  8.260976  2.871233  5.118922  3.145596  2.146489
+    1995 |  8.739085  15.36493  8.189507  11.04361  4.327996  7.050705
+    1996 |  6.924691   11.4853  5.044377  7.720949  3.768876   4.36797
+    1997 |  7.669156  12.95416  5.422891  8.742216  4.217121   4.45779
+    1998 |  7.688366  13.29831  5.783882  8.889195  4.414304  4.705726
+    1999 |  7.194014   12.7631  5.614182  8.446618  4.321229  4.598552
+    2000 |  6.814248  12.57626  5.417783  9.338688  3.242944  4.608189
+    2001 |  7.391096  12.26311  4.726411  8.308148  3.959922  3.958101
+    2002 |  7.583813  12.59629  4.147752  8.787044  3.814087  3.492231
+    2003 |  7.489706  12.79561  4.083292  8.771827  4.029088  3.410152
+    2004 |  7.808446  12.60559  4.137769  8.754972  3.855616  3.503146
+    2005 |  8.330059  14.15854  4.717496  9.455512  4.708634  3.890282
+    2006 |  7.887503  14.41037  4.324952  9.926389  4.489773  3.462342
+    2007 |  7.381038  14.17535   4.99677  9.411916  4.769033  4.025658
+    2008 |  8.171742  16.28937  6.111018   10.8351  5.460701  4.807109
+    2009 |  7.799112  16.30696  6.285884  10.79776  5.509031  4.984407
+---------+------------------------------------------------------------
+   Total |  7.593366  13.44053  5.138875  9.147866  4.297602  4.237229
+----------------------------------------------------------------------
+
+    year |  cpavn2pf  cpavnobl  cpdthcow  cpdthclf  cpdthbir  cpdthc6m
+---------+------------------------------------------------------------
+    1994 |  .7263645  .2097886   .333047  .6171004  .1955894  3856.416
+    1995 |   1.14225  .3834549  .3114514  .6377989  .2603882  4347.813
+    1996 |   .678321  .3267127  .2308699  .5211412  .1855314  3112.642
+    1997 |  .9670345  .3418661  .2780789   .460873  .1515153  3213.511
+    1998 |  1.080536  .3549453   .310337  .5942914  .1909171  3829.017
+    1999 |  1.017459  .3959657  .4012802  .6072778  .0988008  .4181719
+    2000 |  .8119799  .3738708  .2617163  .4980658  .1847684  .2930107
+    2001 |  .7700547  .3916233  .3232867  .4248606  .1754588  3210.205
+    2002 |  .6569018   .380836   .285583  .5129753  .1416463  3195.219
+    2003 |  .6745178  .4424034  .2808241  .4155818  .1369543  .4063218
+    2004 |  .6357432  .4438626   .286445  .4479238  .1464306  .3083691
+    2005 |  .8291784  .4781394  .3102154  .5337148  .1903252  .3144101
+    2006 |  .8642852  .4621787  .3740219   .483717  .1223006  .3399286
+    2007 |  .9726961  .4629931  .2902324  .4824857  .1190169  .2909268
+    2008 |  1.306073  .4398572  .2921193  .6246332  .1507252  .3182309
+    2009 |  1.301292  .3903199  .3139161  .5206745  .0978306  .3597568
+---------+------------------------------------------------------------
+   Total |  .9033817  .4014842  .3039543  .5154747  .1543178  1359.076
+----------------------------------------------------------------------
+
+    year |  cpopinvc  cpclinvc  cpopinvb  cpclinvb  cpopinvt  cpclinvt
+---------+------------------------------------------------------------
+    1994 |  15058.05  15533.16  6144.295  6520.074  8908.913   9012.44
+    1995 |   25662.2  26060.27  8577.092  9026.105  17078.95  17034.16
+    1996 |   19942.9  18968.88  7931.134  8110.944  12011.77  10857.94
+    1997 |  19773.34  20047.01  7780.193  7942.229  11993.15  12104.78
+    1998 |  20284.04   17085.6  8010.557  6697.121  12273.49  10388.48
+    1999 |  22508.44  21152.79  8802.635  8539.059   13705.8  12613.73
+    2000 |  22206.53  22731.98  8687.852  8615.482  13518.68   14116.5
+    2001 |  25212.16  24845.18  10378.05  10677.47  14834.11   14167.7
+    2002 |  24967.36   25343.4  10541.76  10492.08  14425.61  14851.32
+    2003 |   25280.4   25295.8  10476.36  10454.71  14804.04  14841.08
+    2004 |  25440.64  25912.19  10249.87  10400.35  15190.77  15511.84
+    2005 |  27603.85  28259.81  10746.37  10794.22  16857.48   17465.6
+    2006 |  27704.19  27987.04  10562.19  10630.74  17142.01   17356.3
+    2007 |  28888.28  29484.71  10764.76  11179.77  18123.52  18304.95
+    2008 |   31391.3  31964.32  10567.06  10374.92  20824.23   21589.4
+    2009 |  31533.05  30203.83  10008.57  9714.574  21524.49  20489.25
+---------+------------------------------------------------------------
+   Total |  24968.27  24742.41  9564.126  9521.335  15403.85  15221.07
+----------------------------------------------------------------------
+
+    year |  cosalesv  copurval  cotftdvl  cotffdvl  cotftdno  cotffdno
+---------+------------------------------------------------------------
+    1994 |  8689.006   2401.32  505.5462  504.8101  .5688842  2.496102
+    1995 |  19568.71  9373.241  13.90487  13.90487  .0231748  .0231748
+    1996 |  11902.56  5283.427         0  5.688598         0  .0125024
+    1997 |  12934.14  6130.165         0         0         0         0
+    1998 |  11490.26  4452.651         0         0         0         0
+    1999 |  16179.76  5811.245         0  23.27135         0  .0306113
+    2000 |  18368.17   7642.76         0  23.86304         0  .0390908
+    2001 |  16082.18   5723.89         0  20.66983         0  .0325576
+    2002 |  16653.79  7431.736         0         0         0         0
+    2003 |  16530.11  7035.304         0  40.45399         0  .0527569
+    2004 |  17873.77  7518.557         0         0         0         0
+    2005 |  19171.64   7885.14         0  71.91862         0  .0939806
+    2006 |  20176.89  7286.633         0  41.81884         0  .0564161
+    2007 |  21804.13   8758.39         0  190.7456         0  .2303993
+    2008 |  26980.73  11464.23         0  30.63449         0  .0443043
+    2009 |  24254.69  9789.633         0   26.5658         0   .027964
+---------+------------------------------------------------------------
+   Total |  17722.26  7259.682  8.269823  39.99347    .00957  .0807232
+----------------------------------------------------------------------
+
+    year |  copurcno  cosalcno  coprcfno  coslcfno  coprwnno  coslwnno
+---------+------------------------------------------------------------
+    1994 |  6.185764  15.38927  2.054445  .1535139  1.318396  2.787464
+    1995 |  19.37311  30.29151  4.058519  .1741209  2.630314  3.150205
+    1996 |  12.60475  21.99609  2.530962  .0699715  1.755449    3.3364
+    1997 |  15.00511  24.39405  2.453327  .1001293  3.011884  3.132924
+    1998 |   11.9023  23.28127  2.390544  .1520896   2.25815  3.280238
+    1999 |  12.81327   27.4997  1.942939  .2398147  2.625571  4.471961
+    2000 |  13.86755  27.02569  1.926987  .2161939  3.677592  4.688171
+    2001 |  10.76917  24.28959   1.41046  .1608917  3.419306  3.773894
+    2002 |  13.74228  25.48644  1.794345  .1606472  4.173254  4.538987
+    2003 |  12.49141  25.11935  1.414227  .1864792   3.88874  4.420716
+    2004 |  12.87301  24.56198  1.893743  .1002406  4.375918  3.895017
+    2005 |  14.46921  25.53928  2.355763   .164418  4.469852  3.942481
+    2006 |  12.83112  25.30935  1.709802  .1321058  3.970821  3.847131
+    2007 |    14.769  26.23082  1.821362  .1363323  4.470994  3.920121
+    2008 |  18.38682  28.60834  2.533469   .150422   4.37832   3.47752
+    2009 |  17.00298  27.94313  2.163836  .1019922  4.848566  3.630796
+---------+------------------------------------------------------------
+   Total |  13.86813  25.52396  2.094455  .1498149  3.575925  3.842028
+----------------------------------------------------------------------
+
+    year |  coprstno  coslstno  coprmsno  coprfsno  coslmsno  coslfsno
+---------+------------------------------------------------------------
+    1994 |  2.294271  7.765977  1.730131  .5641393   5.23654  2.529437
+    1995 |  11.85651  14.10964  10.72697  1.129534   10.5177  3.591935
+    1996 |  7.656602   9.15209  6.409346  1.247256  6.445195  2.706895
+    1997 |   8.65567  10.60332  7.249867  1.405803  7.370326  3.232997
+    1998 |   6.36541  8.272838  5.446582  .9188287  5.851824  2.421014
+    1999 |  7.432713  9.309376  6.494078  .9386351  6.722847  2.586529
+    2000 |  7.173547  9.349486  6.626331  .5472157   7.25179  2.097696
+    2001 |  5.282244  6.444107  4.621026  .6612182  4.582453  1.861654
+    2002 |  6.779963  6.941386  6.120549  .6594139  4.964948  1.976438
+    2003 |  6.493553  7.278677  5.526408  .9671443  5.083996   2.19468
+    2004 |  5.910635  6.847502   5.34852  .5621152  4.706007  2.141495
+    2005 |   6.84242   6.85928  5.863796  .9786235  4.562746  2.296533
+    2006 |  6.318878  7.506871  5.484789  .8340884  5.230492  2.276379
+    2007 |  7.629525  6.578542  6.038292  1.591233  4.313996  2.264546
+    2008 |  10.58418  7.610492  8.406727  2.177449  5.303531  2.306961
+    2009 |  9.305493  7.162096   6.99002  2.315473  4.787039  2.375058
+---------+------------------------------------------------------------
+   Total |  7.383672  8.092155  6.272541  1.111132  5.705315   2.38684
+----------------------------------------------------------------------
+
+    year |  coslfcno  coslmfno  coslffno  coslffno  coprbhno  coslbhno
+---------+------------------------------------------------------------
+    1994 |  3.266212    2.0189  1.247312  1.247312  .5033313  1.199364
+    1995 |  10.35081  8.341111  2.009696  2.009696  .4739395  1.816109
+    1996 |  7.969466  6.627887  1.341579  1.341579  .5579092  1.194563
+    1997 |  8.700532   7.00531  1.695222  1.695222  .6974603  1.388388
+    1998 |  9.423974  7.543031  1.880943  1.880943  .5705331  1.532747
+    1999 |   11.0647  8.483211  2.581484  2.581484  .6372726   1.99633
+    2000 |  9.939339  8.106561  1.832778  1.832778  .7890288  2.185383
+    2001 |  11.59243  9.188601  2.403826  2.403826  .5135953  1.945312
+    2002 |  11.03447  8.681294  2.353177  2.353177  .7047239  2.411533
+    2003 |  10.76157  8.601157  2.160418  2.160418  .5413342  2.134135
+    2004 |  11.18375  8.992992  2.190756  2.190756  .6120763  2.323523
+    2005 |  11.77272   9.42929  2.343425  2.343425  .7411674  2.531159
+    2006 |  11.10658  8.548427  2.558157  2.558157  .8046098  2.468096
+    2007 |  12.68792  10.04265  2.645268  2.645268  .7848083  2.641191
+    2008 |  14.70413  11.17996  3.524165  3.524165  .6330551  2.470605
+    2009 |  14.70218  10.95978  3.742401  3.742401  .5361044  2.165521
+---------+------------------------------------------------------------
+   Total |   11.0061  8.670075  2.336029  2.336029  .6432987  2.069063
+----------------------------------------------------------------------
+
+    year |  coprocno  coslocno  coocidno
+---------+------------------------------
+    1994 |  .0153203  .2053423  .4279764
+    1995 |  .3538301   .652907  .2175602
+    1996 |  .1038248  .2193435  .9187253
+    1997 |  .1867713  .3945516  .6220328
+    1998 |  .3176595  .5723683  .3671719
+    1999 |  .1747767  .3429244 -.2149015
+    2000 |  .3003962  .6086061 -.2219206
+    2001 |  .1435621    .32601   .311289
+    2002 |  .2899903  .3479461  .0901063
+    2003 |  .1535569  .2987477  .1237613
+    2004 |   .080638   .174002  .1567385
+    2005 |    .06001   .248656  .3858453
+    2006 |  .0270087  .2152945  .0646104
+    2007 |  .0623128  .2310566  .3100385
+    2008 |  .2578012  .1612331  .2318143
+    2009 |  .1489851  .1443555  -.286745
+---------+------------------------------
+   Total |  .1707784  .3207016  .2069364
+----------------------------------------
+
+. 
+. 
+. 
+. *****************************************************
+. * System Selection
+. *****************************************************
+. 
+. tabstat coprcfno coslcfno coprwnno coslwnno coprstno coslstno coslfc
+> no coprbhno coslbhno coprocno coslocno  cotftdno cotffdno cpavno06 -
+> cpavno2p if ncattle > 0 & fsizesu >= 2 & droporig == 0 & (system == 
+> 2 | system == 3) & year == 2008  [weight = wt], by(cpagecat) stats(m
+> ean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: cpagecat 
+
+cpagecat |  coprcfno  coslcfno  coprwnno  coslwnno  coprstno  coslstno
+---------+------------------------------------------------------------
+       0 |        46         0         0         0         0        10
+       1 |  3.194598  .4934048  .7425663  13.47075  .7906612  2.719349
+       2 |  3.071764   .025831  .6850016  2.632268  .6357571  10.89888
+       3 |  2.669545   .022739  1.668377  .7540708  2.462077  4.382222
+       4 |  .7098996  .0103901  14.13099  .3414296  11.10468  21.76177
+       5 |  1.128127  .0145943  13.05007         0  24.71775  6.756991
+       6 |   .016355         0  1.967757         0  40.57955  .9709699
+       8 |  7.522132  2.225393         0  5.269799  5.727813  4.732195
+       9 |  6.387984  .5218415  4.652143  5.527764  6.485199  11.45538
+---------+------------------------------------------------------------
+   Total |  2.533469   .150422   4.37832   3.47752  10.58418  7.610492
+----------------------------------------------------------------------
+
+cpagecat |  coslfcno  coprbhno  coslbhno  coprocno  coslocno  cotftdno
+---------+------------------------------------------------------------
+       0 |        36         0         0         0         0         0
+       1 |  .5769973    1.1206  3.660359         0  .1249322         0
+       2 |  3.446725  .8204049  2.811844         0  .0359906         0
+       3 |  16.30215  .6640457   3.27291         0  .1286236         0
+       4 |  4.282679  .0883222  .1720963         0         0         0
+       5 |  33.00862  .3580244  .5384528  .3137782  .4494195         0
+       6 |  42.20067  .1141545  .5676479  .5169593         0         0
+       8 |  1.919547  .1945789  20.21056  13.59963         0         0
+       9 |  12.17106  1.068784  5.022064  .3178825  .7058797         0
+---------+------------------------------------------------------------
+   Total |  14.70413  .6330551  2.470605  .2578012  .1612331         0
+----------------------------------------------------------------------
+
+cpagecat |  cotffdno  cpavno06  cpavno61  cpavno12  cpavno2p
+---------+--------------------------------------------------
+       0 |         0     15.33     32.15     35.15         0
+       1 |         0  10.07798  6.497614  3.739154  .6422065
+       2 |         0  10.04035  10.03159  12.57344  2.580799
+       3 |  .2708668  11.07234  12.10134  21.02871   7.03558
+       4 |         0   .709614   5.31826   15.2393   4.27503
+       5 |         0  1.237746  7.605823  27.29201  11.68549
+       6 |         0  .2718537  1.125314  21.74342  16.44178
+       8 |         0  11.33776    8.8511  13.58078  1.210913
+       9 |         0   11.5167  13.18359  16.40227  2.893301
+---------+--------------------------------------------------
+   Total |  .0443043  6.993722  8.171742  16.28937  6.111018
+------------------------------------------------------------
+
+. tab cpagecat cpseaprd if fsizesu >= 2 & droporig == 0 & year == 2008
+>  
+
+           |                  cpseaprd
+  cpagecat |         0          1          2          3 |     Total
+-----------+--------------------------------------------+----------
+         0 |        92          0          0          0 |        92 
+         1 |         0         73          0         97 |       170 
+         2 |         0         25          2        218 |       245 
+         3 |         0          5          2        203 |       210 
+         4 |         0         12          1         31 |        44 
+         5 |         0         11          1         82 |        94 
+         6 |         0          6          3         52 |        61 
+         7 |         0          2          0         67 |        69 
+         8 |         0          2          1         11 |        14 
+         9 |         0          4          0         98 |       102 
+-----------+--------------------------------------------+----------
+     Total |        92        140         10        859 |     1,101 
+
+
+. tab cpagecat cptyrear if fsizesu >= 2 & droporig == 0 & year == 2008
+>  
+
+           |                  cptyrear
+  cpagecat |         0          1          2          3 |     Total
+-----------+--------------------------------------------+----------
+         0 |        92          0          0          0 |        92 
+         1 |         0        135          2         30 |       170 
+         2 |         0        142          8         75 |       245 
+         3 |         0        105         10         78 |       210 
+         4 |        35          5          0          3 |        44 
+         5 |        84          9          0          0 |        94 
+         6 |        58          2          1          0 |        61 
+         7 |         0          1          0         67 |        69 
+         8 |         4          4          0          5 |        14 
+         9 |         2         33          4         47 |       102 
+-----------+--------------------------------------------+----------
+     Total |       275        436         25        305 |     1,101 
+
+
+           |  cptyrear
+  cpagecat |         4 |     Total
+-----------+-----------+----------
+         0 |         0 |        92 
+         1 |         3 |       170 
+         2 |        20 |       245 
+         3 |        17 |       210 
+         4 |         1 |        44 
+         5 |         1 |        94 
+         6 |         0 |        61 
+         7 |         1 |        69 
+         8 |         1 |        14 
+         9 |        16 |       102 
+-----------+-----------+----------
+     Total |        60 |     1,101 
+
+
+. tab cpagecat region if fsizesu >= 2 & droporig == 0 & year == 2008 [
+> iweight = wt]
+
+           |                   region
+  cpagecat |         1          2          3          4 |     Total
+-----------+--------------------------------------------+----------
+         0 | 3,218.431  464.81313  960.26081  708.30753 |  10,558.6 
+         1 |2,516.8659          0  1,153.913  1,695.902 | 16,301.49 
+         2 | 4,593.519  124.47911  2,738.898  1,664.896 | 22,578.73 
+         3 | 2,224.799  213.03547  1,777.638  1,648.442 | 15,735.27 
+         4 |503.121582          0  843.84373  945.38943 | 7,792.487 
+         5 | 2,079.279  137.53488  1,066.547  1,692.125 |  11,554.6 
+         6 |796.683815   38.45652  466.78092  1,584.885 | 7,361.639 
+         7 | 1,122.462          0 606.447403  195.61053 | 4,223.724 
+         8 | 248.59091          0  61.447369  187.74487 |1,188.7649 
+         9 |2,292.7278      27.68  305.21362  873.65382 | 7,420.996 
+-----------+--------------------------------------------+----------
+     Total | 19,596.48  1,005.999  9,980.989  11,196.96 | 104,716.3 
+
+
+           |                   region
+  cpagecat |         5          6          7          8 |     Total
+-----------+--------------------------------------------+----------
+         0 | 336.47874  1,489.857  2,264.274  1,116.181 |  10,558.6 
+         1 | 1,226.865 1,531.2394  3,597.252  4,579.453 | 16,301.49 
+         2 |  2,578.55  1,596.182   4,127.75  5,154.461 | 22,578.73 
+         3 |  788.6559   3,369.37  3,485.396  2,227.933 | 15,735.27 
+         4 | 946.67958  764.78291  1,933.708  1,854.962 | 7,792.487 
+         5 | 648.06731  1,097.526  2,018.865  2,814.653 |  11,554.6 
+         6 | 235.81927  382.32455  1,794.477  2,062.211 | 7,361.639 
+         7 |         0  351.58855  1,862.558  85.057144 | 4,223.724 
+         8 | 79.473328          0  503.27926  108.22916 |1,188.7649 
+         9 |  1,291.66  456.96785  2,043.703  129.38889 | 7,420.996 
+-----------+--------------------------------------------+----------
+     Total |8,132.2499 11,039.839  23,631.26  20,132.53 | 104,716.3 
+
+
+. tab cpagecat if fsizesu >= 2 & droporig == 0 & year == 2008 [weight 
+> = wt],sum( fsizuaa)
+(analytic weights assumed)
+
+            |               Summary of fsizuaa
+   cpagecat |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          0 |   35.072041   44.716268   10558.603          92
+          1 |   29.656314   30.310129    16301.49         170
+          2 |   35.307192   25.691027   22578.735         245
+          3 |   51.077878   36.392971    15735.27         210
+          4 |   20.047775   16.065282   7792.4868          44
+          5 |   34.326597   26.260444   11554.598          94
+          6 |   33.965522   35.453695   7361.6388          61
+          7 |   44.083692   27.737069   4223.7237          69
+          8 |   37.514623   27.428429   1188.7649          14
+          9 |   47.798538   35.958212   7420.9958         102
+------------+------------------------------------------------
+      Total |   36.699823   32.630928   104716.31        1101
+
+. 
+. tab cptyrear, gen(cptyrear)
+
+   cptyrear |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      4,098       22.01       22.01
+          1 |      6,829       36.68       58.68
+          2 |        589        3.16       61.85
+          3 |      5,519       29.64       91.49
+          4 |      1,585        8.51      100.00
+------------+-----------------------------------
+      Total |     18,620      100.00
+
+. tab cpseaprd, gen(cpseaprd)
+
+   cpseaprd |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      1,172        6.29        6.29
+          1 |      1,823        9.79       16.08
+          2 |        280        1.50       17.59
+          3 |     15,345       82.41      100.00
+------------+-----------------------------------
+      Total |     18,620      100.00
+
+. gen gmperha = fcatlegm/cpforacs
+(1214 missing values generated)
+
+. gen is65 = age_holder >= 65
+
+. 
+. tabstat region1-region8 cptyrear2-cptyrear5 cpseaprd2-cpseaprd4 gmpe
+> rha fsizuaa fulltime isofffarmy isspofffarmy teagasc age_holder is65
+>  dpcfb* if year == 2008 & ncattle > 0 & fsizesu >= 2 & droporig == 0
+>  & (system == 2 | system == 3) & cpagecat != 0 [weight = wt], by(cpa
+> gecat) stats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: cpagecat 
+
+cpagecat |   region1   region2   region3   region4   region5   region6
+---------+------------------------------------------------------------
+       1 |  .1461961         0   .018076  .0869634  .0982456  .0873527
+       2 |  .2107452  .0041579  .1187619  .0774805    .09587  .0408639
+       3 |  .1416773  .0054031  .1148727  .1355473  .0506747  .1810144
+       4 |  .0951445         0  .1465047  .1715086   .179025   .052488
+       5 |  .2020282  .0155132  .0633996  .1865245   .065255  .0906455
+       6 |  .1106064         0  .0177139  .2329245  .0362381  .0363091
+       8 |         0         0         0  .1163104         0         0
+       9 |   .459074         0         0  .1169348  .2388498         0
+---------+------------------------------------------------------------
+   Total |  .1768776  .0042607  .0749739  .1347116  .0923126  .0775303
+----------------------------------------------------------------------
+
+cpagecat |   region7   region8  cptyre~2  cptyre~3  cptyre~4  cptyre~5
+---------+------------------------------------------------------------
+       1 |   .245602  .3175643  .9622803  .0055113   .021352  .0108564
+       2 |   .140728  .3113927  .7963705  .0463903  .0997167  .0575225
+       3 |  .1844278  .1863827  .8163583  .0769604  .0730215  .0336598
+       4 |  .1916354  .1636938  .0385856         0         0  .0477924
+       5 |  .1292228  .2474112  .0753352         0         0  .0120047
+       6 |  .2493103  .3168977  .0229116         0         0         0
+       8 |  .6891107  .1945789  .6891107         0         0         0
+       9 |  .1457409  .0394005  .7797632  .0836084  .0521096  .0197002
+---------+------------------------------------------------------------
+   Total |  .1871795  .2521537  .5561062  .0291511  .0418124  .0281753
+----------------------------------------------------------------------
+
+cpagecat |  cpseap~2  cpseap~3  cpseap~4   gmperha   fsizuaa  fulltime
+---------+------------------------------------------------------------
+       1 |   .463968         0   .536032  185.7352  28.69636  .1232562
+       2 |  .1569508         0  .8430492  166.1147   30.2699  .2161014
+       3 |  .0370765  .0127803  .9501432  246.9771  38.29157  .2986719
+       4 |  .2387893         0  .7612107  176.0603  19.55443  .0281955
+       5 |  .2034613         0  .7965387  223.1974  31.52233  .1387525
+       6 |  .1943341  .0817119   .723954  250.0374  27.82445  .0630833
+       8 |  .1945789         0  .8054211  264.2488  24.77817  .1945789
+       9 |  .1034623         0  .8965377  205.8875   37.1228  .2591498
+---------+------------------------------------------------------------
+   Total |     .2073  .0114185  .7812815  205.4262  30.57459  .1687989
+----------------------------------------------------------------------
+
+cpagecat |  isofff~y  isspof~y   teagasc  age_ho~r      is65  dpcfbjan
+---------+------------------------------------------------------------
+       1 |  .5150023         0  .3962436  53.75108  .2500932  1.273074
+       2 |  .4587533         0  .4360789  56.83515  .2317774  .7327338
+       3 |     .4887         0  .4411758  54.25854  .2423631  .8918038
+       4 |  .4846398         0  .3221567  61.75936   .364971  .0415604
+       5 |  .4088218         0   .456144  57.61368  .2834005  .0766665
+       6 |  .3788502         0  .3306214  64.76548  .5225322         0
+       8 |  .4418448         0  .7527341   58.6253  .5581552  1.362052
+       9 |  .4438308         0  .5853298  55.06734  .1418018  1.030627
+---------+------------------------------------------------------------
+   Total |   .457998         0  .4221613  57.27117  .2882556   .626931
+----------------------------------------------------------------------
+
+cpagecat |  dpcfbfeb  dpcfbmar  dpcfbapr  dpcfbmay  dpcfbjun  dpcfbjul
+---------+------------------------------------------------------------
+       1 |  2.949686  4.672494  3.527017  1.497374  .7927753  .2419034
+       2 |  2.116942  4.318079  3.753792  2.290742  1.237814   .531421
+       3 |  2.760053  5.548889  3.637142  1.920592  .9375208   .407322
+       4 |  .0623405  .1850617   .398078  .0207802  .0785855         0
+       5 |  .2504183  .2911834   .388076  .0979786  .0433114  .1247779
+       6 |  .0492082  .2193151  .0919324  .0662057  .0208855  .1010414
+       8 |  1.856584  5.127907  2.776792  1.945789  3.024057  .9363767
+       9 |   3.43006  4.601292   3.19125  1.106286  .3615864  .5334372
+---------+------------------------------------------------------------
+   Total |  1.724639  3.129664  2.401236  1.214835  .6458164   .302971
+----------------------------------------------------------------------
+
+cpagecat |  dpcfbaug  dpcfbsep  dpcfboct  dpcfbnov  dpcfbdec  dpcfbtot
+---------+------------------------------------------------------------
+       1 |  .6801996  .3144906  .3281837  .6270729  .4785864  17.38286
+       2 |  .4896594  .6409764  .7886963  .3839287  .3276205  17.61241
+       3 |  .8000076  .4805896  .7396856  .5556026  .4060784  19.08529
+       4 |         0  .1811561  .0484117  .0364401  .0103901  1.062804
+       5 |         0  .0465395  .1573969  .0342301  .0145943  1.525173
+       6 |         0  .0242705  .0388621         0   .072122  .6838427
+       8 |  .6364237  .2472659         0         0         0  17.91325
+       9 |  .3991667  .6036171  .7983068    .55966  .1986639  16.81395
+---------+------------------------------------------------------------
+   Total |  .3927585  .3462532  .4407662  .3306078  .2490583  11.80554
+----------------------------------------------------------------------
+
+. 
+. 
+. *****************************************************
+. * Basic Income and Subsidies
+. *****************************************************
+. 
+. 
+. local subsidy_vlist = " lfa cssuckcw cs10mtbf cs22mtbf csslaugh csex
+> tens csheadag csmctopu fsubchen sfp suckler_welfare fgrntsub_resid f
+> subesag fsubyfig fsubreps dirpayts"
+
+. local subsidy1_vlist = " sfp dirpayts"
+
+. 
+. ineqdeco   familyfarmincome [weight = wt], by (year)
+(analytic weights assumed)
+(52 missing values generated)
+ 
+Warning: familyfarmincome has 1042 values < 0. Not used in calculation
+> s
+ 
+Percentile ratios
+
+----------------------------------------------------------
+  All obs |    p90/p10     p90/p50     p10/p50     p75/p25
+----------+-----------------------------------------------
+          |     18.983       4.042       0.213       4.753
+----------------------------------------------------------
+  
+Generalized Entropy indices GE(a), where a = income difference
+ sensitivity parameter, and Gini coefficient
+
+----------------------------------------------------------------------
+  All obs |     GE(-1)       GE(0)       GE(1)       GE(2)        Gini
+----------+-----------------------------------------------------------
+          |    2.95644     0.60204     0.51444     0.73692     0.54066
+----------------------------------------------------------------------
+   
+Atkinson indices, A(e), where e > 0 is the inequality aversion paramet
+> er
+
+----------------------------------------------
+  All obs |     A(0.5)        A(1)        A(2)
+----------+-----------------------------------
+          |    0.24140     0.45231     0.85534
+----------------------------------------------
+  
+Subgroup summary statistics, for each subgroup k = 1,...,K:
+  
+
+-----------------------------------------------------------
+     year |     Popn. share            Mean   Relative mean
+----------+------------------------------------------------
+     1994 |         0.08344     13227.82839         0.80835
+     1995 |         0.07602     13276.32635         0.81131
+     1996 |         0.06690     14917.54272         0.91161
+     1997 |         0.06919     14589.56485         0.89156
+     1998 |         0.06944     14668.08871         0.89636
+     1999 |         0.06076     12869.16574         0.78643
+     2000 |         0.06283     15066.16770         0.92069
+     2001 |         0.06218     17310.60479         1.05785
+     2002 |         0.06018     16296.35030         0.99586
+     2003 |         0.05856     16647.79506         1.01734
+     2004 |         0.05576     17977.68670         1.09861
+     2005 |         0.05969     23412.69005         1.43074
+     2006 |         0.05804     18353.83348         1.12160
+     2007 |         0.05692     21911.67832         1.33902
+     2008 |         0.05161     19862.05186         1.21376
+     2009 |         0.04846     14995.02535         0.91634
+-----------------------------------------------------------
+
+-------------------------------------------
+     year |    Income share       log(mean)
+----------+--------------------------------
+     1994 |         0.06745         9.49008
+     1995 |         0.06168         9.49374
+     1996 |         0.06098         9.61029
+     1997 |         0.06169         9.58806
+     1998 |         0.06224         9.59343
+     1999 |         0.04779         9.46259
+     2000 |         0.05784         9.62021
+     2001 |         0.06578         9.75907
+     2002 |         0.05994         9.69870
+     2003 |         0.05957         9.72003
+     2004 |         0.06126         9.79689
+     2005 |         0.08541        10.06103
+     2006 |         0.06510         9.81759
+     2007 |         0.07621         9.99478
+     2008 |         0.06265         9.89657
+     2009 |         0.04441         9.61547
+-------------------------------------------
+  
+Subgroup indices: GE_k(a) and Gini_k 
+
+----------------------------------------------------------------------
+     year |     GE(-1)       GE(0)       GE(1)       GE(2)        Gini
+----------+-----------------------------------------------------------
+     1994 |    3.22911     0.70092     0.61407     1.03162     0.57738
+     1995 |    1.71021     0.61227     0.54413     0.83168     0.55108
+     1996 |    8.63537     0.49770     0.43849     0.61767     0.49956
+     1997 |    1.97063     0.51823     0.44460     0.59431     0.50793
+     1998 |    1.17087     0.50908     0.44603     0.61894     0.50569
+     1999 |    2.71888     0.62153     0.52452     0.76088     0.54463
+     2000 |    2.08305     0.58120     0.48693     0.67559     0.52852
+     2001 |    2.23794     0.57432     0.48263     0.63774     0.52989
+     2002 |    2.66420     0.55264     0.46197     0.62735     0.51695
+     2003 |    1.41912     0.54877     0.46361     0.64394     0.51588
+     2004 |    2.45863     0.60238     0.48335     0.64544     0.52846
+     2005 |    1.42279     0.51921     0.43521     0.54812     0.50690
+     2006 |    1.54887     0.58041     0.50323     0.69263     0.53800
+     2007 |    6.25541     0.73578     0.58981     0.81119     0.57991
+     2008 |    4.57861     0.63962     0.55734     0.81398     0.56178
+     2009 |    2.25508     0.59232     0.49706     0.73548     0.53147
+----------------------------------------------------------------------
+  
+Within-group inequality, GE_W(a)
+
+----------------------------------------------------------
+  All obs |     GE(-1)       GE(0)       GE(1)       GE(2)
+----------+-----------------------------------------------
+          |    2.94154     0.58679     0.49868     0.72044
+----------------------------------------------------------
+              
+Between-group inequality, GE_B(a):
+
+----------------------------------------------------------
+  All obs |     GE(-1)       GE(0)       GE(1)       GE(2)
+----------+-----------------------------------------------
+          |    0.01491     0.01525     0.01576     0.01648
+----------------------------------------------------------
+              
+Subgroup Atkinson indices, A_k(e)
+
+----------------------------------------------
+     year |     A(0.5)        A(1)        A(2)
+----------+-----------------------------------
+     1994 |    0.27753     0.50387     0.86592
+     1995 |    0.25025     0.45788     0.77378
+     1996 |    0.20582     0.39207     0.94527
+     1997 |    0.21195     0.40442     0.79762
+     1998 |    0.21104     0.39895     0.70075
+     1999 |    0.24608     0.46288     0.84467
+     2000 |    0.23156     0.44077     0.80643
+     2001 |    0.23079     0.43691     0.81738
+     2002 |    0.22129     0.42457     0.84198
+     2003 |    0.22141     0.42234     0.73946
+     2004 |    0.23345     0.45249     0.83100
+     2005 |    0.21087     0.40501     0.73996
+     2006 |    0.23674     0.44033     0.75596
+     2007 |    0.27941     0.52087     0.92599
+     2008 |    0.25804     0.47251     0.90155
+     2009 |    0.23534     0.44696     0.81852
+----------------------------------------------
+  
+Within-group inequality, A_W(e)
+
+----------------------------------------------
+  All obs |     A(0.5)        A(1)        A(2)
+----------+-----------------------------------
+          |    0.23534     0.44300     0.81861
+----------------------------------------------
+ 
+Between-group inequality, A_B(e)
+
+----------------------------------------------
+  All obs |     A(0.5)        A(1)        A(2)
+----------+-----------------------------------
+          |    0.00793     0.01670     0.20249
+----------------------------------------------
+
+. ineqdeco   familyfarmincome [weight = wt] if fulltime == 1, by (year
+> )
+(analytic weights assumed)
+(52 missing values generated)
+ 
+Warning: familyfarmincome has 342 values < 0. Not used in calculations
+ 
+Percentile ratios
+
+----------------------------------------------------------
+  All obs |    p90/p10     p90/p50     p10/p50     p75/p25
+----------+-----------------------------------------------
+          |      7.886       2.636       0.334       2.869
+----------------------------------------------------------
+  
+Generalized Entropy indices GE(a), where a = income difference
+ sensitivity parameter, and Gini coefficient
+
+----------------------------------------------------------------------
+  All obs |     GE(-1)       GE(0)       GE(1)       GE(2)        Gini
+----------+-----------------------------------------------------------
+          |    0.99239     0.32770     0.29121     0.36766     0.41323
+----------------------------------------------------------------------
+   
+Atkinson indices, A(e), where e > 0 is the inequality aversion paramet
+> er
+
+----------------------------------------------
+  All obs |     A(0.5)        A(1)        A(2)
+----------+-----------------------------------
+          |    0.14126     0.27942     0.66497
+----------------------------------------------
+  
+Subgroup summary statistics, for each subgroup k = 1,...,K:
+  
+
+-----------------------------------------------------------
+     year |     Popn. share            Mean   Relative mean
+----------+------------------------------------------------
+     1994 |         0.08448     24424.43633         0.85946
+     1995 |         0.07331     24491.41130         0.86181
+     1996 |         0.07417     24326.64119         0.85602
+     1997 |         0.07629     24134.17359         0.84924
+     1998 |         0.07626     23734.68465         0.83519
+     1999 |         0.06667     21287.43189         0.74907
+     2000 |         0.06383     26098.17468         0.91835
+     2001 |         0.06686     29340.11779         1.03243
+     2002 |         0.06311     27314.53264         0.96116
+     2003 |         0.05941     28268.33455         0.99472
+     2004 |         0.05694     30888.11456         1.08690
+     2005 |         0.05619     40561.53751         1.42730
+     2006 |         0.05062     34480.63546         1.21332
+     2007 |         0.04900     43569.78392         1.53315
+     2008 |         0.04424     38001.01546         1.33720
+     2009 |         0.03862     27305.75656         0.96085
+-----------------------------------------------------------
+
+-------------------------------------------
+     year |    Income share       log(mean)
+----------+--------------------------------
+     1994 |         0.07261        10.10334
+     1995 |         0.06318        10.10608
+     1996 |         0.06349        10.09933
+     1997 |         0.06479        10.09138
+     1998 |         0.06369        10.07469
+     1999 |         0.04994         9.96587
+     2000 |         0.05862        10.16962
+     2001 |         0.06903        10.28671
+     2002 |         0.06066        10.21517
+     2003 |         0.05910        10.24950
+     2004 |         0.06188        10.33813
+     2005 |         0.08020        10.61058
+     2006 |         0.06142        10.44815
+     2007 |         0.07513        10.68212
+     2008 |         0.05916        10.54537
+     2009 |         0.03711        10.21485
+-------------------------------------------
+  
+Subgroup indices: GE_k(a) and Gini_k 
+
+----------------------------------------------------------------------
+     year |     GE(-1)       GE(0)       GE(1)       GE(2)        Gini
+----------+-----------------------------------------------------------
+     1994 |    2.39387     0.33669     0.32474     0.48464     0.42236
+     1995 |    0.44325     0.28700     0.28078     0.38050     0.40057
+     1996 |    0.41716     0.25171     0.24724     0.32056     0.37726
+     1997 |    0.40074     0.25479     0.23624     0.28661     0.37286
+     1998 |    0.61711     0.29201     0.26340     0.33231     0.39048
+     1999 |    1.44404     0.37785     0.31904     0.40851     0.42955
+     2000 |    1.42023     0.29549     0.25846     0.32175     0.38830
+     2001 |    0.92696     0.32739     0.26330     0.30073     0.39603
+     2002 |    0.58180     0.29290     0.25607     0.31304     0.38742
+     2003 |    0.73716     0.29810     0.25908     0.32346     0.38868
+     2004 |    0.42120     0.27182     0.24898     0.30013     0.38526
+     2005 |    1.18542     0.29726     0.23245     0.25110     0.37376
+     2006 |    0.66676     0.30004     0.25762     0.29986     0.39271
+     2007 |    0.94478     0.34625     0.28162     0.31745     0.41222
+     2008 |    0.72307     0.35942     0.30635     0.37228     0.42688
+     2009 |    1.28008     0.39968     0.31596     0.41039     0.42512
+----------------------------------------------------------------------
+  
+Within-group inequality, GE_W(a)
+
+----------------------------------------------------------
+  All obs |     GE(-1)       GE(0)       GE(1)       GE(2)
+----------+-----------------------------------------------
+          |    0.97313     0.30767     0.27008     0.34506
+----------------------------------------------------------
+              
+Between-group inequality, GE_B(a):
+
+----------------------------------------------------------
+  All obs |     GE(-1)       GE(0)       GE(1)       GE(2)
+----------+-----------------------------------------------
+          |    0.01926     0.02003     0.02113     0.02261
+----------------------------------------------------------
+              
+Subgroup Atkinson indices, A_k(e)
+
+----------------------------------------------
+     year |     A(0.5)        A(1)        A(2)
+----------+-----------------------------------
+     1994 |    0.14884     0.28587     0.82722
+     1995 |    0.13149     0.24949     0.46992
+     1996 |    0.11642     0.22253     0.45484
+     1997 |    0.11473     0.22492     0.44490
+     1998 |    0.12762     0.25324     0.55242
+     1999 |    0.15596     0.31466     0.74280
+     2000 |    0.12644     0.25583     0.73961
+     2001 |    0.13382     0.27920     0.64960
+     2002 |    0.12641     0.25390     0.53781
+     2003 |    0.12753     0.25777     0.59585
+     2004 |    0.12152     0.23801     0.45723
+     2005 |    0.12045     0.25715     0.70334
+     2006 |    0.12847     0.25921     0.57146
+     2007 |    0.14271     0.29266     0.65393
+     2008 |    0.15173     0.30192     0.59119
+     2009 |    0.15862     0.32947     0.71911
+----------------------------------------------
+  
+Within-group inequality, A_W(e)
+
+----------------------------------------------
+  All obs |     A(0.5)        A(1)        A(2)
+----------+-----------------------------------
+          |    0.13236     0.26532     0.60636
+----------------------------------------------
+ 
+Between-group inequality, A_B(e)
+
+----------------------------------------------
+  All obs |     A(0.5)        A(1)        A(2)
+----------+-----------------------------------
+          |    0.01025     0.01920     0.14888
+----------------------------------------------
+
+. 
+. gen wt_ha = wt*fsizuaa
+(52 missing values generated)
+
+. gen wt_lu = wt*cpnolu
+(52 missing values generated)
+
+. 
+. sort year
+
+. by year: egen twt_nfarms1 = sum(wt) if ncattle > 0 & fsizesu >= 2 & 
+> droporig == 0 & (system == 2 | system == 3) & cpagecat != 0
+(12052 missing values generated)
+
+. by year: egen twt_nfarms2 = sum(wt) if fsizesu >= 2 & droporig == 0 
+(951 missing values generated)
+
+. gen pers = (oanolt5y + oano515y + oano1619 + oano2024 + oano2544 + o
+> ano4564 + oanoge65)
+(52 missing values generated)
+
+. gen wt_pers = wt*(oanolt5y + oano515y + oano1619 + oano2024 + oano25
+> 44 + oano4564 + oanoge65)
+(52 missing values generated)
+
+. gen adult = (oano2024 + oano2544 + oano4564 + oanoge65)
+(52 missing values generated)
+
+. gen wt_adult = wt*(oano2024 + oano2544 + oano4564 + oanoge65)
+(52 missing values generated)
+
+. by year: egen twt_pers1 = sum(wt_pers) if ncattle > 0 & fsizesu >= 2
+>  & droporig == 0 & (system == 2 | system == 3) & cpagecat != 0
+(12052 missing values generated)
+
+. by year: egen twt_pers2 = sum(wt_pers) if fsizesu >= 2 & droporig ==
+>  0 
+(951 missing values generated)
+
+. by year: egen twt_adult1 = sum(wt_adult) if ncattle > 0 & fsizesu >=
+>  2 & droporig == 0 & (system == 2 | system == 3) & cpagecat != 0 
+(12052 missing values generated)
+
+. by year: egen twt_adult2 = sum(wt_adult) if fsizesu >= 2 & droporig 
+> == 0 
+(951 missing values generated)
+
+. by year: egen twt_ha1 = sum(wt_ha) if ncattle > 0 & fsizesu >= 2 & d
+> roporig == 0 & (system == 2 | system == 3) & cpagecat != 0
+(12052 missing values generated)
+
+. by year: egen twt_ha2 = sum(wt_ha) if fsizesu >= 2 & droporig == 0 
+(951 missing values generated)
+
+. 
+. by year: egen twt_lu1 = sum(wt_lu) if ncattle > 0 & fsizesu >= 2 & d
+> roporig == 0 & (system == 2 | system == 3) & cpagecat != 0
+(12052 missing values generated)
+
+. by year: egen twt_lu2 = sum(wt_lu) if fsizesu >= 2 & droporig == 0 
+(951 missing values generated)
+
+. 
+. sort year region
+
+. by year region: egen rtwt_ha1 = sum(wt_ha) if ncattle > 0 & fsizesu 
+> >= 2 & droporig == 0 & (system == 2 | system == 3) & cpagecat != 0
+(12052 missing values generated)
+
+. by year region: egen rtwt_ha2 = sum(wt_ha) if fsizesu >= 2 & dropori
+> g == 0 
+(951 missing values generated)
+
+. 
+. 
+. capture log close

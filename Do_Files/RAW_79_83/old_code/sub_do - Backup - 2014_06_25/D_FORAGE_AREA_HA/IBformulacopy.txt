@@ -1,0 +1,30 @@
+"(root/svy_farm/@d_pasture_adjusted_for_hay_and_silage_ha +
+ root/svy_farm/@d_total_hectarage_equivalent_of_commonage_ha)
+ *
+(if(root/svy_farm/@d_total_livestock_units > 0) then
+  ((/root/svy_cattle/@d_dairy_livestock_units_incl_bulls - /root/svy_grazing/@d_dairy_lu_boarding_out) div
+   root/svy_farm/@d_total_livestock_units )
+else 0)
++ 
+  (if(/root/svy_hay_silage/@d_yield_adjusted_silage_hectarage_ha > 0) then
+    sum(root/svy_crop_disposal[@crop_code = ('9230','9231')]/@fed_dairy_tonnes_ha)  div
+     /root/svy_hay_silage/@d_yield_adjusted_silage_hectarage_ha
+ else  0)
+ +
+  (if(/root/svy_hay_silage/@d_yield_adjusted_hay_hectarage_ha > 0) then
+  sum(root/svy_crop_disposal[@crop_code = ('9220','9221')]/@fed_dairy_tonnes_ha)  div
+   /root/svy_hay_silage/@d_yield_adjusted_hay_hectarage_ha
+ else 0)
+ +
+ sum(root/svy_crop_disposal[@crop_code=('9061','9041','9031','9021','9051','9071','9081','8121',
+ '9060','9040','9030','9020','9050','9070','9080','8120')]/@fed_dairy_tonnes_ha)
++
+ sum(root/svy_crop_disposal[@crop_code=('8111','8110')]/@fed_dairy_tonnes_ha) div 7
+ +
+(if(sum(for $i in root/svy_crops[@crop_code = '1321'] return if($i/@cy_hectares_ha > 0 ) then
+	$i/@cy_total_yield div $i/@cy_hectares_ha else 0) > 0) then
+	(sum(for $i in root/svy_crop_disposal return if(matches($i/@crop_code, ""132[0-9]"")) then $i/@fed_dairy_tonnes_ha else 0) div
+	 sum(for $i in root/svy_crops[@crop_code = '1321'] return if($i/@cy_hectares_ha > 0 ) then
+	$i/@cy_total_yield div $i/@cy_hectares_ha else 0))
+else 0)"
+

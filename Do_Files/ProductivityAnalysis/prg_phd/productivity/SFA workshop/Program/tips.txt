@@ -1,0 +1,19 @@
+You can obtain a property menu for any of the project tree items by clicking the right mouse button on an item.
+When you open a ASCII text file, Limdep will automatically convert the file from DOS, Windows, Macintosh, or UNIX format
+You can run the line of Limdep commands the cursor is on by hitting the Enter key
+To obtain the simple analysis of variance for a panel of observations on a variable, use REGR;Lhs=..;Rhs=ONE;Panel;Str=...$
+You can read a data file directly into a matrix with READ;Nobs=...;Nvar=...;File=...;Matrix=name to use$
+Data input is much faster when you use fortran formats.
+R-squared is only guaranteed to be between 0 and 1 if you use OLS and the model includes a constant.
+Use cut/copy in the editing window, then ctrl-v in the windows in the command builder to move text.
+You can move results from any embedded matrix or matrix window directly to a tab delimited file, which you can then read into MS-Excel.  Just highlight, then Edit:Save.
+In the text editing window, the numeric Enter key submits the current line to the program while the main Enter key just types a <CR> and splits the line.
+When using data sets with missing values, be careful either to use SKIP or REJECT to bypass them. Only DSTAT does so automatically.
+You can have more than one editing window open at the same time, and you can move back and forth between them.  You can also move results from the output window to an editing window.
+When using NLSQ, supplying your own derivatives often vastly improves the iterative search.
+Users of earlier versions of LIMDEP!  LIMDEP no longer uses scratch files for large data sets.
+Having a DOS window open in the background often slows down computation by LIMDEP.
+LIMDEP is now supported by Stat/Transfer for moving data between LIMDEP and other programs.
+For computing marginal effects for dummy variables, LIMDEP uses derivatives. To compute the discrete difference between probabilities, you must program this explicitly.  WALD will be useful.
+RPL with only random and correlated constant terms is equivalent to MNP, but estimation is faster and less prone to failure of the iterations.
+To obtain the 'robust' (sandwich) estimator for the parameter covariance matrix in a discrete choice model, you can use this trick: Model... ; WTS=ONE;CHOICEBASED$

@@ -1,0 +1,162 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}/home/patrickgillespie/Documents/lin_forpatrick/Task 4/Data_Analysis/analysis/logs/biofuels.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 2 May 2012, 17:24:30
+{txt}
+{com}. cmdlog using logs/biofuels, replace
+{txt}(cmdlog /home/patrickgillespie/Documents/lin_forpatrick/Task 4/Data_Analysis/analysis/logs/biofuels.txt opened)
+
+{com}. use "../CountrySTATAFiles/databuilds/$dataname.dta", clear
+{txt}
+{com}. sort country region subregion farmcode year
+{txt}
+{com}. 
+. 
+. *************************************************************
+. *** MODEL SETUP         *
+. *************************
+. *** Specify Panel Data
+. ****************
+. egen pid = group(country region subregion farmcode)
+{txt}
+{com}. destring pid, replace
+{txt}pid already numeric; no {res}replace
+{txt}
+{com}. tsset pid year
+{res}{txt}{col 8}panel variable:  {res}pid (unbalanced)
+{txt}{col 9}time variable:  {res}{col 25}year, 1999 to 2007, but with gaps
+{txt}{col 17}delta:  {res}1 unit
+{txt}
+{com}. ****************
+. *** Create a dummy variable for the biofuels directive (energycropsuaa variable was brought in with the policy)
+. ****************
+. gen energydum = 0
+{txt}
+{com}. replace energydum = 1 if year > 2003 
+{txt}(107021 real changes made)
+
+{com}. ****************
+. *** Encode country variable
+. ****************
+. encode country, gen(mscode)
+{txt}
+{com}. ****************
+. *** Create Time Trend
+. ****************
+. generate trend=0 if year==1999
+{txt}(186422 missing values generated)
+
+{com}. replace trend=1 if year==2000
+{txt}(20709 real changes made)
+
+{com}. replace trend=2 if year==2001
+{txt}(20808 real changes made)
+
+{com}. replace trend=3 if year==2002
+{txt}(19566 real changes made)
+
+{com}. replace trend=4 if year==2003
+{txt}(18318 real changes made)
+
+{com}. replace trend=5 if year==2004
+{txt}(26601 real changes made)
+
+{com}. replace trend=6 if year==2005
+{txt}(26666 real changes made)
+
+{com}. replace trend=7 if year==2006
+{txt}(26190 real changes made)
+
+{com}. replace trend=8 if year==2007
+{txt}(27564 real changes made)
+
+{com}. 
+. ****************
+. *** TRANSFORMATIONS AND ADDITIONAL VARIABLES FOR THE MODEL
+. ****************
+. gen trXmsc = trend*mscode
+{txt}
+{com}. gen solvency = totalliabilities/totalassets
+{txt}(18 missing values generated)
+
+{com}. *Correct for negative and 0 FFI in order to take log
+. gen ffi_tmp = familyfarmincome
+{txt}
+{com}. replace ffi_tmp = 0 if familyfarmincome<=0 
+{txt}(24638 real changes made)
+
+{com}. replace ffi_tmp = ffi_tmp + 1
+{txt}(207193 real changes made)
+
+{com}. gen ln_ffi = log(ffi_tmp)
+{txt}
+{com}. gen ln_labour = log(labourinputhours)
+{txt}(1 missing value generated)
+
+{com}. gen specialise = totaloutputcrops/totaloutput 
+{txt}(24 missing values generated)
+
+{com}. gen osrape_prop = oilseedrapeuaa/totaluaa
+{txt}
+{com}. 
+. *************************************************************
+. *** MODEL SPECIFICATION *
+. *************************
+. xtreg osrape_prop energydum farmsrepresented  sizeclass setasideuaa ln_labour ln_ffi solvency specialise trend trXmsc, fe
+
+{txt}Fixed-effects (within) regression               Number of obs      = {res}   207150
+{txt}Group variable: {res}pid                             {txt}Number of groups   = {res}    66483
+
+{txt}R-sq:  within  = {res}0.0031                         {txt}Obs per group: min = {res}        1
+{txt}       between = {res}0.0067                                        {txt}avg = {res}      3.1
+{txt}       overall = {res}0.0080                                        {txt}max = {res}        9
+
+                                                {txt}F({res}10{txt},{res}140657{txt})       = {res}    43.30
+{txt}corr(u_i, Xb)  = {res}-0.2076                        {txt}Prob > F           =    {res}0.0000
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1} osrape_prop{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}energydum {c |}{col 14}{res}{space 2} .0021978{col 26}{space 2} .0006904{col 37}{space 1}    3.18{col 46}{space 3}0.001{col 54}{space 4} .0008446{col 67}{space 3} .0035511
+{txt}farmsrepre~d {c |}{col 14}{res}{space 2} 2.69e-06{col 26}{space 2} 2.99e-06{col 37}{space 1}    0.90{col 46}{space 3}0.367{col 54}{space 4}-3.16e-06{col 67}{space 3} 8.55e-06
+{txt}{space 3}sizeclass {c |}{col 14}{res}{space 2} -.003064{col 26}{space 2} .0003995{col 37}{space 1}   -7.67{col 46}{space 3}0.000{col 54}{space 4}-.0038469{col 67}{space 3} -.002281
+{txt}{space 1}setasideuaa {c |}{col 14}{res}{space 2}-.0003168{col 26}{space 2} .0000224{col 37}{space 1}  -14.14{col 46}{space 3}0.000{col 54}{space 4}-.0003607{col 67}{space 3}-.0002729
+{txt}{space 3}ln_labour {c |}{col 14}{res}{space 2} .0034211{col 26}{space 2} .0007849{col 37}{space 1}    4.36{col 46}{space 3}0.000{col 54}{space 4} .0018828{col 67}{space 3} .0049594
+{txt}{space 6}ln_ffi {c |}{col 14}{res}{space 2}-.0000137{col 26}{space 2} .0000717{col 37}{space 1}   -0.19{col 46}{space 3}0.848{col 54}{space 4}-.0001543{col 67}{space 3} .0001269
+{txt}{space 4}solvency {c |}{col 14}{res}{space 2}-1.21e-08{col 26}{space 2} 7.89e-07{col 37}{space 1}   -0.02{col 46}{space 3}0.988{col 54}{space 4}-1.56e-06{col 67}{space 3} 1.53e-06
+{txt}{space 2}specialise {c |}{col 14}{res}{space 2} .0030211{col 26}{space 2} .0008785{col 37}{space 1}    3.44{col 46}{space 3}0.001{col 54}{space 4} .0012992{col 67}{space 3} .0047429
+{txt}{space 7}trend {c |}{col 14}{res}{space 2}-.0021618{col 26}{space 2} .0002234{col 37}{space 1}   -9.67{col 46}{space 3}0.000{col 54}{space 4}-.0025998{col 67}{space 3}-.0017239
+{txt}{space 6}trXmsc {c |}{col 14}{res}{space 2} .0001733{col 26}{space 2} .0000156{col 37}{space 1}   11.12{col 46}{space 3}0.000{col 54}{space 4} .0001427{col 67}{space 3} .0002038
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}   .06201{col 26}{space 2} .0065939{col 37}{space 1}    9.40{col 46}{space 3}0.000{col 54}{space 4} .0490861{col 67}{space 3} .0749339
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} .11424592
+{txt}     sigma_e {c |} {res} .06639238
+{txt}         rho {c |} {res} .74754129{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+F test that all u_i=0:     F({res}66482{txt}, {res}140657{txt}) = {res}    7.50       {txt}Prob > F = {res}0.0000
+{txt}
+{com}. 
+. *xtreg oilseedrapeuaa energydum farmsrepresented  sizeclass setasideuaa ln_labour ln_ffi solvency specialise trend trend#mscode ,fe
+. 
+. *xi: xtreg oilseedrapeuaa energydum farmsrepresented sizeclass setasideuaa ln_labour ln_ffi solvency specialise i.year*mscode,fe
+. 
+. *************************************************************
+. *** POST-ESTIMATION TESTS *
+. ***************************
+. 
+. *************************************************************
+. *** CLEAN UP              *
+. ***************************
+. *tsset, clear
+. *clear
+. *clear matrix
+. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}/home/patrickgillespie/Documents/lin_forpatrick/Task 4/Data_Analysis/analysis/logs/biofuels.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 2 May 2012, 17:25:10
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

@@ -1,0 +1,8 @@
+* This equation makes no sense!
+*  Talked to Brian Moran about it... he thinks its gone haywire too!
+*   Says what's supposed to be happening, is that the costs of 
+*   keeping an opening stock (drying mainly, but storage as well)
+*   need to be subtracted from the value of opening stock, but 
+*   that doesn't seem to be happening here.
+
+* Spoke with Brian on the afternoon of 04/06/2014.

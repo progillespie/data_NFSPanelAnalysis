@@ -1,0 +1,817 @@
+? NOTE ON IMPORTING DATA -------------------------------------------
+?
+? If the file throws an error on import: 
+?  1  : Open and save the file again (without changes, including  
+?         filename) I'm not sure why this is necessary, but it seems 
+?         to work. I suspect it has something to do with 
+?         [compatibility mode] in recent versions of Excel. 
+?         I'm using Excel 2010. 
+?
+?  2  : If the file is .xlsx, save it as .xls
+?
+?  3  : Check and see if the file has blank cells. If so, try using 
+?         the missing() option on export excel in Stata.
+?
+?  I'm using "export excel" in Stata to write the Excel file, and 
+?    I've had to do "1" from above every time to read the file in. 
+?
+?  NLogit/Limdep is supposed to be able to read csv files as well, 
+?    but I've never gotten it to work properly; often it LOOKS 
+?    like it's correctly in memory, but it reads only half the file!
+? ------------------------------------------------------------------
+
+
+
+
+
+? CURRENT LOCATION--------------------------------------------------
+
+RESET$ 
+READ;FILE="D:\Data\data_NFSPanelAnalysis\code_NLogit\Quota\DAIRY.xls"
+    ;FORMAT=xls$
+
+? ------------------------------------------------------------------
+
+
+
+
+
+? ******************************************************************
+? ------------ Prepare sample for modelling ------------------------
+? ******************************************************************
+
+? Rename Direct Costs
+RENAME	;DC=D$
+
+
+
+? CREATE LAND
+CREATE	;A=LANDFAGE$
+
+
+SAMPLE;ALL$
+? Summary stats
+DSTAT	;RHS=Y2,H,C,D,L3,A$
+
+
+
+? Sample selection
+REJECT	;Y2<=0$
+DSTAT	;RHS=Y2,H,C,D,L3,A$
+REJECT	;H<=0$
+DSTAT	;RHS=Y2,H,C,D,L3,A$
+REJECT	;C<=0$
+DSTAT	;RHS=Y2,H,C,D,L3,A$
+REJECT	;L3<=0$
+DSTAT	;RHS=Y2,H,C,D,L3,A$
+REJECT	;D<=0$
+DSTAT	;RHS=Y2,H,C,D,L3,A$
+REJECT	;A<=0$
+DSTAT	;RHS=Y2,H,C,D,L3,A$
+
+
+
+? More summary for comparison with full sample
+
+
+
+
+?BROKEN !!!!!!
+?REJECT	;D<=0$
+?REJECT	;A<=0$
+?!!!!!!!!!!!!!
+
+
+
+? CREATE PANEL INDICATOR 
+SORT	;LHS=FC;RHS=*$
+CREATE	;IND=NDX(FC,0)$
+REGRESS	;LHS=ONE;RHS=ONE;STR=FC;PANEL$
+CREATE	;GRPSIZE=_GROUPTI$
+CALC	;LIST;G=MAX(GRPSIZE)$
+
+
+
+? CALCULATE MEANS		
+CALC	;MEANY1=XBR(Y1)$
+CALC	;MEANY2=XBR(Y2)$
+CALC	;MEANH=XBR(H)$
+CALC	;MEANC=XBR(C)$
+CALC	;MEAND=XBR(D)$
+CALC	;MEANL=XBR(L3)$
+CALC	;MEANA=XBR(A)$
+
+
+
+? MEAN ADJUSTMENT -- Eases interpretation of parameter estimates
+?                      Makes it so B's are elasticities as in 
+?                      Cobb-Douglas, even for the Translog functional
+?                      form. 
+CREATE	;MY1=Y1/MEANY1 
+ 	;MY2=Y2/MEANY2 
+	;MH=H/MEANH 
+	;MC=C/MEANC 
+	;MD=D/MEAND  
+	;ML=L3/MEANL 
+                ;MA=A/MEANA$  
+
+
+
+? CONVERT TO LOGS -- Both CD and TL functions are non-linear, 
+?                      but this transforms them s.t. they are now 
+?                      linear in parameters, hence they no longer 
+?                      violate assumptions of OLS (which are the same
+?                      that we must adhere to for these SFA models).
+CREATE	;LNY1=LOG(MY1)
+	;LNY2=LOG(MY2)
+	;LNH=LOG(MH)
+	;LND=LOG(MD)
+	;LNC=LOG(MC)
+	;LNL=LOG(ML) 
+	;LNA=LOG(MA)$
+
+
+? CREATE INTERACTION VARIABLES FOR TRANSLOG
+CREATE	;TT=T*T
+	;LNHH=LNH*LNH
+	;LNHD=LNH*LND
+	;LNHC=LNH*LNC
+	;LNHL=LNH*LNL
+	;LNDD=LND*LND
+	;LNDC=LND*LNC
+	;LNDL=LND*LNL
+	;LNCC=LNC*LNC
+	;LNCL=LNC*LNL
+	;LNLL=LNL*LNL
+	;LNHA=LNH*LNA
+	;LNDA=LND*LNA
+	;LNCA=LNC*LNA
+	;LNLA=LNL*LNA
+	;LNAA=LNA*LNA
+	;LNHT=LNH*T
+	;LNDT=LND*T
+	;LNCT=LNC*T
+	;LNLT=LNL*T
+	;TTT=TT*T$
+
+
+? CREATE NAMELISTS -- Similar to macros for Stata, allows you
+?                      to give lists of variables. You cannot
+?                      store other info this way however (e.g.
+?                      conditions states, filepaths, etc.)
+NAMELIST;CD=ONE,LNH,LND,LNC,LNL,LNA$
+NAMELIST;TL=LNHH,LNHD,LNHC,LNHL,LNHA,LNDD,LNDC,LNDL,LNDA,
+            LNCC,LNCL,LNCA,LNLL,LNLA,LNAA$
+
+
+
+???????????????????????????????????????????????????????????
+? TESTING A is a 0 vector for now, so remove those terms
+?
+? Also some of the T vars are always 0 (don't know why) 
+???????????????????????????????????????????????????????????
+
+
+NAMELIST;TCD=T,TT$
+NAMELIST;TTL=T,TT,LNHT,LNDT,LNCT,LNLT$
+NAMELIST;TDV=T2,T3,T4,T5$
+DSTAT	;RHS=TDV$
+
+
+
+
+
+? ******************************************************************
+? --------------------- Models Begin Here --------------------------
+? ******************************************************************
+
+?===================================================================
+?PIT AND LEE 
+?===================================================================
+
+DSTAT	;RHS=CD,TL,TDV$
+
+FRONTIER
+	;LHS=LNY2
+	;RHS=CD,TL,TDV
+	;PDS=GRPSIZE
+	;EFF=UPL$
+
+CREATE	;EPL=EXP(-UPL)$
+
+SAMPLE	;ALL$
+
+
+
+? Save parameter estimates. Note that b(1) is the constant.
+CREATE	
+	;B1  = b(2)
+	;B2  = b(3)
+	;B3  = b(4)
+	;B4  = b(5)
+	;B5  = b(6)
+	;B11 = b(7)
+	;B12 = b(8)
+	;B13 = b(9)
+	;B14 = b(10)
+	;B15 = b(11)
+	;B22 = b(12)
+	;B23 = b(13)
+	;B24 = b(14)
+	;B25 = b(15)
+	;B33 = b(16)
+	;B34 = b(17)
+	;B35 = b(18)
+	;B44 = b(19)
+	;B45 = b(20)
+	;B55 = b(21)$
+
+DSTAT	;RHS =  B1 , B2 , B3 , B4 , B5 , B11, B12, B13, B14, B15,
+	        B22, B23, B24, B25, B33, B34, B35, B44, B45, B55$
+
+
+
+? TODO -- isn't this unnecessary with the mean adjustment above?
+?Using parameter estimates to calc. elasticities 
+CREATE	;EH=B1+(2*LNH*B11)+(LND*B12)+(LNC*B13)+(LNL*B14)+(LNA*B15)$
+CREATE	;ED=B2+(LNH*B12)+(2*LND*B22)+(LNC*B23)+(LNL*B24)+(LNA*B25)$
+CREATE	;EC=B3+(LNH*B13)+(LND*B23)+(2*LNC*B33)+(LNL*B34)+(LNA*B35)$
+CREATE	;EL=B4+(LNH*B14)+(LND*B24)+(LNC*B34)+(2*LNL*B44)+(LNA*B45)$
+CREATE	;EA=B5+(LNH*B15)+(LND*B25)+(LNC*B35)+(LNL*B45)+(2*LNA*B55)$
+
+
+? Using the elasticities to calculate Returns to Scale
+CREATE	;RTS=EH+ED+EC+EL+EA$
+
+
+? Summarise elasticities and RTS overall, and year by year
+DSTAT	;RHS=EH,ED,EC,EL,EA,RTS;WTS=W$
+
+INCLUDE	;New;t=1$
+DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+
+INCLUDE	;New;t=2$
+DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+
+INCLUDE	;New;t=3$
+DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+
+INCLUDE	;New;t=4$
+DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+
+INCLUDE	;New;t=5$
+DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+
+INCLUDE	;New;t=6$
+DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+
+INCLUDE	;New;t=7$
+DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+
+INCLUDE	;New;t=8$
+DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+
+INCLUDE	;New;t=9$
+DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+
+INCLUDE	;New;t=10$
+DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+
+INCLUDE	;New;t=11$
+DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+
+SAMPLE	;ALL$
+
+
+
+
+
+?===================================================================
+? B AND C 1992 
+?===================================================================
+SAMPLE	;ALL$
+
+FRONTIER
+	;LHS=LNY2
+	;RHS=CD,TL,TDV
+	;PDS=GRPSIZE
+	;MODEL=BC
+	;EFF=UBC$
+
+CREATE	;EBC=EXP(-UBC)$
+
+
+? TODO -- Parameter estimates are hard-coded, and will be wrong.
+?         See if there's a way to access estimates dynamically [DONE] 
+? TODO -- there is almost certainly a better way to calc. these using
+?           matrix operations. See if you can pull that off.
+SAMPLE	;ALL$
+CREATE;B1  = b(2)
+	;B2  = b(3)
+	;B3  = b(4)
+	;B4  = b(5)
+	;B5  = b(6)
+	;B11 = b(7)
+	;B12 = b(8)
+	;B13 = b(9)
+	;B14 = b(10)
+	;B15 = b(11)
+	;B22 = b(12)
+	;B23 = b(13)
+	;B24 = b(14)
+	;B25 = b(15)
+	;B33 = b(16)
+	;B34 = b(17)
+	;B35 = b(18)
+	;B44 = b(19)
+	;B45 = b(20)
+	;B55 = b(21)$
+
+		
+CREATE;	EH=B1+(2*LNH*B11)+(LND*B12)+(LNC*B13)+(LNL*B14)+(LNA*B15)$
+CREATE;	ED=B2+(LNH*B12)+(2*LND*B22)+(LNC*B23)+(LNL*B24)+(LNA*B25)$
+CREATE;	EC=B3+(LNH*B13)+(LND*B23)+(2*LNC*B33)+(LNL*B34)+(LNA*B35)$
+CREATE;	EL=B4+(LNH*B14)+(LND*B24)+(LNC*B34)+(2*LNL*B44)+(LNA*B45)$
+CREATE;	EA=B5+(LNH*B15)+(LND*B25)+(LNC*B35)+(LNL*B45)+(2*LNA*B55)$
+
+CREATE;	RTS=EH+ED+EC+EL+EA$
+
+DSTAT	;RHS=EH,ED,EC,EL,EA,RTS;WTS=W$
+
+INCLUDE	;New;t=1$
+DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=2$
+DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=3$
+DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=4$
+DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=5$
+DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=6$
+DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=7$
+DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=8$
+DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=9$
+DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=10$
+DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=11$
+DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
+
+
+
+
+
+?===================================================================
+? 'True' Random Effects Model WITH TIME DUMMIES 
+?===================================================================
+
+?ONLY RESULTS IN LIMDEP 9 - Coefficients are BELOW. UITS are in 
+?                           excel and stata file 
+SAMPLE	;ALL$
+FRONTIER
+	;LHS=LNY2
+	;RHS=CD,TL$
+FRONTIER
+	;LHS=LNY2
+	;RHS=CD,TL
+	;PDS=GRPSIZE
+	;HALTON
+	;PTS=10
+	;RPM
+	;FCN=ONE(n)
+	;EFF=UTRE$
+
+CREATE	;ETRE=EXP(-UTRE)$
+?,TDV
+
+SAMPLE	;ALL$
+CREATE;B1  = b(2)
+	;B2  = b(3)
+	;B3  = b(4)
+	;B4  = b(5)
+	;B5  = b(6)
+	;B11 = b(7)
+	;B12 = b(8)
+	;B13 = b(9)
+	;B14 = b(10)
+	;B15 = b(11)
+	;B22 = b(12)
+	;B23 = b(13)
+	;B24 = b(14)
+	;B25 = b(15)
+	;B33 = b(16)
+	;B34 = b(17)
+	;B35 = b(18)
+	;B44 = b(19)
+	;B45 = b(20)
+	;B55 = b(21)$
+
+		
+CREATE;	EH=B1+(2*LNH*B11)+(LND*B12)+(LNC*B13)+(LNL*B14)+(LNA*B15)$
+CREATE;	ED=B2+(LNH*B12)+(2*LND*B22)+(LNC*B23)+(LNL*B24)+(LNA*B25)$
+CREATE;	EC=B3+(LNH*B13)+(LND*B23)+(2*LNC*B33)+(LNL*B34)+(LNA*B35)$
+CREATE;	EL=B4+(LNH*B14)+(LND*B24)+(LNC*B34)+(2*LNL*B44)+(LNA*B45)$
+CREATE;	EA=B5+(LNH*B15)+(LND*B25)+(LNC*B35)+(LNL*B45)+(2*LNA*B55)$
+
+CREATE;	RTS=EH+ED+EC+EL+EA$
+
+DSTAT	;RHS=EH,ED,EC,EL,EA,RTS;WTS=W$
+
+INCLUDE	;New;t=1$
+DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=2$
+DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=3$
+DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=4$
+DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=5$
+DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=6$
+DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=7$
+DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=8$
+DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=9$
+DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=10$
+DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=11$
+DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
+
+
+
+
+
+?===================================================================
+? 'True' Fixed Effects Model TIME DUMMIES
+?===================================================================
+SAMPLE	;ALL$
+FRONTIER
+	;LHS=LNY2
+	;RHS=CD,TL,TDV$
+FRONTIER
+	;LHS=LNY2
+	;RHS=CD,TL,TDV
+	;PDS=GRPSIZE
+	;FEM
+	;EFF=UTFE$
+
+CREATE;ETFE=EXP(-UTFE)$
+
+SAMPLE;ALL$
+CREATE;B1  = b(2)
+	;B2  = b(3)
+	;B3  = b(4)
+	;B4  = b(5)
+	;B5  = b(6)
+	;B11 = b(7)
+	;B12 = b(8)
+	;B13 = b(9)
+	;B14 = b(10)
+	;B15 = b(11)
+	;B22 = b(12)
+	;B23 = b(13)
+	;B24 = b(14)
+	;B25 = b(15)
+	;B33 = b(16)
+	;B34 = b(17)
+	;B35 = b(18)
+	;B44 = b(19)
+	;B45 = b(20)
+	;B55 = b(21)$
+
+CREATE;	EH=B1+(2*LNH*B11)+(LND*B12)+(LNC*B13)+(LNL*B14)+(LNA*B15)$
+CREATE;	ED=B2+(LNH*B12)+(2*LND*B22)+(LNC*B23)+(LNL*B24)+(LNA*B25)$
+CREATE;	EC=B3+(LNH*B13)+(LND*B23)+(2*LNC*B33)+(LNL*B34)+(LNA*B35)$
+CREATE;	EL=B4+(LNH*B14)+(LND*B24)+(LNC*B34)+(2*LNL*B44)+(LNA*B45)$
+CREATE;	EA=B5+(LNH*B15)+(LND*B25)+(LNC*B35)+(LNL*B45)+(2*LNA*B55)$
+
+CREATE;	RTS=EH+ED+EC+EL+EA$
+
+DSTAT	;RHS=EH,ED,EC,EL,EA,RTS;WTS=W$
+
+INCLUDE	;New;t=1$
+DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=2$
+DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=3$
+DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=4$
+DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=5$
+DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=6$
+DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=7$
+DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=8$
+DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=9$
+DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=10$
+DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
+
+INCLUDE	;New;t=11$
+DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
+
+
+
+
+
+?===================================================================
+? Model comparisons
+?===================================================================
+
+? RANK BY YEAR -- we expect different models' rankings of farm (by 
+?                   efficiency to be close to the same)
+SAMPLE	;ALL$
+INCLUDE	;New;t=1$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=2$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=3$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=4$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=5$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=6$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=7$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=8$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=9$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=10$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=11$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+SAMPLE	;ALL$
+
+? So how do the rankings compare (straight 45 degree line is perfect
+?   agreement)?
+plot	;rhs=rktre2;lhs=rktfe2$
+
+
+
+
+
+?===================================================================
+Latent Class Model
+?===================================================================
+
+SAMPLE	;ALL$
+FRONTIER
+	;LHS=LNY2
+	;RHS=CD,TL,TDV$
+FRONTIER
+	;LHS=LNY2
+	;RHS=CD,TL,TDV
+	;PDS=GRPSIZE
+	;LCM
+	;PTS=2
+	;EFF=ULCM$
+
+CREATE	;ELCM=EXP(-ULCM)$
+DSTAT	;RHS=ELCM;WTS=W$
+
+
+
+?-------------------------
+? CORRELATION MATRIX
+?-------------------------
+DSTAT;Rhs=UPL,UCS,UBC,UKO,UTRE,UTFE;Wts=W;Output=2$
+
+
+
+?-------------------------
+? CREATE RANKS AND COMPARE CORRELATIONS
+?-------------------------
+CREATE	;RKPL=RNK(UPL)$
+CREATE	;RKCS=RNK(UCS)$
+CREATE	;RKBC=RNK(UBC)$
+CREATE	;RKKO=RNK(UKO)$
+CREATE	;RKTRE=RNK(UTRE)$
+CREATE	;RKTFE=RNK(UTFE)$
+DSTAT;Rhs=RKPL,RKCS,RKBC,RKKO,RKTRE,RKTFE;Wts=W;Output=2$
+
+
+
+?-------------------------
+? RANKS (BY YEAR) 
+?-------------------------
+INCLUDE	;New;t=1$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=2$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=3$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=4$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=5$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=6$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=7$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=8$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=9$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=10$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+
+INCLUDE	;New;t=11$
+CREATE	;RKPL2=RNK(UPL)$
+CREATE	;RKBC2=RNK(UBC)$
+CREATE	;RKTRE2=RNK(UTRE)$
+CREATE	;RKTFE2=RNK(UTFE)$
+?-------------------------
+
+
+
+REJECT	;NEW;T<5$
+DSTAT   ;Rhs=RKPL2,RKCS2,RKBC2,RKKO2,RKTRE2,RKTFE2;Wts=W;Output=2$
+
+
+
+?-------------------------
+? PLOT INEFFICIENCES
+?-------------------------
+PLOT    ;Lhs=RKPL2;Rhs=RKBC2$
+PLOT    ;Lhs=RKTFE2;Rhs=RKTRE2$
+PLOT    ;Lhs=RKTRE2;Rhs=RKPL2$
+
+
+
+?-------------------------
+? Export farm-year specific inefficiency terms and rankings to .xls
+?-------------------------
+WRITE
+  ;T,W,FC,
+   UPL,UBC,UTRE,UTFE,
+   RKPL,RKPL2,RKBC,RKBC2,
+   RKTRE,RKTRE2,RKTFE,RKTFE2
+  ;FILE="D:\Data\data_NFSPanelAnalysis\Do_Files\Quota\UITS_DY.xls"
+  ;Format=xls$
+
+
+
+
+
+
+
+
+?****************************************************************
+?***************INACTIVE CODE (for reference) *******************
+?****************************************************************
+
+?Other versions of the same command. Not sure why there were 3.
+?  Edited (combined the 3) and left just one WRITE in.
+
+?WRITE
+?  ;T,FC,UPL,UBC,UTRE,UTFE,
+?   RKPL2,RKBC2,RKTRE2,RKTFE2
+?  ;FILE="D:\Data\data_NFSPanelAnalysis\Do_Files\Quota\UITS_DY.xls"
+?  ;FORMAT=xls$
+
+?WRITE
+?  ;t,fc,upl,ubc,utre,utfe,rkpl2,rkbc2,rktre2,rktfe2
+?  ;File="D:\Data\data_NFSPanelAnalysis\Do_Files\Quota\UITS_DY.xls"
+?  ;Format=XLS$
+
+
+?===================================================================
+?Orea and Kumbhakar - variables effects variance of Ui ?
+?===================================================================
+?FRONTIER;LHS=LNY2;RHS=CD,TL,TDV
+?	;PDS=GRPSIZE
+?	;MODEL=BC; EFF=UKO
+?	;HFU=SOIL2,SOIL3,EXTEND,OFFFARM,AID,FSIZE,AGE,ALLOC,INTENSE,DECOUP$
+
+
+
+? OLD FILE LOCATIONS --------------------------------------------
+?READ	;FILE="F:\pg\productivity\inputdata\xls\9609v2d.xls"$
+?READ	;FILE="F:\pg\productivity\Limdep Data (xls)\DAIRY XLS.xls"$
+?READ	;FILE="F:\pg\productivity\Limdep Data (xls)\DY9609v2d.xls"$
+? ---------------------------------------------------------------

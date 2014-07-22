@@ -1,0 +1,14 @@
+AI	AI dummy  [aidairy (aka iasfdy]					- recreated in cod_data spreadsheet.Merge with 9609v2d
+C	Captial	  [alloc,machinee,PTransportcap,buildingse,POthercap] - ? alloc common with L1 & DC	
+L1	Labour1	  [alloc,labfame,labcase,hiredlabe,CPI]			- ? CPI common w/DEBTRAT & ACREVAL, alloc common with C & DC 
+**** Y2	Milkvaldef[DYmilke,PMilk]					- !critical variable!!! Work on this first!- DYmilke = dotomkvl (total milk production in euro.)... missing in cod8409 and pgillespie4, although latter has dotomkgl (gallons). 
+DC	Dir Cost  [alloc,DYconcentrates,PCattleFeed,DYpasture,PTotalFert,DYwinfor,opexmachinery,PTotalInputs,limee,fuellubse,PMotorfuels]
+							(DC cont.)	- ? alloc
+DEBTRAT	Debt ratio[loan,farmvaluee,CPI]					- ? farmvaluee & CPI in common
+ACREVAL	Value/acre[farmvaluee,size3,CPI]				- ? farmvaluee & CPI in common
+PH	Partial productivity of head of dairy cow indicator[Y2,H]	- Y2 fixes
+PD	Partial productivity of direct costs [Y2,DC]			- Needs DC and Y2 
+PL	Partial productivity of mandays[Y2,L3]				- Y2 fixes
+PA	Partial productivity of forage area[Y2,LANDFAGE]		- Y2 fixes
+PC	Partial productivity of capital[Y2,C]				- Needs C and Y2 
+t

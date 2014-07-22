@@ -1,0 +1,527 @@
+--------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  D:\Data\Stata_Intro\production.txt
+  log type:  text
+ opened on:  15 Oct 2013, 08:52:29
+
+. 
+.                 * <capture> forces Stata to ignore an error from a 
+.                 *  command. In this case, if no log is open 
+.                 *  <log close> would give an error which we can safely 
+.                 *  ignore. If a log is open, we won't get an error, 
+.                 *  and the log will be closed before we try to open our 
+.                 *  new log (exactly what we want to happen).
+. 
+.                 
+. * Now let's create our allocation weight and label it.          
+. gen dpnolu_sh = dpnolu/ftotallu
+(1425 missing values generated)
+
+. label var dpnolu_sh "Share of dairy LU's (allocation weight)"
+
+. 
+. 
+. 
+. /*
+>  Now apply this allocation weight to labour to get hours devoted
+>  to dairying, and all of our variables will be at the enterprise
+>  level, i.e. the dairy business and only the dairy business. 
+> */
+. 
+. 
+. 
+. gen dylabour =  HOURS_WORKED * dpnolu_sh 
+(1425 missing values generated)
+
+. label var dylabour "Total hours of work allocated to dairy"
+
+. 
+. 
+. 
+. /*
+>  Since we know that we'll be using a log-log specification, we 
+>   should generate the logged variables for the model, but we'll
+>   need to do a bit of data cleaning first. 
+> 
+>  You can't take the log of any number that is <= 0, so we need
+>   to drop such observations from the data first.
+> */
+. 
+. 
+. 
+. * Get some basic info on the dataset
+. describe, short
+
+Contains data from origdata/nfspractical.dta
+  obs:        36,952                          
+ vars:            69                          7 Oct 2013 12:06
+ size:     9,016,288                          
+Sorted by:  
+     Note:  dataset has changed since last saved
+
+. * Drop the 0 and negative obs
+. drop if doslmkgl <= 0
+(23108 observations deleted)
+
+. drop if dpnolu   <= 0
+(0 observations deleted)
+
+. drop if daforare <= 0
+(0 observations deleted)
+
+. drop if dylabour <= 0
+(278 observations deleted)
+
+. * Get info again for comparison
+. describe, short
+
+Contains data from origdata/nfspractical.dta
+  obs:        13,566                          
+ vars:            69                          7 Oct 2013 12:06
+ size:     3,310,104                          
+Sorted by:  
+     Note:  dataset has changed since last saved
+
+. 
+. 
+. 
+. /*
+>  Now that we have the data cleaned up, we can go ahead and 
+>   generate our logged vars. It's a good idea to keep most of the
+>   variable name of the original variable intact, and add 
+>   something like "ln" at the front or back of the name to
+>   indicate that it's a logged variable. The convention for most 
+>   of the code I've seen in REDP puts the ln at the front. Let's 
+>   start with volume of milk output.
+> */
+. 
+. 
+. 
+. gen lndoslmkgl = ln(doslmkgl)
+
+. * It's good practice to label vars as you create them.
+. label var lndoslmkgl "Logged Milk sales (quantity)"
+
+. 
+.  
+. /*
+>  We see that the syntax for creating a logged variable is very 
+>   easy; it's just the usual gen command, and we use the function
+>   ln(varname) to calculate the logged value for each observation
+>   of dotomkgl. 
+> 
+>  We can move on to inputs. For dairy farms, important outputs 
+>   will include feed, fertiliser  herd size, and dairy forage
+>   area. 
+> */
+. 
+. 
+. 
+. gen lndaforare  = ln(daforare)
+
+. label var lndaforare    "Logged dairy forage area (hectares)"
+
+. 
+. gen lndylabour  = ln(dylabour)
+
+. label var lndylabour    "Logged dairy labour (hours)"
+
+. 
+. gen lndpnolu    = ln(dpnolu)
+
+. label var lndpnolu              "Logged dairy LU's"
+
+. 
+. 
+. 
+. 
+. * ---------------------------------------------------------------
+. * Models of production functions and frontiers
+. * ---------------------------------------------------------------
+. 
+. /*
+>  With log transformed variables in hand, let's estimate a simple 
+>   production function using just the typical the standard panel
+>   models. 
+> */
+. 
+. 
+. 
+. * A fixed effect model of production
+. xtreg lndoslmkgl lndaforare lndylabour lndpnolu, fe
+
+Fixed-effects (within) regression               Number of obs      =     13566
+Group variable: farmcode                        Number of groups   =      2101
+
+R-sq:  within  = 0.7535                         Obs per group: min =         1
+       between = 0.9450                                        avg =       6.5
+       overall = 0.9320                                        max =        29
+
+                                                F(3,11462)         =  11681.52
+corr(u_i, Xb)  = 0.0335                         Prob > F           =    0.0000
+
+------------------------------------------------------------------------------
+  lndoslmkgl |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  lndaforare |   .0662822   .0099707     6.65   0.000     .0467379    .0858265
+  lndylabour |   .0266909   .0056576     4.72   0.000     .0156011    .0377807
+    lndpnolu |   1.149778    .010584   108.63   0.000     1.129031    1.170524
+       _cons |    7.34938   .0352376   208.57   0.000     7.280308    7.418451
+-------------+----------------------------------------------------------------
+     sigma_u |  .24855025
+     sigma_e |  .15106942
+         rho |   .7302342   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+F test that all u_i=0:     F(2100, 11462) =    12.20         Prob > F = 0.0000
+
+. * Use <predict> to record predicted values of xb and u 
+. predict xb_fe, xb
+
+. predict u_fe, u
+
+. 
+. 
+. 
+. * A random effect model of production 
+. xtreg lndoslmkgl lndaforare lndylabour lndpnolu, re
+
+Random-effects GLS regression                   Number of obs      =     13566
+Group variable: farmcode                        Number of groups   =      2101
+
+R-sq:  within  = 0.7529                         Obs per group: min =         1
+       between = 0.9467                                        avg =       6.5
+       overall = 0.9335                                        max =        29
+
+                                                Wald chi2(3)       =  73371.16
+corr(u_i, X)   = 0 (assumed)                    Prob > chi2        =    0.0000
+
+------------------------------------------------------------------------------
+  lndoslmkgl |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  lndaforare |   .0125834   .0088183     1.43   0.154       -.0047    .0298669
+  lndylabour |   .0329919   .0049027     6.73   0.000     .0233827     .042601
+    lndpnolu |   1.198175   .0083083   144.21   0.000     1.181891    1.214459
+       _cons |   7.270396   .0313374   232.00   0.000     7.208976    7.331816
+-------------+----------------------------------------------------------------
+     sigma_u |  .22034548
+     sigma_e |  .15106942
+         rho |  .68024857   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+
+. * Record this model's estimates of xb and u. 
+. predict xb_re, xb
+
+. predict u_re, u
+
+. 
+. 
+. 
+. /*
+>  The models above describe the "average" production relationship 
+>   between inputs and output for all farms in the sample. If we
+>   want to move to estimating a production frontier, then we can
+>   change our command from <xtreg> to <xtfrontier> which is
+>   Stata's preloaded panel SF command. <xtfrontier>, requires us
+>   to specify one of two options (at a minimum). These are "ti"
+>   (time-invariant) or "tvd" (time-varying decay), which refer to
+>   the assumptions we make about the nature of inefficiency (the u
+>   parameter).
+> */
+. 
+. 
+. 
+. * Review the help file for the command.
+. *help xtfrontier
+. 
+. 
+. 
+. * Time-invariant SF model
+. xtfrontier lndoslmkgl lndaforare lndylabour lndpnolu, ti
+
+Iteration 0:   log likelihood =   3760.273  (not concave)
+Iteration 1:   log likelihood =  3802.1598  
+Iteration 2:   log likelihood =  3863.1461  
+Iteration 3:   log likelihood =   3875.264  
+Iteration 4:   log likelihood =  3881.1897  
+Iteration 5:   log likelihood =  3881.9939  
+Iteration 6:   log likelihood =  3882.0835  
+Iteration 7:   log likelihood =  3882.0847  
+Iteration 8:   log likelihood =  3882.0847  
+
+Time-invariant inefficiency model               Number of obs      =     13566
+Group variable: farmcode                        Number of groups   =      2101
+
+                                                Obs per group: min =         1
+                                                               avg =       6.5
+                                                               max =        29
+
+                                                Wald chi2(3)       =  68085.41
+Log likelihood  =  3882.0847                    Prob > chi2        =    0.0000
+
+------------------------------------------------------------------------------
+  lndoslmkgl |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  lndaforare |    .013164   .0089385     1.47   0.141    -.0043551    .0306831
+  lndylabour |   .0324867   .0048946     6.64   0.000     .0228935      .04208
+    lndpnolu |   1.193724   .0084999   140.44   0.000     1.177064    1.210383
+       _cons |   7.814031   .0503412   155.22   0.000     7.715364    7.912698
+-------------+----------------------------------------------------------------
+         /mu |   .5195284   .0495237    10.49   0.000     .4224637    .6165931
+   /lnsigma2 |  -2.583012   .0394326   -65.50   0.000    -2.660299   -2.505726
+  /ilgtgamma |   .8267013   .0580082    14.25   0.000     .7130072    .9403953
+-------------+----------------------------------------------------------------
+      sigma2 |   .0755461    .002979                      .0699273    .0816163
+       gamma |    .695657   .0122814                      .6710653    .7191795
+    sigma_u2 |   .0525542   .0029646                      .0467437    .0583646
+    sigma_v2 |   .0229919   .0003055                      .0223931    .0235907
+------------------------------------------------------------------------------
+
+. * Record this model's estimates of xb,  u (inefficiency), and te. 
+. predict xb_sf_ti, xb
+
+. predict u_sf_ti, u
+
+. * For <predict> now has the te option to obtain TE estimates.
+. predict te_sf_ti, te
+
+. * But we have to use the following to get estimates of v.
+. gen v_sf_ti = lndoslmkgl - xb_sf_ti + u_sf_ti
+
+. 
+. 
+. 
+. * Time-varying decay model
+. xtfrontier lndoslmkgl lndaforare lndylabour lndpnolu, tvd
+
+Iteration 0:   log likelihood = -1324610.9  
+Iteration 1:   log likelihood = -3808.7955  (not concave)
+Iteration 2:   log likelihood = -2731.7311  (not concave)
+Iteration 3:   log likelihood =  2866.8502  (not concave)
+Iteration 4:   log likelihood =  3293.0182  
+Iteration 5:   log likelihood =   3645.074  (not concave)
+Iteration 6:   log likelihood =   3707.947  
+Iteration 7:   log likelihood =  3764.1442  
+Iteration 8:   log likelihood =   3777.578  
+Iteration 9:   log likelihood =  3847.6175  
+Iteration 10:  log likelihood =  3853.8662  
+Iteration 11:  log likelihood =  3879.9872  
+Iteration 12:  log likelihood =  3882.3834  
+Iteration 13:  log likelihood =  3883.0745  
+Iteration 14:  log likelihood =  3883.1313  
+Iteration 15:  log likelihood =  3883.1322  
+Iteration 16:  log likelihood =  3883.1322  
+
+Time-varying decay inefficiency model           Number of obs      =     13566
+Group variable: farmcode                        Number of groups   =      2101
+
+Time variable: year                             Obs per group: min =         1
+                                                               avg =       6.5
+                                                               max =        29
+
+                                                Wald chi2(3)       =  67515.46
+Log likelihood  =  3883.1322                    Prob > chi2        =    0.0000
+
+------------------------------------------------------------------------------
+  lndoslmkgl |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  lndaforare |   .0117715   .0089913     1.31   0.190    -.0058511     .029394
+  lndylabour |   .0332422   .0049225     6.75   0.000     .0235943    .0428901
+    lndpnolu |   1.194489   .0085394   139.88   0.000     1.177752    1.211226
+       _cons |   7.824419   .0566301   138.17   0.000     7.713426    7.935412
+-------------+----------------------------------------------------------------
+         /mu |   .5333633   .0577437     9.24   0.000     .4201877     .646539
+        /eta |   .0010384   .0007039     1.48   0.140    -.0003413     .002418
+   /lnsigma2 |  -2.593452   .0395706   -65.54   0.000    -2.671009   -2.515895
+  /ilgtgamma |   .8127717   .0583559    13.93   0.000     .6983963    .9271472
+-------------+----------------------------------------------------------------
+      sigma2 |   .0747615   .0029584                      .0691824    .0807906
+       gamma |   .6926998    .012422                      .6678321    .7164961
+    sigma_u2 |   .0517873   .0029426                      .0460199    .0575546
+    sigma_v2 |   .0229742   .0003054                      .0223756    .0235728
+------------------------------------------------------------------------------
+
+. * Record this model's estimates of xb and u. 
+. predict xb_sf_tvd, xb
+
+. predict u_sf_tvd, u
+
+. predict te_sf_tvd, te
+
+. gen v_sf_tvd = lndoslmkgl - xb_sf_ti + u_sf_ti
+
+. 
+. 
+. * A handy option for running tests on the coefficients ... 
+. xtfrontier lndoslmkgl lndaforare lndylabour lndpnolu, tvd coeflegend
+
+Iteration 0:   log likelihood = -1324610.9  
+Iteration 1:   log likelihood = -3808.7955  (not concave)
+Iteration 2:   log likelihood = -2731.7311  (not concave)
+Iteration 3:   log likelihood =  2866.8502  (not concave)
+Iteration 4:   log likelihood =  3293.0182  
+Iteration 5:   log likelihood =   3645.074  (not concave)
+Iteration 6:   log likelihood =   3707.947  
+Iteration 7:   log likelihood =  3764.1442  
+Iteration 8:   log likelihood =   3777.578  
+Iteration 9:   log likelihood =  3847.6175  
+Iteration 10:  log likelihood =  3853.8662  
+Iteration 11:  log likelihood =  3879.9872  
+Iteration 12:  log likelihood =  3882.3834  
+Iteration 13:  log likelihood =  3883.0745  
+Iteration 14:  log likelihood =  3883.1313  
+Iteration 15:  log likelihood =  3883.1322  
+Iteration 16:  log likelihood =  3883.1322  
+
+Time-varying decay inefficiency model           Number of obs      =     13566
+Group variable: farmcode                        Number of groups   =      2101
+
+Time variable: year                             Obs per group: min =         1
+                                                               avg =       6.5
+                                                               max =        29
+
+                                                Wald chi2(3)       =  67515.46
+Log likelihood  =  3883.1322                    Prob > chi2        =    0.0000
+
+------------------------------------------------------------------------------
+  lndoslmkgl |      Coef.  Legend
+-------------+----------------------------------------------------------------
+  lndaforare |   .0117715  _b[lndoslmkgl:lndaforare]
+  lndylabour |   .0332422  _b[lndoslmkgl:lndylabour]
+    lndpnolu |   1.194489  _b[lndoslmkgl:lndpnolu]
+       _cons |   7.824419  _b[lndoslmkgl:_cons]
+-------------+----------------------------------------------------------------
+         /mu |   .5333633  _b[mu:_cons]
+        /eta |   .0010384  _b[eta:_cons]
+   /lnsigma2 |  -2.593452  _b[lnsigma2:_cons]
+  /ilgtgamma |   .8127717  _b[ilgtgamma:_cons]
+-------------+----------------------------------------------------------------
+      sigma2 |   .0747615
+       gamma |   .6926998
+    sigma_u2 |   .0517873
+    sigma_v2 |   .0229742
+------------------------------------------------------------------------------
+
+. 
+. * you should now see the codes you use to access coefficient 
+. *  estimates. It is, however, much easier to use the <lincom> 
+. *  command
+. 
+. * help lincom
+. 
+. lincom lndaforare + lndylabour + lndpnolu 
+
+ ( 1)  [lndoslmkgl]lndaforare + [lndoslmkgl]lndylabour + [lndoslmkgl]lndpnolu = 0
+
+------------------------------------------------------------------------------
+  lndoslmkgl |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         (1) |   1.239503   .0055785   222.19   0.000     1.228569    1.250436
+------------------------------------------------------------------------------
+
+. 
+. * Let's test for CRS...
+. lincom lndaforare + lndylabour + lndpnolu - 1
+
+ ( 1)  [lndoslmkgl]lndaforare + [lndoslmkgl]lndylabour + [lndoslmkgl]lndpnolu = 1
+
+------------------------------------------------------------------------------
+  lndoslmkgl |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         (1) |   .2395027   .0055785    42.93   0.000      .228569    .2504364
+------------------------------------------------------------------------------
+
+. 
+. * If we feel justified, we can impose CRS by first defining the
+. *  constraint...
+. constraint 1 lndaforare + lndylabour + lndpnolu = 1
+
+. 
+. * ... and then rerunning the model as a constrained optimisation 
+. xtfrontier lndoslmkgl lndaforare lndylabour lndpnolu, tvd contraints(1)
+option contraints() not allowed
+r(198);
+
+end of do-file
+
+r(198);
+
+. doedit \Data\Stata_Intro\dofiles\prg_stataworkshop
+
+. help xtfrontier
+
+. xtfrontier lndoslmkgl lndaforare lndylabour lndpnolu, tvd contraints(1)
+option contraints() not allowed
+r(198);
+
+. xtfrontier lndoslmkgl lndaforare lndylabour lndpnolu, tvd contraint(1)
+option contraint() not allowed
+r(198);
+
+. xtfrontier lndoslmkgl lndaforare lndylabour lndpnolu, contraints(1)
+either ti or tvd must be specified
+r(198);
+
+. help constraint
+
+. constraint list
+     1:  lndaforare + lndylabour + lndpnolu = 1
+
+. constraint 2 _b[lndaforare] + _b[lndylabour ]+ _b[lndpnolu] = 1
+
+. xtfrontier lndoslmkgl lndaforare lndylabour lndpnolu, tvd contraint(2)
+option contraint() not allowed
+r(198);
+
+. xtfrontier lndoslmkgl lndaforare lndylabour lndpnolu, tvd constraint(1)
+
+Iteration 0:   log likelihood = -298081.98  (not concave)
+Iteration 1:   log likelihood = -296644.76  (not concave)
+Iteration 2:   log likelihood = -296565.79  (not concave)
+Iteration 3:   log likelihood = -296544.59  (not concave)
+Iteration 4:   log likelihood = -296544.55  (not concave)
+Iteration 5:   log likelihood = -296544.54  (not concave)
+Iteration 6:   log likelihood = -296544.54  (not concave)
+Iteration 7:   log likelihood = -296544.54  (not concave)
+Iteration 8:   log likelihood = -296544.54  (not concave)
+Iteration 9:   log likelihood = -296544.54  (not concave)
+Iteration 10:  log likelihood = -296544.54  (not concave)
+Iteration 11:  log likelihood = -301932.73  (not concave)
+Iteration 12:  log likelihood = -301928.58  (not concave)
+Iteration 13:  log likelihood = -301928.44  (not concave)
+Iteration 14:  log likelihood = -301928.44  (not concave)
+Iteration 15:  log likelihood = -301928.43  (not concave)
+Iteration 16:  log likelihood = -301928.43  (not concave)
+Iteration 17:  log likelihood = -301928.43  (not concave)
+Iteration 18:  log likelihood = -301928.43  (not concave)
+Iteration 19:  log likelihood = -301928.43  (not concave)
+Iteration 20:  log likelihood = -302636.72  (not concave)
+Iteration 21:  log likelihood = -302595.21  (not concave)
+Iteration 22:  log likelihood =    -302593  (not concave)
+Iteration 23:  log likelihood = -302592.73  (not concave)
+Iteration 24:  log likelihood =  -302592.7  (not concave)
+Iteration 25:  log likelihood = -302592.69  (not concave)
+Iteration 26:  log likelihood = -302592.69  (not concave)
+Iteration 27:  log likelihood = -302592.69  (not concave)
+Iteration 28:  log likelihood = -302592.69  (not concave)
+Iteration 29:  log likelihood =  -303151.9  (not concave)
+Iteration 30:  log likelihood = -303146.69  (not concave)
+Iteration 31:  log likelihood = -303146.39  (not concave)
+Iteration 32:  log likelihood = -303146.35  (not concave)
+Iteration 33:  log likelihood = -303146.34  (not concave)
+Iteration 34:  log likelihood = -303146.34  (not concave)
+Iteration 35:  log likelihood = -303146.34  (not concave)
+Iteration 36:  log likelihood = -303146.34  (not concave)
+Iteration 37:  log likelihood = -303146.34  (not concave)
+Iteration 38:  log likelihood = -303146.34  (not concave)
+Iteration 39:  log likelihood =    -303755  (not concave)
+Iteration 40:  log likelihood = -303605.25  (not concave)
+Iteration 41:  log likelihood =  -303572.6  (not concave)
+Iteration 42:  log likelihood =  -303572.6  (not concave)
+--Break--
+r(1);
+
+. help constraint
+
+. clear
+
+. exit

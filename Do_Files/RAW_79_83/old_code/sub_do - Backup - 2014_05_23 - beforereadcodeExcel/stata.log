@@ -1,0 +1,26 @@
+
+  ___  ____  ____  ____  ____ (R)
+ /__    /   ____/   /   ____/
+___/   /   /___/   /   /___/   12.0   Copyright 1985-2011 StataCorp LP
+  Statistics/Data Analysis            StataCorp
+                                      4905 Lakeway Drive
+     Special Edition                  College Station, Texas 77845 USA
+                                      800-STATA-PC        http://www.stata.com
+                                      979-696-4600        stata@stata.com
+                                      979-696-4601 (fax)
+
+Single-user Stata network perpetual license:
+       Serial number:  93611859953
+         Licensed to:  Saturn
+                       Saturn
+
+Notes:
+      1.  (/v# option or -set maxvar-) 5000 maximum variables
+      2.  Stata running in batch mode
+
+
+running D:\programs\Stata12\ado\base\profile.do ...
+
+. cd . do convertSheet1.do standalone 
+invalid syntax
+r(198);

@@ -1,0 +1,287 @@
+-----------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /home/patrickgillespie/Documents/lin_forpatrick/Task 4/Data_Analysis/analysis/logs/resul
+> ts/8_May_2012_22_34_47.log
+  log type:  text
+ opened on:   8 May 2012, 22:34:47
+
+. 
+. *xtreg osrape_prop energydum sizeclass setasideuaa ln_labour  specialise osrprice i.year, fe
+. 
+. *xtreg osrape_prop energydum sizeclass setasideuaa ln_labour  specialise l.osrprice i.year, fe
+. 
+. *xtreg osrape_prop energydum sizeclass setasideuaa ln_labour  specialise ln_osrprice i.year, fe
+. 
+. xtreg osrape_prop energydum ln_totaluaa ln_setasideuaa ln_labour intensity ln_osrprice i.year, fe
+note: 2007.year omitted because of collinearity
+
+Fixed-effects (within) regression               Number of obs      =     18233
+Group variable: pid                             Number of groups   =      4263
+
+R-sq:  within  = 0.0334                         Obs per group: min =         1
+       between = 0.0044                                        avg =       4.3
+       overall = 0.0021                                        max =         8
+
+                                                F(12,13958)        =     40.21
+corr(u_i, Xb)  = -0.3419                        Prob > F           =    0.0000
+
+------------------------------------------------------------------------------
+ osrape_prop |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   energydum |  -.0150405   .0056268    -2.67   0.008    -.0260698   -.0040113
+ ln_totaluaa |   .0182502   .0041811     4.36   0.000     .0100548    .0264456
+ln_setasid~a |  -.0113503    .000889   -12.77   0.000     -.013093   -.0096077
+   ln_labour |  -.0015145   .0007154    -2.12   0.034    -.0029167   -.0001123
+   intensity |  -.0136337   .0166226    -0.82   0.412    -.0462162    .0189488
+ ln_osrprice |   .0513394   .0105009     4.89   0.000     .0307562    .0719225
+             |
+        year |
+       2001  |  -.0089893   .0023721    -3.79   0.000     -.013639   -.0043396
+       2002  |  -.0170288   .0027983    -6.09   0.000    -.0225139   -.0115438
+       2003  |   -.013555   .0031769    -4.27   0.000     -.019782   -.0073279
+       2004  |   .0061835   .0036599     1.69   0.091    -.0009905    .0133575
+       2005  |   .0117074   .0046059     2.54   0.011     .0026791    .0207356
+       2006  |   .0181208   .0032306     5.61   0.000     .0117883    .0244532
+       2007  |  (omitted)
+             |
+       _cons |   -.121923   .0389697    -3.13   0.002    -.1983088   -.0455371
+-------------+----------------------------------------------------------------
+     sigma_u |  .10088267
+     sigma_e |  .05190627
+         rho |  .79068129   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+F test that all u_i=0:     F(4262, 13958) =    12.69         Prob > F = 0.0000
+
+. 
+. xtreg osrape_prop energydum ln_totaluaa ln_setasideuaa ln_labour intensity ln_osrprice i.year year#
+> mscode, fe
+note: ln_osrprice omitted because of collinearity
+note: 2007.year omitted because of collinearity
+note: 2000b.year#5.mscode omitted because of collinearity
+note: 2001.year#2.mscode omitted because of collinearity
+note: 2003.year#10.mscode omitted because of collinearity
+note: 2006.year#4.mscode omitted because of collinearity
+note: 2007.year#8.mscode omitted because of collinearity
+note: 2007.year#12.mscode omitted because of collinearity
+note: 2007.year#13.mscode omitted because of collinearity
+note: 2007.year#14.mscode omitted because of collinearity
+
+Fixed-effects (within) regression               Number of obs      =     18233
+Group variable: pid                             Number of groups   =      4263
+
+R-sq:  within  = 0.0632                         Obs per group: min =         1
+       between = 0.0122                                        avg =       4.3
+       overall = 0.0054                                        max =         8
+
+                                                F(66,13904)        =     14.22
+corr(u_i, Xb)  = -0.4942                        Prob > F           =    0.0000
+
+------------------------------------------------------------------------------
+ osrape_prop |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   energydum |   .1293984   .0630001     2.05   0.040     .0059098     .252887
+ ln_totaluaa |   .0119842    .004217     2.84   0.004     .0037184    .0202501
+ln_setasid~a |  -.0105071   .0008881   -11.83   0.000    -.0122478   -.0087663
+   ln_labour |   -.001771   .0007087    -2.50   0.012    -.0031601   -.0003818
+   intensity |  -.0045387   .0165029    -0.28   0.783    -.0368865    .0278091
+ ln_osrprice |  (omitted)
+             |
+        year |
+       2001  |  -.0042016   .0064061    -0.66   0.512    -.0167585    .0083553
+       2002  |  -.0005327   .0062335    -0.09   0.932    -.0127511    .0116857
+       2003  |   .0126626   .0063581     1.99   0.046     .0001998    .0251254
+       2004  |  -.1083145   .0628914    -1.72   0.085    -.2315901    .0149612
+       2005  |  -.1219704   .0627804    -1.94   0.052    -.2450284    .0010876
+       2006  |  -.1031937    .062776    -1.64   0.100    -.2262431    .0198556
+       2007  |  (omitted)
+             |
+ year#mscode |
+    2000  2  |  -.0054529   .0070664    -0.77   0.440    -.0193041    .0083983
+    2000  4  |   .0608057   .0092042     6.61   0.000     .0427641    .0788472
+    2000  5  |  (omitted)
+    2000  8  |   .0768804    .070833     1.09   0.278    -.0619618    .2157226
+    2000 10  |   .0058839   .0099856     0.59   0.556    -.0136892    .0254571
+    2000 12  |   .1083034      .0638     1.70   0.090    -.0167531      .23336
+    2000 13  |   .0934559   .0639301     1.46   0.144    -.0318558    .2187675
+    2000 14  |   .1399141   .0636388     2.20   0.028     .0151735    .2646547
+    2001  2  |  (omitted)
+    2001  4  |   .0759065   .0085019     8.93   0.000     .0592416    .0925713
+    2001  5  |  -.0026634   .0070979    -0.38   0.707    -.0165763    .0112495
+    2001  8  |   .0922581   .0688936     1.34   0.181    -.0427826    .2272987
+    2001 10  |   .0182056   .0095565     1.91   0.057    -.0005263    .0369375
+    2001 12  |   .1104798    .063696     1.73   0.083    -.0143728    .2353325
+    2001 13  |   .0932993   .0637852     1.46   0.144    -.0317283    .2183269
+    2001 14  |   .1235544   .0631551     1.96   0.050    -.0002381     .247347
+    2002  2  |   .0083225   .0061747     1.35   0.178    -.0037807    .0204257
+    2002  4  |   .0420416   .0082243     5.11   0.000     .0259209    .0581624
+    2002  5  |  -.0214676   .0069242    -3.10   0.002      -.03504   -.0078953
+    2002  8  |   .0910564   .0686367     1.33   0.185    -.0434808    .2255936
+    2002 10  |   .0191632    .009338     2.05   0.040     .0008595    .0374669
+    2002 12  |   .1074617   .0636446     1.69   0.091    -.0172903    .2322137
+    2002 13  |   .1048876   .0637925     1.64   0.100    -.0201543    .2299296
+    2002 14  |   .1070882   .0631034     1.70   0.090    -.0166029    .2307793
+    2003  2  |  -.0034028   .0063345    -0.54   0.591    -.0158193    .0090138
+    2003  4  |   .0306632   .0082697     3.71   0.000     .0144535    .0468729
+    2003  5  |   -.030717   .0070524    -4.36   0.000    -.0445407   -.0168934
+    2003  8  |   .0793799   .0687442     1.15   0.248     -.055368    .2141278
+    2003 10  |  (omitted)
+    2003 12  |   .1168119   .0635952     1.84   0.066    -.0078432     .241467
+    2003 13  |   .0849996   .0637546     1.33   0.182    -.0399679    .2099671
+    2003 14  |    .117212   .0631109     1.86   0.063    -.0064938    .2409178
+    2004  2  |  -.0100393   .0062402    -1.61   0.108     -.022271    .0021924
+    2004  4  |   .0262956   .0081445     3.23   0.001     .0103312      .04226
+    2004  5  |  -.0407567   .0070076    -5.82   0.000    -.0544926   -.0270208
+    2004  8  |   .0584448    .070738     0.83   0.409    -.0802111    .1971007
+    2004 10  |  -.0025946   .0093127    -0.28   0.781    -.0208487    .0156595
+    2004 12  |   .1208594   .0635728     1.90   0.057    -.0037519    .2454707
+    2004 13  |   .0894193   .0637589     1.40   0.161    -.0355568    .2143954
+    2004 14  |   .1047032   .0630936     1.66   0.097    -.0189687     .228375
+    2005  2  |   .0034413   .0062654     0.55   0.583    -.0088398    .0157223
+    2005  4  |    .024989   .0081173     3.08   0.002     .0090779    .0409001
+    2005  5  |  -.0181255   .0069817    -2.60   0.009    -.0318106   -.0044404
+    2005  8  |  (empty)  
+    2005 10  |   .0196166   .0093651     2.09   0.036     .0012597    .0379734
+    2005 12  |    .123287   .0634628     1.94   0.052    -.0011087    .2476827
+    2005 13  |    .101134   .0636611     1.59   0.112    -.0236503    .2259184
+    2005 14  |   .1272636    .062981     2.02   0.043     .0038124    .2507148
+    2006  2  |   .0080588   .0065488     1.23   0.219    -.0047777    .0208954
+    2006  4  |  (omitted)
+    2006  5  |  -.0296999   .0072669    -4.09   0.000    -.0439439   -.0154558
+    2006  8  |     .09021   .0705784     1.28   0.201    -.0481333    .2285532
+    2006 10  |   .0185942    .009863     1.89   0.059    -.0007386    .0379271
+    2006 12  |   .1372276   .0635717     2.16   0.031     .0126186    .2618366
+    2006 13  |   .0952093   .0636604     1.50   0.135    -.0295736    .2199923
+    2006 14  |   .1071131    .062998     1.70   0.089    -.0163715    .2305977
+    2007  2  |  -.1123014   .0629979    -1.78   0.075    -.2357858     .011183
+    2007  4  |  -.1106792   .0635385    -1.74   0.082    -.2352233    .0138648
+    2007  5  |  -.1233656   .0630825    -1.96   0.051    -.2470158    .0002846
+    2007  8  |  (omitted)
+    2007 10  |   -.102519   .0634805    -1.61   0.106    -.2269494    .0219113
+    2007 12  |  (omitted)
+    2007 13  |  (omitted)
+    2007 14  |  (omitted)
+             |
+       _cons |   .0440433   .0232798     1.89   0.059    -.0015882    .0896748
+-------------+----------------------------------------------------------------
+     sigma_u |  .10995073
+     sigma_e |  .05119892
+         rho |  .82180546   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+F test that all u_i=0:     F(4262, 13904) =    12.46         Prob > F = 0.0000
+
+. sldkfj;
+unrecognized command:  sldkfj
+r(199);
+
+end of do-file
+r(199);
+
+end of do-file
+
+r(199);
+
+. do master_lin
+
+. *************************************************************
+. *                                                                                       
+. * Patrick R. Gillespie                                  
+. * Research Officer                                      
+. * Teagasc, REDP                                         
+. * Athenry, Co Galway, Ireland                           
+. * patrick.gillespie@teagasc.ie                  
+. *                                                                                       
+. *************************************************************
+. * RSF Project DAF RSF 07 505 (GO1390)           
+. *                                                                                       
+. * A micro level analysis of the Irish   
+. * agri-food sector: lessons and                 
+. * recommendations from Denmark and      
+. * the Netherlands                               
+. *                                                                               
+. * Task 4
+. *
+. *************************************************************
+. *       How this do file works
+. *************************************************************
+. * BE SURE TO READ THE FILE README.RTF!!!
+. * The data to be used in this analysis is the 
+. * FADN data for the years 2004 through 2007.Each 
+. * country's data is contained in it's own data 
+. * file. Rather than combine them all (would be 
+. * a massive file), I'm importing variables as I 
+. * need them. Once finished with a variable, I 
+. * discard everything until I need it again.
+. *
+. * This master file calls do files from the 
+. * subdirectory called sub_do. Any portion of the 
+. * analysis can be omitted by inserting a * in 
+. * front of the relevant do command. Output 
+. * datasets will be generated by this file and 
+. * stored in the subdirectory called output.
+. *
+. * In order for this do file to run, it must be
+. * located in a folder (name is not important)
+. * that is itself in the same folder that contains
+. * CountryData and CountrySTATAFiles (those names 
+. * are important, copy exactly). The datasets in 
+. * those folders shouldn't contain any spaces and 
+. * should match the list in the global macro "ms" 
+. * defined below.
+. * 
+. * You can easily include or exclude countries
+. * to the analysis by altering this macro 
+. * (provided the datasets are in the right shape 
+. * and are saved as a .dta in CountrySTATAFiles).
+. *
+. * At the time of writing, the directory 
+. * structure in which this file resided was
+. * 
+. * Task 4
+. *  >Data_Analysis
+. *   >>CountryData
+. *   >>CountrySTATAFiles
+. *   >>descriptives
+. *    >>>logs
+. *    >>>output
+. *    >>>sub_do
+. *    >>>varname.xls
+. *    >>>descriptives.do  <- your viewing this now
+. *    >>>README.rtf
+. *    >>>blank.dta
+. *    >>>energygph.dta
+. *************************************************************
+. 
+. *************************************************************
+. *** PRELIMINARIES       *
+. *************************
+. clear
+
+. clear matrix
+
+. set mem 1500m
+
+Current memory allocation
+
+                    current                                 memory usage
+    settable          value     description                 (1M = 1024k)
+    --------------------------------------------------------------------
+    set maxvar         5000     max. variables allowed           1.909M
+    set memory         1500M    max. data space              1,500.000M
+    set matsize         800     max. RHS vars in models          4.950M
+                                                            -----------
+                                                             1,506.859M
+
+. set matsize 800
+
+Current memory allocation
+
+                    current                                 memory usage
+    settable          value     description                 (1M = 1024k)
+    --------------------------------------------------------------------
+    set maxvar         5000     max. variables allowed           1.909M
+    set memory         1500M    max. data space              1,500.000M
+    set matsize         800     max. RHS vars in models          4.950M
+                                                            -----------
+                                                             1,506.859M
+
+. capture log close

@@ -1,0 +1,24 @@
+_40raw83_surplus:
+                100
+_32raw83_surplus:
+                20
+_13raw83_surplus:
+                1
+_7raw83_surplus:
+                1
+_7raw82_surplus:
+                1
+_32raw81_surplus:
+                13
+_7raw81_surplus:
+                1
+_6raw81_surplus:
+                1300
+_10raw80_surplus:
+                2
+_9raw80_surplus:
+                1
+_21raw79_surplus:
+                1
+1
+

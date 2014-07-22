@@ -1,0 +1,89 @@
+********************************************************
+********************************************************
+*							
+*	Patrick R. Gillespie
+*	Recording Code written by: 
+*
+*       Daragh Clancy
+* 
+*       Research Officer		
+*	Teagasc, REDP			
+*	Athenry, Co Galway, Ireland
+*	patrick.gillespie@teagasc.ie		
+*											
+********************************************************
+*	RSF Project DAF RSF 07 505 (GO1390)	*											
+*	A micro level analysis of the Irish 	
+*	agri-food sector: lessons and 		
+*	recommendations from Denmark and 	
+*	the Netherlands				
+*											
+*	Task4	
+*		
+********************************************************
+* Statistical test of FADN dataset
+********************************************************
+
+
+********************************************************
+* Panel must be tsset before running! Can be called at * the bottom of sub_do/biofuels.do 
+********************************************************
+*
+*Ramsey RESET Test*
+*******************
+*
+generate trend = _n
+regress 
+estat ovtest
+
+
+*Multicollinearity*
+*******************
+*
+quietly regress 
+estat vif
+
+
+*Heteroskedasticity: Breusch-Pagan Test*
+****************************************
+*
+quietly regress 
+estat hettest
+
+
+*Heteroskedasticity: White's Test*
+**********************************
+*
+quietly regress 
+imtest, white
+
+
+*Fixed Effects
+**************
+*
+xtreg 
+estimates store fixed
+*
+xtreg 
+estimates store random
+*
+hausman fixed random, constant
+
+
+*Serial Correlation: Prais-Winsten Procedure*
+*********************************************
+prais 
+*
+
+
+*FE/RE Models with AR(1) Disturbances*
+**************************************
+*
+xtregar 
+estimates store fixed
+xtregar 
+*
+estimates store random
+hausman fixed random, constant
+
+********************************************************

@@ -1,0 +1,4974 @@
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 16:46:35
+
+. di  "Job  Started  at  $S_TIME  on $S_DATE"
+Job  Started  at  16:46:35  on 27 Aug 2012
+
+. 
+. 
+. 
+. *****************************************************
+. * 3* Merge in weights
+. *****************************************************
+. 
+. use `nfsdatadir'/nfs_data.dta, clear
+
+. sort farmcode year
+
+. merge farmcode year using `Regional_outdatadir'/regional_weights.dta
+year was int now float
+variables farmcode year do not uniquely identify observations in
+    D:/Data/data_NFSPanelAnalysis/OutData/RegionalAnalysis/regional_weight
+    > s.dta
+
+. drop _merge
+
+. *drop if region == . //turned off until regional_weights.dta gets 95-96
+. tabstat wt region, by(year)
+
+Summary statistics: mean
+  by categories of: year 
+
+    year |        wt    region
+---------+--------------------
+    1994 |   123.355         .
+    1995 |  119.8166         .
+    1996 |  109.6184         .
+    1997 |  107.7916  5.032773
+    1998 |  116.5386  4.964896
+    1999 |  110.5878  5.032432
+    2000 |  109.1055  5.030142
+    2001 |  101.6309  4.880912
+    2002 |  98.90901  4.908867
+    2003 |  94.59256  5.013223
+    2004 |  92.38255  4.966558
+    2005 |  94.40527   5.08836
+    2006 |  97.55651  5.036238
+    2007 |   97.2311  5.020851
+    2008 |  95.08258  4.973684
+    2009 |  99.38775         .
+---------+--------------------
+   Total |  104.3517  4.995274
+------------------------------
+
+. 
+. 
+. 
+. *****************************************************
+. * 4* Get derived variables
+. *****************************************************
+. * To run analysis starting from nfs_data.dta uncomment
+. * the following. In the interest of transparency and
+. * reproducibility, this should be done to obtain final 
+. * results. Leave it turned off when doing intermediate
+. * program runs to save time. Don't forget to save the 
+. * intermediate dataset again when debugging.
+. 
+. *do doFarmDerivedVars.do
+. 
+. local intdata nfs_9508
+
+. *save `outdatadir'/`intdata', replace
+. 
+. * closes any logs the previous do-file may have left
+. * open restarts this file's log
+. capture log close
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 16:46:36
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 16:46:42
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 16:50:39
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 16:50:45
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 16:53:35
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 16:53:41
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 16:57:58
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 16:58:05
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 16:58:12
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 16:58:18
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 17:00:34
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 17:00:41
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 17:03:25
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 17:03:32
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 17:04:37
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 17:04:44
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 17:09:01
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 17:09:07
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 17:10:35
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 17:10:41
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 17:12:32
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 17:12:38
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 17:14:02
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 17:14:09
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 17:15:32
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 17:15:39
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 17:27:12
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 17:27:21
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  27 Aug 2012, 17:39:56
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  27 Aug 2012, 17:40:03
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 10:44:38
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 10:45:06
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 10:47:36
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 10:47:41
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 14:08:55
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 14:09:22
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 14:10:07
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 14:10:14
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 14:11:42
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 14:11:48
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 14:16:30
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 14:16:36
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 14:25:37
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 14:26:05
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 14:40:16
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 14:40:26
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 14:42:12
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file D:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 14:42:18
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 14:45:23
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+file
+    F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/nfs_9508.
+    > dta not found
+r(601);
+
+end of do-file
+r(601);
+
+. vim dychap.do
+
+. do dychap.do
+
+. *****************************************************
+. *****************************************************
+. * REDP Book - Dairy Chapter
+. *
+. * Patrick R. Gillespie          
+. *
+. * 2012
+. *
+. *
+. *****************************************************
+. * Required input files - nfs_data.dta
+. *                        regional_weights.dta
+. *                        doFarmDerivedVars.do
+. *****************************************************
+. 
+. clear
+
+. set mem 700m
+
+Current memory allocation
+
+                    current                                 memory usage
+    settable          value     description                 (1M = 1024k)
+    --------------------------------------------------------------------
+    set maxvar         5000     max. variables allowed           1.733M
+    set memory          700M    max. data space                700.000M
+    set matsize         500     max. RHS vars in models          1.949M
+                                                            -----------
+                                                               703.682M
+
+. set more off
+
+. set matsize 500
+
+Current memory allocation
+
+                    current                                 memory usage
+    settable          value     description                 (1M = 1024k)
+    --------------------------------------------------------------------
+    set maxvar         5000     max. variables allowed           1.733M
+    set memory          700M    max. data space                700.000M
+    set matsize         500     max. RHS vars in models          1.949M
+                                                            -----------
+                                                               703.682M
+
+. 
+. capture log close
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 14:47:42
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+(note: file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/c
+> m_9508.dta not found)
+file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 14:47:46
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 14:56:17
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 14:56:31
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 15:00:35
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 15:00:39
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 15:10:45
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 15:10:49
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 15:12:59
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 15:13:03
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 15:14:06
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 15:14:10
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 15:15:26
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 15:15:30
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 15:15:58
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 15:16:03
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 15:17:09
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 15:17:13
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 15:22:24
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 15:22:29
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 15:26:19
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 15:26:24
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 15:44:56
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 15:45:00
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 15:45:28
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 15:45:33
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 16:05:33
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. local intdata2 "cm_9508"
+
+. save `outdatadir'/`intdata2'.dta, replace
+file F:/Data/data_NFSPanelAnalysis/OutData/REDP_Book/DairyChapter/cm_9508.
+> dta saved
+
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 16:05:38
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  28 Aug 2012, 17:47:20
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  28 Aug 2012, 17:47:32
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  29 Aug 2012, 11:05:48
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  29 Aug 2012, 11:06:01
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  29 Aug 2012, 11:17:13
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  29 Aug 2012, 11:17:14
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  29 Aug 2012, 11:37:26
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  29 Aug 2012, 11:37:26
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  29 Aug 2012, 11:47:50
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  29 Aug 2012, 11:47:51
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  30 Aug 2012, 18:39:04
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  30 Aug 2012, 18:39:22
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  30 Aug 2012, 18:41:08
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  30 Aug 2012, 18:41:09
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  30 Aug 2012, 18:54:36
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  30 Aug 2012, 18:54:36
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  30 Aug 2012, 19:10:14
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  30 Aug 2012, 19:10:14
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  30 Aug 2012, 19:36:29
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  30 Aug 2012, 19:36:29
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  30 Aug 2012, 19:40:19
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  30 Aug 2012, 19:40:19
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  30 Aug 2012, 19:41:57
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  30 Aug 2012, 19:41:58
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  30 Aug 2012, 19:44:36
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  30 Aug 2012, 19:44:37
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  30 Aug 2012, 19:45:51
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  30 Aug 2012, 19:45:51
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  30 Aug 2012, 20:17:32
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  30 Aug 2012, 20:17:32
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  30 Aug 2012, 20:19:05
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  30 Aug 2012, 20:19:06
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  31 Aug 2012, 19:20:37
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  31 Aug 2012, 19:20:53
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:   3 Sep 2012, 12:25:11
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:   3 Sep 2012, 12:25:24
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:   3 Sep 2012, 14:03:52
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:   3 Sep 2012, 14:03:52
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:   3 Sep 2012, 14:05:23
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:   3 Sep 2012, 14:05:24
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:   3 Sep 2012, 15:56:57
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:   3 Sep 2012, 15:56:58
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:   3 Sep 2012, 17:25:07
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:   3 Sep 2012, 17:25:22
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:   3 Sep 2012, 17:38:38
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:   3 Sep 2012, 17:38:42
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:   3 Sep 2012, 17:40:36
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:   3 Sep 2012, 17:40:36
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:   3 Sep 2012, 18:18:38
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:   3 Sep 2012, 18:18:40
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:   4 Sep 2012, 15:34:32
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:   4 Sep 2012, 15:34:41
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:   4 Sep 2012, 15:45:56
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:   4 Sep 2012, 15:45:56
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  E:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  12 Oct 2012, 13:56:22
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+      name:  <unnamed>
+       log:  E:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  12 Oct 2012, 13:56:29
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  E:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  12 Oct 2012, 13:59:37
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+      name:  <unnamed>
+       log:  E:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  12 Oct 2012, 13:59:38
+--------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ opened on:  13 Nov 2012, 17:15:35
+
+. 
+. * Starts from the intermediate dataset as a shortcut
+. use `outdatadir'/`intdata', clear
+
+. 
+. 
+. 
+. *****************************************************
+. * 5* System selection
+. *****************************************************
+. 
+. gen syst = ffszsyst-int(ffszsyst/10)*10
+
+. keep if syst == 1 | syst == 2
+(9605 observations deleted)
+
+. 
+. 
+. 
+. *****************************************************
+. * 6* Code borrowed from 
+. *    data_NFSPanelAnalysis/Do_Files/FarmLevelModel/FarmLevel_dairy.do
+. *    ... originally thought it was Thia's, but she wasn't
+. *    familiar with it, although her name is on the file.
+. *    ************************************************
+. *    Subset
+. *    Keep only farms with dairy gross output
+. *****************************************************
+. 
+. * Farms with no milk sales
+. keep if fdairygo > 0 & fdairygo < .
+(405 observations deleted)
+
+. keep if doslcmgl > 0 & doslcmgl < .
+(222 observations deleted)
+
+. 
+. * Farms with 50% liquid milk sales
+. keep if dosllmgl < 0.5*dotomkgl
+(260 observations deleted)
+
+. 
+. * No herds with less than 10 dairy cows
+. keep if dpopinvd > 10
+(15 observations deleted)
+
+. 
+. * Save another intermediate dataset, but do so using
+. * a local macro as this one will be called several times
+. * in the code below. Using the local ensures that
+. * the code calls in the correct file if the name of the 
+. * dataset is ever changed. 
+. 
+. 
+. 
+. *****************************************************
+. * Log this section separately
+. log close
+      name:  <unnamed>
+       log:  F:\Data\data_NFSPanelAnalysis\Do_Files\REDP_Book\dychap.log
+  log type:  text
+ closed on:  13 Nov 2012, 17:15:42
+------------------------------------------------------------------------------

@@ -1,0 +1,51 @@
+This is BibTeX, Version 0.99dThe top-level auxiliary file: adv_res_prop.aux
+The style file: dcu.bst
+Database file #1: pgbib.bib
+You're missing a field name---line 45 of file pgbib.bib
+ : Vincent}, 
+ :           '
+I'm skipping whatever remains of this entry
+Warning--string name "september" is undefined
+--line 73 of file pgbib.bib
+You're missing a field part---line 298 of file pgbib.bib
+ :   month= 
+ :          ,
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 566 of file pgbib.bib
+ : 
+ : doi = {10.1073/pnas.0912890107},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+You're missing a field part---line 665 of file pgbib.bib
+ :   month= 
+ :          ,
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 834 of file pgbib.bib
+ : 
+ : city ={Dublin},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 953 of file pgbib.bib
+ : Farm level modelling can be used to determine how farm management adjustments and environmental policy affect different sustainability indicators. In this paper indicators were included in a dairy farm LP (linear programming)-model to analyse the effects of environmental policy and management measures on economic and ecological sustainability on Dutch dairy farms. For analysing ecological sustainability, seven indicators were included in the model: eutrophication potential, nitrate concentration in groundwater, water use, acidification potential, global warming potential, terrestrial ecotoxicity, and aquatic ecotoxicity. Net farm income was included for measuring economic sustainability. The farm structure of "
+ :                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 De Marke" formed the basis for three optimisations: (1) basis situation without environmental policy, (2) situation with Dutch environmental policy for 2004, and (3) situation with farm management measures applied at "De Marke". The Dutch environmental policy was included to comply with the EC nitrate directive. It resulted in lower fertiliser use and consequently in a decrease in sales of maize. This led to a decrease in net farm income of ca. [euro]2500. Including this policy improved most used ecological indicators (except for ecotoxicity) and showed to be an effective tool to reduce the environmental impact of dairy farming. Adapting the model with farm management measures applied at experimental farm "De Marke" resulted in even better ecological performance compared to the situation with environmental policy. Nonetheless this increase in ecological performance led to a considerably lower net farm income (\euro14,500).",
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 992 of file pgbib.bib
+ : 
+ : @article{reinhard00,
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 1017 of file pgbib.bib
+ : 
+ : @article{reinhard99,
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Repeated entry---line 1082 of file pgbib.bib
+ : @article{conradie09
+ :                    ,
+I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "carter10"
+Warning--I didn't find a database entry for "doe99"
+Warning--empty title in bouamra08
+Warning--empty institution in flaten03
+Warning--empty institution in jesse07
+(There were 9 error messages)

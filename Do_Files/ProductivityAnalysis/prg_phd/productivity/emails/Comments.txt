@@ -1,0 +1,48 @@
+CommentsFrom: Cathal ODonoghue
+Sent: 30 November 2010 12:22
+To: Patrick Gillespie(External)
+Cc: Fiona Thorne; Thia Hennessy; stephe.hynes@nuigalway.ie
+Subject: Comments
+
+Patrick
+
+Thanks for the document. Here are a few comments
+
+- It might make it easier for us to edit, if you write in Word rather than LaTeX; as none of us use it.
+- The Kumbhakar et al 2008 paper looks like an interesting template to use for the quota paper
+- It looks like a relatively comprehensive literature survey
+
+Some things to consider
+
+- How should we model feed demand? Do we treat the stocking rate as exogeneous, or make it endogenous? Given grass growth conditions, how substitutable are feed stuffs? Are there efficiency gains in total levels of feed? In other words how much of the feed decision is based on stocking rate decisions and environmental conditions and how much choice does the farmer have. How does the cost of substitutes influence decisions?
+- Useful to look at the demand system literature to come up with a methodology for estimating the elasticities associated with this choice and coming up with derivations of potential welfare measures
+- Useful also to become familiar with Fiona and James Carroll's overview of the productivity literature. Then make decision as to whether we go straight to estimate a stochastic frontier model for (a) comparative data (b) long run dairy data going back to 1970's (c) Production function incorporating farm management data. Do we want to run some DEA's for different years and different farm types to help to understand the data contextually before running the SFA? In either case you will need to become familiar with the relevant software.
+- By the way, there is a risk that Gerry Quinlan may retire in the next few months, so you should make sure you have all historical data you need.
+
+
+Cathal
+
+
+Dr Cathal O'Donoghue
+Head, Rural Economy and Development Program
+Teagasc Mellows Campus
+Athenry
+Co. Galway
+Ireland
+
+
+
+
+
+
+
+Attention:
+
+This e-mail is privileged and confidential. If you are not the intended recipient please delete the message and notify the sender. Any views or opinions presented are solely those of the author. This email was scanned by Teagasc and has been certified virus free with the pattern file currently in use. This however cannot guarantee that it does not contain malicious content. 
+
+Tabhair aire:
+
+Tá an r-phost seo faoi phribhléid agus faoi rún. Mura tusa an duine a bhí beartaithe leis an teachtaireacht seo a fháil, scrios é le do thoil agus cuir an seoltóir ar an eolas. Is leis an údar amháin aon dearcaí nó tuairimí a léirítear. Scanadh an r-phost seo le Teagasc agus deimhníodh go raibh sé saor ó víoras leis an bpatrúnchomhad atá in úsáid faoi láthair. Ní féidir a ráthú leis seo áfach nach bhfuil ábhar mailíseach ann. 
+
+
+

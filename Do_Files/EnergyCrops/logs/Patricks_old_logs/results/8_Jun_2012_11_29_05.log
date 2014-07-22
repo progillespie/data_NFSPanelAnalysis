@@ -1,0 +1,143 @@
+-----------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /home/patrickgillespie/Documents/lin_forpatrick/Task 4/Data_Analysis/analysis/logs/resul
+> ts/8_Jun_2012_11_29_05.log
+  log type:  text
+ opened on:   8 Jun 2012, 11:29:05
+
+. 
+. 
+. * Full panel 
+. 
+. quietly xtreg oilseedrapeuaa policy sizeclass setasideuaa ln_labour ln_ffi solvency intensity speci
+> alise i.year year#mscode, fe vce(robust)
+
+. estimates store fulluaa
+
+. 
+. quietly xtreg osrape_prop policy sizeclass setasideuaa ln_labour ln_ffi solvency intensity speciali
+> se i.year year#mscode, fe vce(robust)
+
+. estimates store fullprop
+
+. 
+. 
+. * Panel restriction (adopters only)
+. 
+. quietly xtreg oilseedrapeuaa policy sizeclass setasideuaa ln_labour ln_ffi solvency intensity speci
+> alise i.year year#mscode if adopt==1, fe vce(robust)
+
+. estimates store resuaa
+
+. 
+. quietly xtreg osrape_prop policy sizeclass setasideuaa ln_labour ln_ffi solvency intensity speciali
+> se i.year year#mscode if adopt==1, fe vce(robust)
+
+. estimates store resprop
+
+. 
+. outreg2 policy sizeclass setasideuaa ln_labour ln_ffi solvency intensity specialise[*] using "outpu
+> t/docs/model", word stat(coef se) replace 
+output/docs/model.rtf
+dir : seeout
+
+. ********************************************************
+. 
+. 
+. 
+. ********************************************************
+. *** CHOW TESTS
+. ********************************************************
+. 
+. 
+. * Break across time
+. 
+. quietly xtreg osrape_prop policy sizeclass setasideuaa ln_labour ln_ffi solvency intensity speciali
+> se i.year year#mscode pol_sizeclass pol_setasideuaa pol_ln_labour pol_ln_ffi pol_solvency pol_inten
+> sity pol_specialise, vce(robust)
+
+. 
+. test _b[pol_sizeclass]=0, notest
+
+ ( 1)  pol_sizeclass = 0
+
+. test _b[pol_setasideuaa]=0, notest
+
+ ( 1)  pol_setasideuaa = 0
+
+. test _b[pol_ln_labour]=0, notest
+
+ ( 1)  pol_ln_labour = 0
+
+. test _b[pol_ln_ffi]=0, notest
+
+ ( 1)  pol_ln_ffi = 0
+
+. test _b[pol_solvency]=0, notest
+
+ ( 1)  pol_solvency = 0
+
+. test _b[pol_intensity]=0, notest
+
+ ( 1)  pol_intensity = 0
+
+. test _b[pol_specialise]=0, notest
+
+ ( 1)  pol_specialise = 0
+
+. test _b[policy]=0, accum
+
+ ( 1)  pol_specialise = 0
+ ( 2)  policy = 0
+
+           chi2(  2) =    1.17
+         Prob > chi2 =    0.5584
+
+. 
+. outreg2 sizeclass pol_sizeclass setasideuaa pol_setasideuaa ln_labour pol_ln_labour ln_ffi pol_ln_f
+> fi solvency pol_solvency intensity pol_intensity specialise pol_specialise using "output/docs/Chow_
+> time", addstat(Chi-squared statistic, r(chi2), Prob > chi2, r(p)) word nocons
+output/docs/Chow_time.rtf
+dir : seeout
+
+. 
+. 
+. * Break across adoption status
+. 
+. quietly xtreg osrape_prop policy adopt sizeclass setasideuaa ln_labour ln_ffi solvency intensity sp
+> ecialise i.year year#mscode pol_adop, vce(robust)
+
+. 
+. test _b[pol_adop]=0, notest
+
+ ( 1)  pol_adop = 0
+
+. test _b[adopt]=0, accum
+
+ ( 1)  pol_adop = 0
+ ( 2)  adopt = 0
+
+           chi2(  2) =   80.64
+         Prob > chi2 =    0.0000
+
+. 
+. outreg2 policy pol_adop adopt using "output/docs/Chow_adopt", addstat(Chi-squared statistic, r(chi2
+> ), Prob > chi2, r(p)) word nocons
+output/docs/Chow_adopt.rtf
+dir : seeout
+
+. ********************************************************
+. 
+. 
+. 
+. ********************************************************
+. *** CLEAN UP
+. ********************************************************
+. 
+. tsset, clear
+
+. clear
+
+. clear matrix
+
+. capture log close

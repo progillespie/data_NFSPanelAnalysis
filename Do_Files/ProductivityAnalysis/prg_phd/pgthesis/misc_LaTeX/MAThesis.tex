@@ -1,0 +1,2298 @@
+
+\documentclass{ucthesis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsfonts}
+\usepackage{chicago}
+
+%TCIDATA{OutputFilter=LATEX.DLL}
+%TCIDATA{Version=5.00.0.2552}
+%TCIDATA{<META NAME="SaveForMode" CONTENT="1">}
+%TCIDATA{Created=Thursday, September 09, 2004 09:52:16}
+%TCIDATA{LastRevised=Friday, September 10, 2004 07:19:56}
+%TCIDATA{<META NAME="GraphicsSave" CONTENT="32">}
+%TCIDATA{<META NAME="DocumentShell" CONTENT="Theses\SW\University of California">}
+%TCIDATA{CSTFile=ucthesis.cst}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{acknowledgement}[theorem]{Acknowledgement}
+\newtheorem{algorithm}[theorem]{Algorithm}
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{case}[theorem]{Case}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{conclusion}[theorem]{Conclusion}
+\newtheorem{condition}[theorem]{Condition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{criterion}[theorem]{Criterion}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{solution}[theorem]{Solution}
+\newtheorem{summary}[theorem]{Summary}
+\newenvironment{proof}[1][Proof]{\textbf{#1.} }{\ \rule{0.5em}{0.5em}}
+\def\dsp{\def\baselinestretch{2.0}\large\normalsize}
+\dsp
+\input{tcilatex}
+
+\begin{document}
+
+\title{Quasi-Rationality, the Semantic Web and the Irish Stock Market}
+\author{Patrick R. Gillespie}
+\degreeyear{2004}
+\degreesemester{Fall}
+\degree{Master of Economic Science}
+\chair{Professor Michael Cuddy}
+\othermembers{Professor K. Vela Velupillai\\
+Professor Eamon O'Shea}
+\numberofmembers{3}
+\prevdegrees{B.A.(Brooklyn College) 2002}
+\field{Economic Policy, Evaluation and Planning}
+\campus{Galway}
+\maketitle
+\approvalpage{}
+\copyrightpage{}
+
+\begin{abstract}
+At a time when the world is becoming more interconnected and simultaneously
+less stable, both politically and militarily, it is becoming harder to
+believe that the actions of the few can be `washed away' simply by
+aggregating. Nor does it seem appropriate to assume that markets act `as if'
+people behaved in a rational manner, at least not in the way it is used in
+standard economic theory. It is becoming increasingly important, it seems,
+to view the actors in the economic system as more human than economists have
+given them credit for in the past. Such a view seems to fit well in the
+Irish Stock Market, particularly as online trading becomes more common. The
+advent of the Semantic Web, with its ability to supply information and
+`rationality' of a sort could have a dramatic impact.
+
+Chapter 1 is an introduction, chapter 2 is a [review of] \textbf{BRIEF}\ 
+\textbf{GLANCE AT} \textbf{RELEVANT ASPECTS\ OF}\ the literature of bounded
+rationality, and in chapter 3 a behavioral model of assets prices is
+introduced. In chapter 4 the results of the data simulation and testing are
+given. The Wilcoxon sign rank test is used to assess whether the medians of
+each of the models' average predicted returns are significantly different
+from the median average returns from the actual ISE data. The results show
+that the median average predicted return of the combined model of
+quasi-rational and rational asset pricing is not significantly different
+from the median average ISE returns. The median average CAPM returns are
+significantly different from the median average ISE returns at the 95\%
+confidence level. An introduction the Semantic Web is also given in chapter
+4 and its possible affects on asset markets are discussed. Chapter 5
+concludes.
+\end{abstract}
+
+%SW doesn't properly handle new environments in the front matter.
+%To avoid this problem, the frontmatter environment is not defined in the .cst
+%file being used and the begin and end environments appear as an encapsulated fields.  
+%Use care when editing the contents of the frontmatter environment.
+
+%TCIMACRO{\TeXButton{Begin frontmatter}{\begin{frontmatter}}}%
+%BeginExpansion
+\begin{frontmatter}%
+%EndExpansion
+
+\begin{dedication}
+\null\vfil
+
+\vfil\null
+\end{dedication}
+
+%Use encapsulated TeX fields to the TOC, LOF, and LOT appear at this point in the document.
+
+%TCIMACRO{\TeXButton{Table of Contents}{\tableofcontents}}%
+%BeginExpansion
+\tableofcontents%
+%EndExpansion
+
+%TCIMACRO{\TeXButton{List of Figures}{\listoffigures}}%
+%BeginExpansion
+\listoffigures%
+%EndExpansion
+
+%TCIMACRO{\TeXButton{List of Tables}{\listoftables}}%
+%BeginExpansion
+\listoftables%
+%EndExpansion
+
+%TCIMACRO{\TeXButton{End frontmatter}{\end{frontmatter}}}%
+%BeginExpansion
+\end{frontmatter}%
+%EndExpansion
+
+\chapter{Introduction}
+
+\begin{quotation}
+`MAN is a rational animal -- so at least I have been told. Throughout a long
+life, I have looked diligently for evidence in favor of this statement, but
+so far I have not had the good fortune to come across it, though I have
+searched in many countries spread over three continents. On the contrary, I
+have seen the world plunging continually further into madness.'
+
+\qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad --- Bertrand
+Russell \cite[1951, pp.71]{Russell}
+\end{quotation}
+
+It is no surprise that Russell never found evidence of the rational animal
+in man. It is not surprising because, in many ways rational man,
+particularly \textit{rational economic man}, is a myth. Most undergraduate
+students and many of their professors would write off anyone uttering this
+statement as a radical. Indeed, mainstream economists have been drilling
+this thinking into students\textbf{'} heads for several decades now.
+Neoclassical economics is still taught to undergraduate students as if there
+were no other possible way to think about the economy. `Why is this a
+problem?', one might ask. The answer is that teaching a paradigm as if it
+were an objective truth limits the scope of intellectual thought and chokes
+off the search for better theories. The energy that it takes to break free
+from the mainstream would be far better spent on tackling actual economic
+problems.
+
+Despite the rosy picture that advocates of the neoclassical paradigm paint
+about the triumph of `Homo Economicus', there are many phenomena that
+economists still don't fully understand. The standard theory cannot resolve
+the existence of an equity premium in U.S. stock markets other than to
+postulate extremely high levels of risk aversion. News broadcasts regularly
+report that the Irish economy is running at `close to full employment' and
+yet many still find it difficult to find jobs in the western regions of the
+country. Third world nations still have debt crises. Japan's aging
+population is wondering how their pensions will be paid for by a much
+smaller population of young people. Environmentalists still cry out for
+cleaner technology and better waste disposal policy, and yes, the planet is
+still warming at an uncomfortable rate.
+
+To ask why it is important to teach a broader spectrum of economic theories
+is to ask why any of the statements listed above are important. All of these
+issues are at some point questions of economic concern. When the standard
+theory states that a businessman, {\LARGE whom?} is assumed to be globally
+rational, will invest in cleaner technology to avoid clean up costs and to
+improve production efficiency then that theory had better deliver on its
+promise. When mainstream economics says that people {\LARGE that? [who]}
+work 60 hours per week do so because that is the optimum trade off between
+their wage income and the value of leisure, then that theory had better be
+right. When a central bank decides its response to some stimulus, one would
+hope that those making the decisions will be willing and able to look at the
+situation from several different perspectives, not just the popular one.
+
+The world today is in a violent state of change. Technologies are being
+developed at breakneck speeds. Information is being transferred instan%
+{\LARGE TAN}eously over the Internet while the World Wide Web is adapting
+to\ better retrieve the overwhelmingly large amount of information stored in
+so many servers around the world. Businesses have found a new outlet for
+their wares as consumers have entered the world of e-commerce. Globalisation
+has made every nation more closely linked than ever before. Global war is
+again a topic for the news. If ever there was a time when a butterfly could
+cause a hurricane halfway around the world, then that time is now. Now is
+not a time for sweeping generalisations, but for careful and deliberate
+applications of Ockham's Razor to yield better theories about the way we
+work and live. Such theories can only come about if economists are willing
+to redefine their representative agent so that it is actually representative
+of the humans whose behaviour it is meant to describe. Economists must start
+modeling systems with agents that are at best `boundedly rational' because
+it is implausible that the effects of such agents can be `washed out'
+through aggregating, especially in the world we live in today, one in which
+the smallest effects are often magnified.
+
+The next major innovation to hit the world and send us all reeling is like%
+{\LARGE ly} to be yet another advancement in Information Technology. A
+particularly interesting and promising research endeavour is the development
+of Semantic Web technologies and the widespread implementation of
+ontologies. Standard economic theory would view the major affects of such a
+technology as a cost reducer and as a new way to disseminate information
+quickly and more efficiently. There could also be substantial societal gains
+to be had through the Semantic Web's effect on human decision making
+behaviour. It could be that the ability of a semantically versed `web agent'
+to reduce the cognitive load on individuals may actually improve the
+predictive powers of the standard models, not because the models will
+change, but because the people will. In essence, the `quasi-rationality'
+that people exhibit in their everyday routines could be diminished.
+
+This thesis, will pose a model that takes account of human quasi-rationality
+in the context of the Irish Stock Exchange and in doing so, attempts to show
+that quasi-rationality can capture some of the unexplained variation of a
+volatile stock market. The thesis will proceed as follows. Chapter 2 is a
+review of {\LARGE selected aspects of }the literature of bounded
+rationality. Chapter 3 will put forth the model, chapter 4 will describe the
+data and simulation and review the results as well as introduce the Semantic
+Web and hypothesize about its effect. Chapter 5 conludes.
+
+\chapter{A Review of the Literature}
+
+\section{Rationality}
+
+In order to understand what bounded rationality is one must understand the
+alternative. The neoclassical paradigm {\LARGE of the rational agent }is
+predicated on several assumptions. Kreps \cite[1990]{Kreps 1990} {\LARGE %
+[page citation from Kreps missing; moreover I\ am puzzled at this
+characterization; I\ hope you are sure of this. }lists several of these
+assumptions, including
+
+\begin{axiom}
+Preferences are \textbf{asymmetric:} There is no pair $x$ and $y$ from $X$
+such that $x\succ y$ and $y\succ x$.
+\end{axiom}
+
+\begin{axiom}
+Preferences are \textbf{negatively transitive:} If $x\succ y$ then for any
+third element $z$, either $x\succ z$ or $z\succ y$, or both.
+\end{axiom}
+
+\begin{axiom}
+The coice function $c$ is nonempty valued: $c\left( A\right) \neq \emptyset $
+for all $A$.
+\end{axiom}
+
+\begin{axiom}
+The choice function $c$ satisfies \textbf{Houthakker's axiom of revealed
+preference:} If $x$ and $y$ are both contained in both $A$ and $B$ and if $%
+x\in c\left( A\right) $ and $y\in c\left( B\right) $, then $x\in c\left(
+B\right) $ and $y\in c\left( A\right) $.
+\end{axiom}
+
+Where $x,{\LARGE [y}$ and ${\LARGE z]}$ are alternatives in the set $X$ from
+which agents must choose and `$\succ $' is the strict preference relation.
+Though these assumptions may seem innocuous at first glance, a closer
+inspection will reveal how fundamentally flawed {\LARGE [fragile might be a
+better and less categorical word?]} they are. Kahneman and Tversky \cite[1979%
+]{prospect} find evidence of significant `framing effects' that contradict
+even the simple and intuitive logic of the asymmetry assumption. All {\LARGE %
+[Most?]}of the traits of the rational agent {\LARGE [invoked in orthodox
+theory]}are dependent on these axioms.
+
+Rational agents know the world in a way that mere economists never could.
+Rational agents know all alternatives to every choice, i.e. the set $X$,
+either immediately or with some search involved, as in search theory.\ The
+rational agent is able to order these alternatives according to his own
+preferences by virtue of the second assumption above. In so doing, he
+constructs a utility function which has a definite shape and which does not
+change over the course of his life, at least in the short term. Finally, the
+rational agent never has trouble in maximising his utility, even in the face
+of varied and possibly competing agendas. There is no mention of how this
+process is actually carried out in the standard theories in economics, but
+there is a feeling that the agent will do a better job at maximising his own
+utility than anyone else would be able to do on his behalf, i.e. a civil
+servant or other governmental authority, provided that there is a
+competitive market.
+
+The idea of global rationality is not an immediately offensive one. After
+all, in many situations people do believe that they know what they want.
+People do come up with preference orderings quite frequently, and while most
+people do not actually think of these orderings in terms of changes in
+levels of utility, the construct does seem to fit. Theories of rationality
+never claimed that the process was conscious anyway. But this is where the
+romance ends. Even as Kreps \cite[1990, pp. 19]{Kreps 1990} puts it; `A
+favorite game of economists is to make simple, basic constructions work in
+ever wider and wilder circumstances'. Olympian rationality puts a strain on
+the cognitive abilities of the agent that no mortal being could possibly
+support. These assumptions fail using all the classical rationality rules
+including max-min rules, conditions of certainty and conditions of
+uncertainty. This last set of conditions is of primary concern for financial
+analyses. In this situation the agent is assumed to behave as if he were
+maximizing his subjective expected utility. Subjective expected utility
+theory assumes that agents know the probability distribution for all
+possible outcomes as well as the utility payoffs associated with each of
+these outcomes. The agent is assumed to be able to choose an the action that
+is associated with an the outcome and probability which maximises his
+expected utility.
+
+An alternative to the approach of rational choice exhibited above was set
+forth by Simon \cite[1955]{Simon BMRC} in his famous paper \textit{A
+Behavioural Model of Rational Choice}. `Broadly stated, the task is to
+replace the global rationality of economic man with a kind of rational
+behavior that is compatible with the access to information and the
+computational capacities that are actually possessed by organisms, including
+man, in the kinds of environments in which such organisms exist' \cite[pp. 99%
+]{Simon BMRC}. Simon took exception to the concept of Rational Economic Man,
+the much trumpeted `Homo-Economicus', on grounds that it falsifies the
+reality of human decision beyond any acceptable limit. Simon, as quoted in
+Velupillai \ \cite[2000]{Vela 2000}, comments on the beginnings of his
+research programme \ \cite[all quotes are originally from Simon, 1979:
+ix-xiii and 3-5 ]{Vela 2000},;
+
+\begin{quotation}
+`\textquotedblleft \lbrack When Allen Newell and I began discussing `the
+prospect of simulating thinking in the summer of 1954' it was due to] my
+longstanding discontent with the economists' model of global rationality,
+which seemed to me to falsify the facts of human behavior and to provide a
+wholly wrong foundation for a theory of human decision
+making...\textquotedblright '\cite[pp. 23, (a)]{Vela 2000}
+\end{quotation}
+
+Velupillai also highlights Simon's interest in modeling humans as \textit{%
+Information Processing Systems\footnote{%
+cf. the Appendix below for more about IPS.}};
+
+\begin{description}
+\item[`(i)] From the early 1950s Simon, with Newell, had empirically
+investigated evidence on \ human problem-solving and had \textquotedblleft
+organised that evidence on within an explicit framework of an information
+processing theory\textquotedblright (p.$x$)
+
+\item[(ii)] This led to \textquotedblleft a general theory of human
+cognition, not limited to problem solving, [and] a methodology for
+expressing \textit{theories of cognition as programs} and for using
+computers to simulate human thinking\textquotedblright\ (p. $x$; emphasis
+added).'\cite[pp. 24]{Vela 2000}
+\end{description}
+
+\textit{Behavioural Economics} then is a framework for modeling economic
+behaviour that respects and gives credence to the environment in which human
+decision making takes place as well as the `basic repertory of mechanisms
+and processes that Thinking Man uses in all the domain in which he exhibits
+intelligent behavior' \cite[Velupillai quoting Simon, pp. 25, originally in
+Simon, 1979, p. $x$]{Vela 2000}.
+
+Another alternative to the orthodox view of rationality is the emergent
+discipline of \textit{Computable Economics}. This school of economic thought
+takes issue with the long standing tradition within the mainstream of
+ignoring the discrete nature of economic data. It is argued that agents that
+sea{\LARGE [r]}ch for solutions based on continuous maximisation problems
+will at times face unsolvable problems when the disconinuous nature of the
+data is accounted for. Traditionally, such discontinuities have been rounded
+up or down, but this could come at very high costs as far as the predictive
+accuracy of models are concerned. Velupillai \cite[pp. 22-24]{Vela 2005}
+sketches a picture of the Computable Economist's approach
+
+\begin{quotation}
+\qquad `First of all, the overall nature of the overall modelling strategy
+in computable economics is disciplined by what may be called the following
+\textquotedblleft credo\textquotedblright :
+\end{quotation}
+
+\begin{description}
+\item[1.] \qquad \qquad The triple \{assumption; proof; conclusion\} will
+always be understood in terms of \{input data; algorithm; output data\}.
+
+\item[2.] \qquad \qquad Mathematics is best regarded as a very high level
+programming language.
+
+\item[3.] \qquad \qquad Every proof is an algorithm in the strict recursion
+theoretic sense. This, of course, means that classical logic is freely and
+almost uncritically invoked. There will be no qualms about invoking the law
+of the excluded middle. However, that does not mean that there will by
+undecidable disjunctions in any algorithm (see the next criterion).
+
+\item[4.] \qquad \qquad To understand a theorem of computable economics, in
+algorithmic terms, represent the assumptions as input data and the
+conclusions as output data. Then try to convert the proof into an algorithm
+which will take in the input and produce the desired output. If you are
+unable to do this, it is probably because the proof relies essentially on
+the law of excluded middle. This step will identify any inadvertent infusion
+of undecidable disjunctions in existential statements.
+
+\item[5.] \qquad \qquad If we take algorithms and data structures to be
+fundamental, then it is natural to define and understand functions in these
+terms. If a function does not correspond to an algorithm, what can it be?
+Hence, take the stand that functions are, by definition, computable.
+
+\item[6.] \qquad \qquad Given a putative function $f$, we do not ask
+\textquotedblleft Is it computable?\textquotedblright , or \textquotedblleft
+Is it constructive?\textquotedblright , but rather \textquotedblleft What
+are the data types of the domain and of the range?\textquotedblright\ This
+question will often have more than one natural answer, and we will need to
+consider both restricted and expanded domain/range pairs. Distinguishing
+between these pairs will require that we reject undecidable propositions. If
+you attempt to pair an expanded domain for $f$ with a restricted range, you
+will come to the conclusion that $f$ is non-computable.
+\end{description}
+
+\begin{quotation}
+\qquad Secondly, the optimization paradigm of orthodox economic analysis
+and, indeed, of almost every kind of formal decision theory except classical
+behavioural economics and some parts of the cognitive sciences, is replaced
+by the more general paradigm of \textit{Diophantine decision problems}. This
+is specifically to acknowledge the fact that the domain of discourse in
+computable economics are the computable numbers, in general, and the
+rational numbers (or the integers), in particular. Thus, one does not
+arbitrarily force the domain of discourse to be the real numbers simply
+because the economic theorist is only competent in real analysis. The
+available, natural, domain of analysis in economic and financial markets, in
+a digital economy, will be rational, integer or, perhaps, the algebraic
+numbers. This will be adequately respected in the assumptions made about the
+analytical and decision theoretic framework.
+
+\qquad Thirdly, the implementation of a \textit{Diophantine decision problem}
+will be in the form of asking for the solvability or not of a \textit{%
+Diophantine representation} of market equilibrium in a digital economy.'\cite%
+[pp. 23]{Vela 2005}
+\end{quotation}
+
+The \textit{Computable Economic} approach seems much more `in tune' with the
+Behavioural programme. Indeed, it may even supply convincing rebuttals to
+attacks from the mainstream.
+
+\begin{quotation}
+`..., algorithmic agents and algorithmic institutions will routinely face
+formally unsolvable Diophantine decision problems. This is the context in
+which \textit{boundedly rational agents }could be defined and their
+behaviour experimentally and empirically analysed. Next, it is precisely the
+existence of formally unsolvable\ decision problems in a Diophantine economy
+that calls forth \textit{satisficing behaviour}. These two remarks are made
+to dispel the conventional misconception that a boundedly rational agent is
+simply orthodxy's omnipotent substantively rational agent cognitively
+constrained in various \textit{ad hoc} ways; and that \textit{satisficing}
+is simply a `second best' optimization outcome. If anything, the truth is
+exactly the opposite...' \cite[pp. 25, italics in the original]{Vela 2005}
+\end{quotation}
+
+Velupillai's vision of the concept of rationality and its limits comes part
+and parcel with his belief that economic agents can and should be modeled as
+`suitably encoded' Turing machines \cite[cf., 2000, ch. 3 \& 4]{Vela 2000}.
+Viewed from this perspective, rationality becomes a question of the
+solvability of a Diophantine decision problem.\footnote{%
+I\ have dealt with the topic of Computable Economics in an overly course and
+clumsy way here. This is mainly due to my own cognitive constraints. For a
+much better exposition c.f. Velupillai [2000]
+\par
+{}}
+
+\subsection{Satisficing vs. Maximising}
+
+Instead of assuming that people are `maximisers' of utility (an artificial
+concept), agents may be `satisficers.' To be a satisficer means that you
+have a set of minimum criteria which must be satisfied in your final choice.
+The satisficer engages in the processes of goal setting and alternative
+search. When an alternative is found that satisfies all the minimum criteria
+the search is ended and the choice is made.
+
+Satisficing is a powerful tool that agents use to reduce the complexity of
+any choice. Simon \cite[1955]{Simon BMRC} outlines two particular examples
+of these simplifications being put to use. One of these is the choice of a
+chess player on his 20th move and the other is the case of a person trying
+to sell his house. In the example of the house seller, the owner begins with
+an optimising approach to the sale. He is trying to maximise his expected
+utility which requires that he knows something about the distribution of
+offers that he will get everyday until he sells the house. Clearly he will
+not have this information, but even if he did, he would still have to
+compute the value of his pay-off function (his utility) to be able to choose
+the optimal sale, i.e., he would have to choose between \$30,000 today and
+\$150,000 in 10 years time. The simplification that Simon introduces to this
+choice is to make the pay-off function have a range of only two values,
+satisfactory and unsatisfactory. This can be interpreted to mean that
+instead of the house seller looking for the `best price' he would hold out
+only until he had obtained an offer above some minimum level. This may be
+what he considers to be a `fair' price for the house, or it may be the best
+offer that he believes he is likely to get.
+
+Beyond the simplification of the pay-off function, the agent must engage in
+alternative searches to populate the choice set with behavioural
+alternatives. It takes time {\LARGE [to]}realise what one's options are in
+any situation, and even longer to ascertain outcomes of those actions or
+assign probabilities to those outcomes. This process is necessary and costly.
+
+Satisficing in and of itself does not even guarantee satisfactory or unique
+outcomes. What if our house seller receives several satisfactory offers, or
+none at all? This is a problem for an economist. Simon uses an idea from
+cognitive psychology to solve it. The concept is that of an aspiration
+level. This measuring stick is set by the agent and will take the place of
+the boundary between satisfactory and unsatisfactory outcomes that exists
+initially either due to societal norms or because it was chosen arbitrarily.
+The lynch-pin of the idea is that this boundary moves up and down as the
+agent has to exert different levels of effort to find behavioural
+alternatives which have a high probability of yielding a satisfactory
+outcomes. If the agent finds this search to be easy, then he raises his
+aspiration level to increase his pay-off. If the agent finds the search to
+be difficult, then he lowers his aspiration level to ensure a satisfactory
+outcome. Through this process of altering aspiration levels and expanding or
+restricting the alternative set a satisfactory and unique solution is
+ensured. A choice will be made.
+
+This process of decision making, Simon \cite[1955]{Simon BMRC} comments,
+does not have to be completely divorced from the concept of Rational
+Economic Man; ` The two viewpoints are not, of course, completely different,
+much less antithetical. We have already pointed out that the organism may
+possess a whole hierarchy of rational mechanisms -- that for example, the
+aspiration level itself may be subject to an adjustment process that is
+rational in some dynamic sense' \cite[pp. 112]{Simon BMRC}. In the appendix
+to this famous article, Simon takes the reader through an example of such a
+hybrid process. In particular, if a house seller sets an acceptance price $%
+d(k)$ for the $k$th day and that price is met he accepts his highest offer.
+If not, he sets a new acceptance price the next day, $d(k+1)$. If he has
+information on the probability distribution of offers on each day he can set
+these acceptance prices such that the expected value of the sales price, $%
+V[d(k)]$, will be maximised.so
+
+\begin{quotation}
+`... Let $p_{k}(y)$ be the probability that $y$ will be he highest price
+offered on the $k$th day. Then:
+
+\begin{equation}
+P_{k}(d)=\dint\limits_{d(k)}^{\infty }p_{k}\text{ }(y)dy  \tag{A.1}
+\label{BMRC 1}
+\end{equation}
+
+is the probability that the house will be sold on the $k$th day if it has
+not been sold earlier.
+
+\begin{equation}
+\varepsilon _{k}(d)=\dint\limits_{d(k)}^{\infty }yp(y,k)dy  \tag{A.2}
+\label{BMRC 2}
+\end{equation}
+
+will be the expected value received by the seller on the $k$th day if the
+house has not been sold earlier. Taking into account the probability that
+the house will be sold before the $k$th day,
+
+\begin{equation}
+E_{k}(d)=\varepsilon _{k}(d)\prod\limits_{j=1}^{k-1}\left( 1-P_{j}(d\right) )
+\tag{A.3}  \label{BMRC 3}
+\end{equation}
+
+will be the unconditional expected value of the seller's receipts on the $k$%
+th day; and
+
+\begin{equation}
+V\{d(k)\}=\sum\limits_{k=1}^{\infty }E_{k}(d)  \tag{A.4}  \label{BMRC 4b}
+\end{equation}
+
+will be the expected value of the sales price.
+
+\qquad Now we wish to set $d(k)$, for each $k$, at the level that will
+maximize (A.4). The $k$ components of the function $d(k)$ are independent.
+Differentiating $V$ partially with respect to each component, we get:
+
+\begin{equation}
+\begin{array}{cc}
+\dfrac{\delta V}{\delta d(i)}=\tsum\limits_{k=1}^{\infty }\frac{E_{k}(d)}{%
+\delta (i)} & \left( i=1,\cdots ,n\right)%
+\end{array}
+\tag{A.5}  \label{BMRC 5}
+\end{equation}
+
+But:
+
+\begin{equation}
+\dfrac{\delta E_{i}(d)}{\delta d(i)}=\dfrac{\delta \varepsilon _{i}(d)}{%
+\delta d(i)}\tprod\limits_{j=1}^{i-1}(1-P_{j}(d)),\qquad and  \tag{A.6}
+\label{BMRC 6}
+\end{equation}%
+{}
+
+\begin{equation}
+\dfrac{\delta E_{k}(d)}{\delta d\left( i\right) }=\varepsilon _{k}\left(
+d\right) \tprod\limits_{\QTATOP{j\neq i}{j=1}}^{k-1}\left( 1-P_{j}\left(
+d\right) \right) \left( -\dfrac{\delta P_{i}\left( d\right) }{\delta d\left(
+i\right) }\right) \text{ for }i<k\text{ and}  \tag{A.7}  \label{BMRC 7}
+\end{equation}
+
+\begin{equation}
+\begin{array}{cc}
+\dfrac{E_{k}\left( d\right) }{\delta d\left( i\right) }=0 & \text{for }i>k%
+\text{.}%
+\end{array}
+\tag{A.8}  \label{BMRC 8}
+\end{equation}
+
+Hence for a maximum:
+
+\begin{equation}
+\dfrac{\delta V}{\delta d\left( i\right) }=-d\left( i\right) p_{i}\left(
+d\right) \tprod\limits_{j=1}^{i-1}\left( 1-P_{j}(d\right)
+)+\tsum\limits_{k=i+1}^{\infty }\varepsilon _{k}\left( d\right)
+\tprod\limits_{j\neq i}^{k-1}\left( 1-P_{j}\left( d\right) \right)
+p_{i}\left( d\right) =0.  \tag{A.9}  \label{BMRC 9}
+\end{equation}
+
+Factoring out $p_{i}\left( d\right) $, we obtain, finally:
+
+\begin{equation}
+d\left( i\right) =\dfrac{\tsum\limits_{k=i+1}^{\infty }\varepsilon
+_{k}(d)\tprod\limits_{j\neq i}^{k-1}\left( 1-P_{j}\left( d\right) \right) }{%
+\tprod\limits_{j=1}^{i-1}\left( 1-P_{j}\left( d\right) \right) }%
+=\sum_{k=i+1}^{\infty }\varepsilon _{k}\left( d\right)
+\prod_{j=i+1}^{k-1}\left( 1-P_{j}\left( d\right) \right) \text{.}  \tag{A.10}
+\label{BMRC 10}
+\end{equation}
+
+For the answer to be meaningful, the infinite sum in (A.10) must
+converge.\textquotedblright \cite[pp.116]{Simon BMRC}
+\end{quotation}
+
+The convergence of (A.10) will happen if the probability distribution of
+offers shifts downward fast enough, which can occur if there is an expected
+fall in prices or if the agent has a high discounting rate for the present
+value of the future price. Simon side steps this issue of convergence by
+assuming that there exists a reservation price $a(n)$ for the $n$th day that
+is low enough so that $P_{n}\left( d\right) $ is unity. By ceasing the
+summation in period $n$ the optimal $d\left( i\right) $ can be computed `by
+working backward from the terminal period, and without the necessity of
+solving simultaneously the equations (A.10)' \cite[pp. 117]{Simon BMRC}.
+Simon also points out that the information required of the agent using the
+method above will still be massive. In fact it would be a complete
+information set, detailing the probability distribution of offers for every
+day until the house is sold. Simon explains that for the house seller that
+is willing to settle for `a more bumbling kind of rationality' the
+simplification is to; 1) decide a price that he will definitely be able to
+get for the house within a specified time period and 2)set a very high price
+to begin with and adjust it depending on the distribution of offers he
+receives. In this way, no probability calculations have to be made. This
+modification of the choice process, Simon argues, is `the kind of rational
+adjustment that humans find \textquotedblleft good enough\textquotedblright\
+and are capable of exercising in a wide range of practical circumstances.' 
+\cite[ibid]{Simon BMRC}
+
+Satisficing is not a sufficient condition for bounded rationality, nor is it
+a necessary. There are several models of boundedly rational agents that
+maximise an objective function and it is possible to model rational agents
+that satisfice. The key is that satisficing is not synonomous with bounded
+rationality. It is however, a radically different way of looking at a choice
+problem.
+
+In theories of global rationality, the choice process can be characterized
+as mystical in nature with optima being effortlessly divined by agents,
+whereas in theories of bounded rationality the process can be characterized
+as a heuristic search and selection technique. Rational agents know
+everything about the choice set with which they are endowed. Indeed,
+alternatives seem to drop into the lap of the rational agent even as manna
+from heaven! Meanwhile, the boundedly rational agent has to observe his
+world and find a solution that works. The rational agent is a demigod, while
+the boundedly rational agent is an information processing system. The
+rational agent will settle for nothing less than the absolute best. The
+boundedly rational agent knows his own limitations and tries to choose as
+best he can. These are the different people that economists must choose
+between to populate their hypothetical worlds.
+
+\section{Performance, Naive Realism, and Methodological Philosophy}
+
+There are not many economists that would argue against the boundedly
+rational agent as the more realistic portrait of a human being, but the
+prominent economist Milton Friedman has made the argument that the
+descriptive qualites (or lack thereof) of a model or its assumptions are not
+as important as its ability to predict observable and empirically testable
+outcomes. In particular Lawrence Boland \cite[1979]{boland 1979} defends and
+restates Friedman's controversial claim in his paper entitled `A Critique of
+Friedman's Critics'
+
+\begin{quote}
+`So long as a theory does its intended job, there is no apparent need to
+argue in its favor (or in favor of any of its constituent parts). For some
+policy-oriented economists, the intended job is the generation of true or
+successful predictions. In this case a theory's predictive success is always
+a sufficient argument in its favor. This view of the \textit{role} of
+theories is called \textquotedblleft instrumentalism.\textquotedblright\ It
+says that theories are convenient and useful ways of (logically) generating
+what have turned out to be true (or successful) predictions or conclusions .
+Instrumentalism is the primary methodological point of view expressed in
+Friedman's essay.
+
+For those economists who see the object of science as finding the \textit{one%
+} true theory of the economy, their task cannot be simple. However, if the
+object of building or choosing theories (or models of theories)\ is only to
+have a theory or model that provides true predictions or conclusions, 
+\textit{a priori} truth of the assumption is not required \textit{if} it is
+already known that the conclusions are true or acceptable... Thus, theories
+do not have to be considered true statements about the nature of the world,
+but only convenient ways of systematically generating the already known
+\textquotedblleft true\textquotedblright\ conclusions.' \cite[pp. 508-509]%
+{boland 1979}
+\end{quote}
+
+Chief among those that oppose this `instrumentalist' approach is the revered
+Paul Samuelson. Stanley Wong \cite[1973]{wong 1973}\ summarizes Samuelson's
+arguments in his paper for the American Economic Review called `The
+\textquotedblleft F-Twist\textquotedblright\ and the Methodology of Paul
+Samuelson.'
+
+\begin{quotation}
+`We can summarize Samuelson's critique as follows. 1) It is a contradiction
+to maintain that all the consequences can be valid and the theory and the
+assumptions not valid. 2) It is absurd to maintain, in the case where only
+some of the consequences are valid, that the theory and the assumptions are
+important though invalid. The part of the theory set and the assumption set
+corresponding \ to the invalid \ part of the consequence should be
+eliminated. For convenience let us call 1) the F-Twist Theorem and 2) the
+F-Twist Corollary.' \cite[pp. 314]{wong 1973}
+\end{quotation}
+
+Wong spends most of the article criticizing Samuelson's critique, even going
+on to define an `S-Twist' \cite[pp. 316]{wong 1973}. Wong does make clear
+his misgivings about Friedman's credo however. Wong writes on the last page
+of the article,
+
+\begin{quotation}
+\textquotedblleft What then is the methodological choice? It surely is not
+instrumentalism or descriptivism. Instrumentalism in its single-minded
+pursuit of predictions \textit{goes} \textquotedblleft beyond the
+facts\textquotedblright\ by considering the truth or falsity of statements
+to be irrelevant; descriptivism in its pursuit of pure descriptions designs
+a theory \textit{not to go} beyond the facts and thus ends up with a theory
+being just a restatement of the \textquotedblleft facts.\textquotedblright\
+As an alternative to the two views, we have advocated the view that a theory
+is explanatory and informative, namely, that in order to have any
+explanatory content it must go beyond pure description.' \cite[pp. 324]{wong
+1973}
+\end{quotation}
+
+This methodological debate is tangent to many economic issues including the
+bounded vs. global rationality divide. Proponents of the latter use
+Friedman's credo as a shield from the criticisms of those on the other side 
+\footnote{%
+It is one of life's great ironies that the proponents of global rationality
+use the Friedman credo to shield themselves from attacks when parallels can
+be drawn between the reasoning behind it and the choice process of a
+boundedly rational agent. Frazer and Boland \cite[1983]{boland 1983} say
+`... Friedman is more concerned with the immediate practical problems of
+policymaking than with the philosophical problems that have troubled those
+who have been searching for centuries for \textit{the} method of finding the 
+\textit{one} true or acceptable theory....'\cite[pp. 131]{boland 1983} It
+sounds like Milton Friedman chose to be an instrumentalist because he was
+already a satisficer.}. `Why', they ask, `should we abandon such a
+successful theory as Neoclassical Economics?' But if one does agree with the
+instrumentalist view of the role of theory, is this a proper application of
+the logic? Friedman is quoted in Wong \cite[pp. 315]{wong 1973} as saying,
+
+\begin{quote}
+`(a) \textquotedblleft A hypothesis can be tested \textit{only} by the
+conformity of its implications or predictions with\ observable
+phenomena\textquotedblright\ (p. 40, our italics).
+
+(b)\ \textquotedblleft Great confidence is attached to ... a [hypothesis] if
+it has survived many opportunites for\ contradiction\textquotedblright\ (p.
+9)
+
+(c) A new or rival theory \textquotedblleft\ must have implications
+susceptible to empirical contradiction\textquotedblright\ before it can be
+regarded as interesting and important (p. 38). [p.66]' \cite[pp. 315]{wong
+1973}
+\end{quote}
+
+There are several situations in which the neoclassical paradigm fails at
+providing accurate `predictions of observable phenomena', so by their own
+reasoning anyone subscribing to the Friedman credo should be an advocate of
+studies using bounded rationality. Of course, those that remain squarely in
+the neoclassical corner write off such failures as `statistical anomalies.'
+One such `anomaly' or failure has been the repeated attempts to explain the
+existence of an equity premium in U.S. financial markets, an area where a
+behavioural approach seems better equipped to reconcile the paradox of high
+stock returns and a low risk free rate (cf. \cite{myopic}, for a detailed
+treatment of this topic). Certainly, the limitations of agents ability to
+perceive and predict are intrinsic in this context and many others.
+
+Friedman's approach did not preclude descriptive assumptions for models, it
+simply doesn't concern itself with the assumptions at all. What matters to
+an instrumentalist is the empirical performance of a model. If more
+descriptive assumptions yield useful theoretical models where less
+descriptive models cannot, then the desciptive model should be used. Boland
+and Frazer \cite[1983]{boland 1983} quote Friedman in their paper `An Essay
+on the Foundations of Friedman's Methodology.'
+
+\begin{quotation}
+`The reason is simple. A hypothesis is important if it \textquotedblleft
+explains\textquotedblright\ much by little, that is, if it abstracts the
+common and crucial elements from the mass of complex and detailed
+circumstances surrounding the phenomena to be explained and permits valid
+predictions on the basis of them alone. To be important, therefore, a
+hypothesis must be descriptively false in its assumptions; it takes account
+of, and accounts for, none of the many other attendant circumstances, since
+its very success show them to be irrelevant for the phenomena to be
+explained. To put this point less paradoxically, the relevant question to
+ask about the \textquotedblleft assumptions\textquotedblright\ of a theory
+is not whether they are descriptively\ \textquotedblleft
+realistic,\textquotedblright\ for they never are, but whether they are
+sufficiently good approximations for the purpose at hand. And this question
+can be answered only by seeing whether the theory works, which means whether
+it yields sufficiently accurate predictions. The two supposedly independent
+tests thus reduce to one test. [p. 15]' \cite[pp. 130-131]{boland 1983}
+\end{quotation}
+
+Friedman is right in this respect, restricting models with assumptions that
+attempt to capture the minutae of everyday life is a futile effort. Models
+are meant to be abstractions. If one were trying to read the small print of
+a contract one would find it quite useless to use a telescope when all that
+was needed was a low magnification lens. But Friedman's warning has a limit,
+as does his logic. It certainly wouldn't help matters to look through the
+telescope at the other end. In the same way, the level of abstraction that
+will yield the clearest picture, or rather a clearer picture, must be
+somewhere in between. Moreover, it is the premise of this thesis that more
+descriptively `realistic' assumptions should be the rule rather than the
+exception. Of course, economists that{\LARGE [? who?]} don't sympathise with
+Friedman's ideas about methodology will agree. Whether or not to accept
+boundedly rational behaviour as the norm becomes a matter of degree then.
+
+Friedman's credo has been very controversial and has been the subject of
+criticism from several schools of methodological philosophy. Boylan \cite[%
+1995]{Boylan} gives the proper methodology from the so called `Causal
+Holist's' point of view;
+
+\begin{quotation}
+`Thus economists use the conceptual resources of a shared theory to
+construct a semantical economic model of some observable aspect of an actual
+economy and, in addition, they must both deploy and develop the inductive
+methodological resources of that theory to ascertain the descriptive
+adequacy of the constructed model....In this connection the causal holist is
+not optimistic that neoclassical theory has the required inductive resources
+for this desciptive task and, if this is so, it must be deemed to be
+descriptively inadequate.'\cite[pp. 208-210]{Boylan}
+\end{quotation}
+
+\subsection{Deliberation and Optimisation}
+
+John Conlisk \cite[1996]{conlisk} focuses on the implications and
+difficulties of incorporating deliberation costs in economic models
+explicitly in his paper `Why Bounded Rationality?' `If rationality is
+scarce, good decisions are costly. There is a tradeoff\textit{\ }between
+effort devoted to deliberation and effort devoted to other activities...' 
+\cite[pp. 682]{conlisk}.\textit{\ }The paper addressed some of the more
+common objections to using boundedly rational agents in models. Among these
+were:
+
+1. `Agents act as if\ they were unboundedly rational.' To this Conlisk says
+that the evidence shows that this statement is sometimes true but not
+always. If agents don't always behave in this manner, then models that
+assume they do will be useless.
+
+2. `The learning argument' says that agents' rationality is bounded but also
+that they learn to optimise over repeated choices and in the end behave as
+if they were completely rational. The argument that people learn to optimise
+implies that there are varying degrees of rationality existing in agents
+within any economic system.\ This is precisely what assumptions of global
+rationality will not allow for in economic modeling. Moreover, it seems
+plausible that there may be significantly fewer agents in the system that
+behave as if they were globally rational than ones that do behave in a
+`close to optimal' way. Conlisk also points out that the existence of
+rational agents is necessary but not sufficient for other agents to learn
+how to behave in a more rational way. Learning requires a suitable
+environment. A `suitable environment' has in place and available to an agent
+the proper institutional structure, the relevant information, teachers of
+some sort, and most importantly, there is enough time for an agent to
+understand the concept well enough to start to behave in a rational way.
+There is little reason to believe that this will often be the case.
+
+3. `Agents who do not optimize will not survive.' This is another case
+where, Conlisk says, the rule applies only under certain conditions.
+`Non-optimizing firms survive under some conditions but not others. In the
+presence of deliberation cost, for example, survival logic may favor a cheap
+rule of thumb over a costly optimization.' \cite[pp.684]{conlisk}
+
+4. The models that have had success in the past have been based on global
+rationality. To abandon that would be foolish. Conlisk's reply to this is
+that the argument assumes that the success of previous models was due to the
+rationality assumption (which is unfounded) and that expanding on the
+previous ideas of rationality won't lead to further gains (which is also
+unfounded). This argument amounts to sticking one's head in the sand.
+
+5. The `sidewalk twenties' argument says that optimising identifies an
+opportunity for gain which any agent would have to be a fool to pass up. The
+rebuttal to this argument is that an economic increase is only an economic
+gain if it is worth the effort to procure for oneself.
+
+6.`The neoclassical paradigm provides structure and discipline for economic
+models.' To abandon global rationality assumptions would allow the science
+of economics to fall into `ad hocery.' A complete abandonment of the
+neoclassical paradigm would be painful but this adjustment might be
+mitigated by borrowing supports from other disciplines such as cognitive
+psychology. This doomsday prediction sounds more like fear than reason.
+
+7. `Optimization provides tractability and definite outcomes'. Extensive
+systems of equations to be solved in limited real time hardly seems
+`tractable' from the agent's point of view. As for definite outcomes,
+convergence of the multiple equilibria of a model of bounded rationality is
+very possible, perhaps even probable. In Simon's \cite[1955]{Simon BMRC}
+model, it was the existence of aspiration levels that led to definite
+outcomes. Formally, if there exists;
+
+\begin{itemize}
+\item A set of behaviour alternatives, $A$, and a subset of alternatives
+perceived by the agent, $A^{\circ }$
+
+\item A set of possible future state of affairs $S$
+
+\item A pay off function $V\left( s\right) $ defined over all elements $s$
+of $S$
+
+\item The acceptance price or level, $d\left( k\right) $ from above.
+\end{itemize}
+
+Then a unique solution will be guaranteed through the combination of the two
+processes; 1) altering $d\left( k\right) $ based on the ease or difficulty
+of finding satifactory outcomes and 2) by expanding or contracting $A^{\circ
+}$ by search of the superset $A$ depending on the number of elements that
+yield satisfactory values after being put through the pay off function, $%
+V\left( s\right) $. To the extent that these processes are likely to
+actually be used by agents, it is likely that models of boundedly rational
+agents will yield definite outcomes.
+
+8. `Economics is the study of optimizing behaviour. Bounded rationality is
+the province of other disciplines.' To this argument Conlisk gives the
+eloquent reply;
+
+\begin{quotation}
+`By its most common definition, economics concerns scarcity. Because human
+reasoning ability is scarce, one could as well argue that economists are by
+definition \textit{required} to study bounded rationality. More important,
+economics as a science must view every theory, including optimization
+theory, as open to empirical challenge. Regarding the province metaphor,
+scientific disciplines are in fact clusters of activity, not provinces
+protected by border guards. Whenever theory \ and evidence suggest a need to
+settle the sparsely populated areas between clusters, science says welcome.'%
+\cite[pp. 686, italics in the original]{conlisk}
+\end{quotation}
+
+Conlisk also addressed the problem of infinite regress when trying to model
+`economizing economizing.' Conlisk says that economists up to this point
+have chosen to ignore any cost beyond the original and auxiliary choice
+functions, but Simon made use of a fixed point theorem to solve this type of
+problem, and it can be argued that the same should have been done here. In
+any case, Conlisk goes on to give an example of how a model with
+deliberation costs might look if any function beyond the first auxiliary
+function is ignored \cite[pp. 688]{conlisk}. Specifically, if one is
+attempting to maximise some function $P$, part of that process is to decide
+how much effort to expend on making the original choice, which can be
+represented by another function, $F\left( P\right) $. In particular, suppose
+a decision maker faces a problem like
+
+\begin{problem}
+Choose $X$ such that $\Pi \left( X\right) $ becomes large.
+\end{problem}
+
+With $\Pi \left( X\right) $ being a payoff function. Suppose that the agent
+has enough information to find the optimal value of $X$, $X^{\ast }$.
+Suppose also $\Pi \left( X\right) $ is complex enough so that solving for $%
+X=X^{\ast }$ is prohibitively costly, that $T$ is the effort devoted to
+making the decision, and $C$ is the cost of one unit of $T$. Then
+
+$%
+\begin{array}{ll}
+X\left( T\right) & \text{is the decision that will actually be realised if
+deliberation is undertaken} \\ 
+X_{0} & \text{is an effortless rule of thumb}%
+\end{array}%
+$
+
+and%
+\begin{equation}
+X\left( T\right) =G\left( T,X^{\ast },X_{0},u\right)
+\end{equation}
+
+With $u$ being a random disturbance term. Conlisk also gives $X\left(
+T\right) $ the following properties by assumption
+
+\begin{axiom}
+\begin{equation}
+G\left( 0,X^{\ast },X_{0},u\right) =X_{0}
+\end{equation}
+\end{axiom}
+
+\begin{axiom}
+\begin{equation}
+\left( \dfrac{\delta }{\delta T}\right) E[G\left( T,X^{\ast },X_{0},u\right)
+-X^{\ast }]^{2}<0
+\end{equation}
+\end{axiom}
+
+\begin{axiom}
+\begin{equation}
+G\left( \infty ,X^{\ast },X_{0},u\right) =X^{\ast }
+\end{equation}
+\end{axiom}
+
+Given these assumptions, Conlisk says, $F\left( P\right) $ may resemble the
+problem
+
+\begin{problem}
+Choose $T$ to make $E\{\Pi \lbrack X(T)]\}-CT$ large.
+\end{problem}
+
+Conlisk says that there are two ways to approach the second problem. Either
+one tries to optimise $F\left( P\right) $ or one uses rules of thumb to
+approximate the solution. He uses this set up to describe four approaches to
+solving the choice problem \cite[pp. 689]{conlisk}. His `Four Rationalities'
+are as follows;
+
+\begin{enumerate}
+\item Treat problem $P$. Optimal closure.
+
+\item Treat problem $P$. Adaptive closure.
+
+\item Treat problem $F\left( P\right) $. Optimal closure.
+
+\item Treat problem $F\left( P\right) $. Adaptive closure.
+\end{enumerate}
+
+The first approach covers standard neoclassical models, the second includes
+most of the boundedly rational models, while the third and fourth approaches
+cover models of deliberation cost. The treatment of $F\left( P\right) $ with
+optimal closure has been dubbed `optimal imperfection' and has been the
+choice of many models of deliberation costs. Conlisk brings up a good point
+when he says `Why would a decision maker who cannot optimize relative to
+problem $P$ be able to optimize relative to problem $F(P)$, which will often
+be more complicated?'\cite[pp. 689]{conlisk}. The defenses for such an
+approach parallel those for global rationality and optimality, e.g. learning
+over repeated trials. So an agent, it is argued, cannot learn to be rational
+but they can learn to rationally decide how much time to devote to a
+decision. The logic is strained here, and Conlisk admits `a modeler may have
+to justify optimal imperfection... as nothing more profound than as a
+compromise of expedience' \cite[pp. 690]{conlisk}. While models of
+deliberation costs are very interesting, it appears that they lose focus
+when it comes to economic phenomena by paying too much attention to the
+psychological aspect of it.
+
+In his paper Simon writes,
+
+\begin{quotation}
+`If the pay-off were measurable in money or utility terms, and \textit{if}
+the cost of discovering alternatives were similarly measurable... Then we
+could speak of the optimal degree of the persistence of behavior- we could
+say that the more persistent organism was more rational than the other, or
+vice versa. But the central argument of the present paper is that the
+behaving organism does \textit{not }in general know these costs, nor does it
+have a set of weights for comparing the components of a multiple pay-off.' 
+\cite[pp.112]{Simon BMRC}
+\end{quotation}
+
+So, the question of whether or not to model deliberation costs hinges on
+whether or not one believes that the agents know the costs of deliberation,
+because if they do not know these costs, it is impossible for them to choose
+a deliberation technology in any `optimal' way. It is curious that Conlisk
+never makes mention of the idea of deadlines in his analysis of
+deliberation. Surely agents must make a decision within acceptable
+timeframes. Also, if Simon is right and people's choice processes tend to be
+sequential in nature, as opposed to the beforehand approach that Conlisk
+uses, the whole question of deliberation costs seems flawed.
+
+\section{Bounded Rationality in Finance}
+
+\subsection{Kahneman and Tversky}
+
+Kahneman and Tversky \cite[1979]{prospect} found empirical evidence that
+people tend to avoid negative outcomes, often at the cost of `overall '
+results in their paper entitled, `Prospect Theory: An Analysis of Decision
+under Risk' which went on to win a Nobel Prize{\LARGE [It is not the case
+that this one paper won the Prize? It was the general work on prospect
+theory]}. In Kahneman's acceptance essay \cite[2003]{Kahneman 2003} \ he
+restates his and Tversky's findings from a simple experiment that asks
+respondents whether or not they would take gambles like these;
+
+\begin{problem}
+`Would you accept this gamble?
+
+\textit{50\% chance to win \$150}
+
+50\% chance to lose \$100
+
+Would your choice change if your overall wealth were lower by \$100?' \cite[%
+pp. 1455]{Kahneman 2003}
+\end{problem}
+
+\begin{problem}
+`Which would you choose?
+
+\qquad lose \$100 with certainty
+
+or
+
+\qquad 50\% chance to win \$50
+
+\qquad 50\% chance to lose \$200
+
+Would your choice change if your overall wealth were higher by \$100?' \cite[%
+pp1456]{Kahneman 2003}
+\end{problem}
+
+Kahneman reports `There will be few takers of the gamble in Problem 10. The
+experimental evidence shows that most people will reject a gamble with even
+chances to win or lose, unless the possible win is at least twices the size
+of the possible loss.... In Problem 2 the gamble appears much more
+attractive that the sure loss. Experimental results indicate risk-seeking
+preferences are held by a large majority of respondents in problems of this
+kind.'\cite[ibid.]{Kahneman 2003}.{\LARGE [It is too late now but it wold
+have been nice if you had been able to mention the celibrated paradoxes of
+Allais, Ellsberg, Newcomb, etc., that are the forerunners to these issues;
+if you are interested, look at some of the early books on game theory; for
+eg., the one by Duncan Luce and Howard Raiffa. Daniel Ellsberg later became
+'famous' for having 'leaked' the Pentagon papers during the Nixon years. He
+was, by the way, a pupil of Goodwin at Harvard. I\ have copies of his
+original papers, signed and presented to Goodwin!!!!]}
+
+In the course of the essay Kahneman sketches two psyhcological systems.
+System 1 is most closely associated with intuition, while System 2 is better
+deescribed as `reason.' Each system has its own characteristics. System 1 is
+highly accessible, with no conscious effort being needed for it to work but
+often will yield contradictory or incorrect answers while System 2 is much
+slower but can handle complex problems more reliably. System 1 is very slow
+to learn while System 2 is highly adaptable and eventually, through
+practice, provides very low cost answers. In his concluding remarks,
+Kahneman highlights the exceptional powers of the rational agent; `The
+rational agent of economic theory would be described, in the language of the
+present treatment, as endowed with a single congnitive system that has the
+logical ability of a flawless System 2 and the low computing costs of System
+1.' $\cite[pp1469]{Kahneman 2003}$
+
+Kahneman and Tversky's findings go against the basic tenets of the
+neoclassical paradigm. They did offer an alternative in Prospect Theory. At
+the core of this approach is the recognition that people find changes in
+levels more accessible than absolute values and the importance of framing
+effects in their attitudes towards risk \cite[1979]{prospect}. In
+particular, if a regular prospect is defined as an outcome and probability
+pairing, for regular prospects
+
+\[
+V\left( x,p;y,q\right) =\pi \left( p\right) v\left( x\right) +\pi \left(
+q\right) v\left( y\right) 
+\]
+
+where
+
+$%
+\begin{array}{ll}
+V & \text{is the value function defined over prospects, }\left( x,p\right) 
+\text{ and }\left( y,q\right) \\ 
+\pi & \text{is the weighting function defined over probabilities, }p\text{
+and }q \\ 
+v & \text{is the value functions defined over outcomes, }x\text{ and }y%
+\end{array}%
+$
+
+if $\left( x,p;y,q\right) $ is a regular prospect (i.e., either $p+q<1$, or $%
+x\geq 0\geq y$, or $x\leq 0\leq y$)
+
+where $v\left( 0\right) =0$, $\pi \left( 0\right) =0$, and $\pi \left(
+1\right) =1$. Strictly positive and strictly negative prospects would have
+the alternate formulation,
+
+\[
+V\left( x,p;y,q\right) =v\left( y\right) +\pi \left( p\right) \left[ v\left(
+x\right) -v\left( y\right) \right] 
+\]
+
+if $p+q=1$ and either $x>y>0$ or $x<y<0$
+
+The weighting function introduces key effects of human psychology into the
+weight of probabilities. In general $\pi \left( p\right) $ demostrates the
+following properties;
+
+$%
+\begin{array}{ll}
+\text{Overweighting of small probabilities} & \pi \left( p\right) >p\text{
+for low }p \\ 
+\text{Subcertainty} & \pi \left( p\right) +\pi \left( 1-p\right) \text{ for
+all }0<p<1 \\ 
+\text{Subproportionality} & \dfrac{\pi \left( pq\right) }{\pi \left(
+p\right) }\leq \dfrac{\pi \left( pqr\right) }{\pi \left( pr\right) }%
+,0<p,q,r\leq 1 \\ 
+\text{Subadditivity} & 
+\begin{array}{l}
+\pi \left( rp\right) >r\pi \left( p\right) ,0<r<1\text{ when } \\ 
+\text{subproportionality and overweighting hold}%
+\end{array}%
+\end{array}%
+$
+
+In addition the value function takes a characteristic S-shape, with the
+important properties of a steeper slope in the domain a{\LARGE [?]} of
+losses and reflectivity throught{\LARGE [?]} the origin, ie. it is concave
+in the domain of gains and convex in the domain of losses.
+
+\FRAME{ftbpFU}{3.032in}{2.4941in}{0pt}{\Qcb{Kahneman and Tversky's S-shaped
+Value Function}}{\Qlb{prospect 1979}}{Figure}{\special{language "Scientific
+Word";type "GRAPHIC";maintain-aspect-ratio TRUE;display "USEDEF";valid_file
+"T";width 3.032in;height 2.4941in;depth 0pt;original-width
+4.2921in;original-height 3.5224in;cropleft "0";croptop "1";cropright
+"1";cropbottom "0";tempfilename 'I3SKVC18.bmp';tempfile-properties "PR";}}
+
+\subsection{Behavioural Finance}
+
+According to Kahneman \cite[2003]{Kahneman 2003}, `Theories in behavioral
+economics have generally retained the basic architecture of the rational
+model, adding assumptions about cognitive limitations designed \ to account
+for specific anomalies' \cite[pp. 1469]{Kahneman 2003}. What Kahneman is
+talking about here is the ad-hoc application of boundedly rational behaviour
+from agents in economic models. \textit{Behavioural Economics} as it stands
+today, while it is a step in the right direction, is an incomplete version
+of what it should be. Behavioural Economics should take its assumptions of
+human behaviour from cognitive psychology to start from, and generalise
+outward from there when it can be justified. Currently the trend is to do
+the converse. However, the application of evidence from cognitive psychology
+has gained wide spread approval in many contexts, and one can be hopeful for
+the future.
+
+The field of \textit{Behavioural Finance} has emerged as a force to be
+reckoned with in recent decades. This school of finance takes cues from
+Behavioural Economics in\ that it explicitly includes in models the human
+aspects of agents. Richard Thaler has contributed more to the field than
+most. His numerous columns and papers have identified anomalies in financial
+markets and addressed major weaknesses in the neo-classical paradigm, as
+well as offering some possible answers. He has also worked with others to
+develop behavioural theories, pushing the field ever closer to a new
+framework with which economists can look at problems both old and new. He
+pinned down an `overreaction effect' and hypothesized its cause in a paper
+he wrote with Werner F. M. De Bondt called `Does the Stock Market
+Overreact?' \cite[1985]{overreact}. He and Shlomo Benartzi also contributed
+to the field in their identification of the `naive diversification strategy'
+which they describe in their paper `Naive Diversification Strategies in
+Defined Contribution Saving Plans' \cite[2001]{naive}. They present their
+approach saying,
+
+\begin{quote}
+`We do not attempt to evaluate asset allocations on an individual
+case-by-case basis because nearly any combination of stocks and bonds could,
+in principle, be consistent with the maximization of some utility function.
+Rather, in this paper we look for evidence that participants make decisions
+that seem to be based on naive (or confused) notions of diversification. One
+extreme example we discuss is what we call the \textquotedblleft $1/n$
+heuristic\textquotedblright . Someone using this rule simply divides her
+contributions evenly among the $n$ options offered in her retirement savings
+plan' \cite[pp. 79]{naive}.
+\end{quote}
+
+Thaler and Benartzi even find that the words and actions of Harry Markowitz
+himself seem to defend this heuristic.
+
+\begin{quote}
+`Indeed, Harry Markowitz, a pioneer in the development of modern portfolio
+theory, reports that he used this rule himself. He justifies his choice on
+psychological grounds: \textquotedblleft My intention was to minimize my
+future regret. So I split my contributions fifty-fifty between bonds and
+equities\textquotedblright\ (Jason Zweig, 1998)' \cite[pp. 80]{naive}.
+\end{quote}
+
+They also go on to identify another effect they call `myopic loss aversion'
+in a paper called `Myopic Loss Aversion and the Equity Premium Puzzle' \cite[%
+1995]{myopic}. This paper borrows from the results of a paper by Daniel
+Kahneman and Amos Tversky which{\LARGE [?]} later went on to win a nobel
+prize{\LARGE [repetitive]}.
+
+Thaler and Thomas Russell have put together a convincing argument for the
+relevance of so-called `quasi-rational' agents in economic models in a paper
+entitled `The Relevance of Quasi Rationality in Competitive Markets' \cite[%
+1985]{quasi}. Such agents exhibit behaviour which suggests that they follow
+a system of decision rules which fundamentally differ from those employed in
+economic models of globally rational agents. Their paper also suggested that
+in many markets, the number of quasi-rational agents need not constitute a
+majority for their behaviour to have a significant affect on prices and
+output and as a matter of fact, the level of competitiveness of the market
+might actually bolster the quasi-rational's effect on prices and output.
+
+There are situations in which quasi's{\LARGE [?]} should not have an affect.
+These are when markets for characteristics can be made out of the market for
+goods and short selling is allowed. Since these stipulations apply to
+financial markets, it seems that Thaler and Russell \cite[pp. 1076]{quasi}
+are suggesting that these markets are the least likely to exhibit the
+effects of quasi-rational behaviour. However, the costs of trading and
+financial advice, the possibility that quasi-rationals may also short sell,
+and doubt over whether or not the correct mapping of characteristics onto
+goods can ever be known leaves the door open for a significant effect from
+the existence of quasi-rationals in a market. It is therefore reasonable to
+ask the question `Can models of financial markets be enriched by allowing
+quasi-rational behaviour?' This paper will assume the answer to that
+question is `yes' and shall endeavour to piece together the beginnings of
+such a model while borrowing quite a bit from Thaler, Russell, De Bondt,
+Benartzi, Tversky, Kahneman, and of course Simon.
+
+\chapter{A Model of Quasi-Rationality in the Irish Stock Exchange}
+
+\section{The Model}
+
+Thaler and Russell's general model of quasi-rational agents approached the
+problem this way. Markets are composed of hetergenous agents, some of whom
+(rationals) consume in such a way as to maximise their utility. There also
+exist agents called quasi-rationals that consume in such a way that they
+maximise their utility a certain percentage of the time and at other times
+mistakenly believe that they are maximising their utility but are actually
+at an inefficient point inside their budget constraint. The agents consume
+goods but obtain utility from some characteristic(s) contained within the
+goods as opposed to getting it from the goods themselves. The exact
+composition of the market is unknown, ie., one does not know the ratio of
+rational agents to quasi-rational agents. Furthermore, rational agents in
+this model use a specific mapping of the characteristic onto goods. The key
+difference between the two types of agents is that the quasi-rational agent
+uses a different characteristic mapping than the rational agent does and
+this leads the two populations to form different demand functions. Thus, the
+quasi's make systematic `errors' in choosing their consumption bundle. Note
+that both types of agent attempt to maximise their utility.
+
+To convert this model to a model of financial markets is{\LARGE \ }more or
+less straightforward. Financial goods are typically thought of in terms of
+their risk and return characteristics and of all markets, capital asset
+markets are believed to have the most sophisticated participants with
+information most readily available to them. In this context, maximisation
+problems seem appropriate for the capabilities of agents in their portfolio
+decisions.
+
+The model is a multiperiod model. A certain proportion of assets are held by
+rational agents and the rest is held by quasi-rational agents. There is no
+insider trading, i.e.,quasi-rational and rational investors have the same
+information set and know the model that the other uses. They simply just
+`believe' in their own methodologies.
+
+To begin, rational investors use the standard CAPM.
+
+$R_{r}=R_{f}+\beta _{i}\left( R_{M}-R_{f}\right) $
+
+where:
+
+$%
+\begin{array}{ll}
+R_{r} & \text{is the expected rate of return on an asset} \\ 
+R_{f} & \text{is the rate of a \textquotedblleft
+risk-free\textquotedblright\ investment given exogenously} \\ 
+R_{M} & \text{is the return rate of the market portfolio} \\ 
+\beta _{i} & 
+\begin{array}{l}
+\text{is the }cov\left( R_{i},R_{M}\right) /\sigma _{M}^{2}\text{ which
+measures the relative risk of the} \\ 
+\text{ asset compared to the market portfolio}%
+\end{array}%
+\end{array}%
+$\bigskip
+
+Suppose quasi-rational investors also use the CAPM framework as a guideline
+but their expectations veer off from the model's as they realise sharp
+swings in returns on their portfolios or persistent return behaviour.
+Suppose also that they tend to exaggerate the importance of recent stock
+performance. Then the effect they will have on the expected rate of return
+will be to increase it in a bull market and to decrease it in a bear market,
+thus aggrevating the situation. In either situation the quasi's will have an
+affect if: 1)There are enough of them and 2) Rationals are slow to react. In
+a bear market, as the quasi's sell off their stock, their affect on prices
+diminishes as their participation in the market becomes less. Combined with
+a rational agent that is somewhat cautious about buying an undervalued stock
+that is still diving in price, this should increase the variance of prices
+and also make peaks and valleys somewhat persistent. In a bull market,
+rationals may be slow to sell to quasi's because they are trying to `milk
+them for all they're worth.'
+
+Formally, this could all be shown by simply altering the equation for the
+Securities Market Line in the following manner,
+
+\[
+R_{c}=\alpha Rr+(1-\alpha )R_{q} 
+\]
+
+with
+
+$%
+\begin{array}{ll}
+R_{c} & 
+\begin{array}{l}
+\text{is the expected rate of return taking into account the expectations}
+\\ 
+\text{of both rationals and quasi-rationals}%
+\end{array}
+\\ 
+L & \text{is the proportion of market assets that are held by rational
+agents } \\ 
+M & \text{is the proportion of market assets that are held by quasi-rational
+agents } \\ 
+R_{q} & \text{is the equation for the Security Market Line for a quasi
+rational agent being given by}%
+\end{array}%
+$
+
+$\bigskip $%
+\[
+R_{q}=R_{f}+\gamma \beta _{P}\left( R_{M}-R_{f}\right) 
+\]
+
+$\beta _{P}$ is the split function
+
+$\beta _{P}=\left\{ 
+\begin{array}{cc}
+2.5\left( \dfrac{\beta _{i,t}-\beta _{i,t-1}}{\beta _{i,t-1}}\right) & \text{%
+if }\left( \dfrac{\beta _{i,t}-\beta _{i,t-1}}{\beta _{i,t-1}}\right) >0%
+\text{ } \\ 
+\left( \dfrac{\beta _{i,t}-\beta _{i,t-1}}{\beta _{i,t-1}}\right) & \text{if 
+}\left( \dfrac{\beta _{i,t}-\beta _{i,t-1}}{\beta _{i,t-1}}\right) <0%
+\end{array}%
+\right. $
+
+With the subscript $i$ representing the portfolio or stock and $t$
+representing the time period. $\beta _{P}$ is the part of the overreaction
+of quasi's that responds to changes in the level of risk.
+
+$\gamma $ is a split function resembling
+
+\[
+\gamma =\left\{ 
+\begin{array}{ll}
+2(1+\overline{R)} & \text{if }\overline{R}\geq 0 \\ 
+-5(1+\left\vert \overline{R}\right\vert ) & \text{if }\overline{R}<0%
+\end{array}%
+\right. 
+\]
+
+and $\overline{R}$ is a moving average of returns for some specified number
+of periods.
+
+\section{Prices and Motion}
+
+\subsection{Price Effects}
+
+As news about macroeconomic indicators, individual companies, political
+developments at home and abroad, and many other things hit the market, the
+Security Market Line's slope changes, reflecting the new information and the
+changes in attitudes about market and idiosyncratic risk that this
+information brings about. In addition to the security market line that a
+rational agent uses, another line exists that reflects the beliefs of the
+quasi-rational population. The line `wags' about the security market line,
+pulling expected returns and prices off away from what would be forecasted
+using CAPM\textrm{\ }such as in Figure 3.1 above.
+
+\FRAME{ftbpFU}{5.2036in}{4.2514in}{0pt}{\Qcb{Though they believe that they
+are moving from $A^{\circ }$ to $B^{\circ }$, quasi-rational investors are
+actually taking on too much risk.}}{}{quasi sml 2.wmf}{\special{language
+"Scientific Word";type "GRAPHIC";maintain-aspect-ratio TRUE;display
+"USEDEF";valid_file "F";width 5.2036in;height 4.2514in;depth
+0pt;original-width 51.7642in;original-height 42.2357in;cropleft "0";croptop
+"1";cropright "1";cropbottom "0";filename 'My Shapes/Quasi SML
+2.wmf';file-properties "NPEU";}}
+
+Suppose a quasi-rational's portfolio at point $A$ is riskier than intended
+at $\beta _{A}$ and as a result he observes returns to his portfolio, $%
+R_{A,A^{\circ }}$, that are higher than expected. Rather than recognising
+his risky position, he believes that the security market line's slope has
+steepened and the return for risk has increased, represented above as a
+rotation from the Rational Sercurity Market Line to the Optimist Quasi Line.
+Using the Optimist Quasi line, and having the same level of risk aversion,
+he finds a higher level of risk acceptable at the new price of risk. A key
+point here is that the quasi will believe that he is moving from $A^{\circ }$
+to $B^{\circ }$.along the Optimistic Quasi Line, but in reality he is moving
+from $A$ to $B$ along the Security Market Line. Indeed, \textit{every}
+quasi-rational will see it this way and as a result \textit{every}
+quasi-rational will opt to take on some additional level of risk. Of course
+the rational agent sees things differently. Rationals with similar levels of
+risk aversion will not accept the risk return trade-off that the quasi's are
+willing to make and will begin to sell any of those stocks they own which
+the quasi's are causing to be overvalued. More daring rationals \ may buy
+the overvalued stock and hold it until just before the `bubble bursts,' in \
+a gambit to maximise their return. As the proportion of rational assets
+decreases and as the more sensitive quasi's influence increases, the
+variance of stocks increase. This affects all agents, and the market starts
+to turn downward as everyone perceives that the riskiness of their position
+is increasing, which can be interpreted as a rotation of the Optimistic
+Quasi Line back towards the Rational Security Market Line. The logic is
+similar in a bear market. In this scenario it would be the reduction of the
+quasi-rational influence in the market and the rational perception of \
+`great value' that would eventually push prices back up from downturns.
+
+The returns that will actually be realised then will be somewhere between
+the the returns associated with the Security Market Line and the returns
+associated with the Optimist or Pessimistic Quasi line. What will cause
+optimism or pessimism in a market? There are many `triggers' that could do
+this, many of which have been noted in the financial literature. One likely
+candidate is stock performance from recent history, i.e. rates of return
+from the last period, or average rates of return from recent periods.
+
+We can divine from Figure 3.1 the effect of quasi-rational agents will be to
+exaccerbate price fluctuations in the market. This is due to bouts of
+excessive optimism in bull markets and excessive pessimism in bear markets.
+Reasons for these `mood' swings are rooted in the psychology of the agent.
+It is impossible for a quasi-rational agent to completely seperate himself
+from the atmosphere of a market. Note that this need not always be a
+shortcoming. The quasi-rational agent's nature allows him to react more
+quickly than a rational agent, often allowing him to avoid losses or secure
+gains at the rational's expense.
+
+\subsection{The Potential Impact of the Semantic Web}
+
+\subsubsection{What is the Semantic Web?}
+
+The Internet is;
+
+\begin{quotation}
+`A worldwide network of computer networks. It is an interconnection of large
+and small networks around the globe. The Internet began in 1962 as a
+computer network for the U.S. military and over time has grown into a global
+communication tool of many thousands of computer networks that share a
+common addressing scheme.Unlike online services, which are centrally
+controlled, the Internet is decentralized by design. Each Internet computer,
+called a host, is independent. Its operators can choose which Internet
+services to use and which local services to make available to the global
+Internet community. Remarkably, this anarchy by design works exceedingly
+well. There are a variety of ways to access the Internet. Most online
+services, such as America Online, offer access to some Internet services. It
+is also possible to gain access through a commercial Internet Service
+Provider (ISP).' \footnote{%
+Definition obtained from www.oln.org/student\_services/definitions.php}
+\end{quotation}
+
+Using the web as it is constructed today is based on keyword searches. When
+one uses a search engine, a web crawler searches for instances of the word
+or phrase on a web page and returns a link to it. Obviously, most searches
+will return several links, so the search engine will list all the matches on
+one or several pages along with the site's name and sentence fragments in
+which the word appeared. It is then up to the user to sift through the
+listing to find the site that is most suitable to his needs.
+
+The keyword search system has several well documented flaws. Search engines
+will generally return far more links to a keyword search then a user needs
+or wants. Duplicates of the same site quickly take up space in the results
+listings and there are many links returned that have little to do with the
+intended search. To make things worse, listings are not exclusively sorted
+in terms of relevance. One reason for this may be the standard practice of
+charging websites for a higher listing on the page. Some search engines get
+around this by having an explicitly marked `sponsored links' section before
+the standard list is given. Another more important reason for irrelevant
+matches is the limitations of the technology.
+
+Search engines do not have the ability to interpret their results. It is as
+if the system is looking for the `shape' of the word rather than the meaning
+that is attached to it. Recent efforts in research and development of
+internet technology have focused on using advances in artificial
+intelligence to give `meaning' to the shapes of words that computers
+recognise. Such definitions are known as `ontologies.' The term is borrowed
+from metaphysics and in that context it refers to a deeper defintion of the
+existence and nature of an object, place, or person. A `desk' is not just a
+piece of furniture, it is all the concepts and values that are attached to
+it such as `a place where work is done' and `a status symbol reflecting
+one's position in a company' along with all the other meanings and
+associations that anyone, anywhere has ever thought of. The definition of
+`ontology' is somewhat different in computer science. In this context, an
+ontology is a type of master database that relates different word shapes to
+one another through logical taxonomies. In this way, the associations that a
+web server can make imitates the types of meanings that humans give to
+words. Ying Ding et al. \cite[2004]{Ying Ding et al.} give a more technical
+definition;
+
+\begin{quotation}
+`Ontologies (cf. [Fensel,2001]) are a key enabling technology for the
+semantic web. They interweave human understanding of symbols with
+machine-processability.... Ontologies define formal semantics for
+information that allows information processing by a computer. Ontologies
+define real-world semantics that make it possible to link
+machine-processable content with meaning for humans based on consensual
+terminologies' \cite[pp. 595]{Ying Ding et al.}.
+\end{quotation}
+
+The desired effect is a world wide web that is populated by `web agents'
+which will be able to sift through returned links subject to several
+user-set criteria and narrow down results to a manageable size. de Bruijn 
+\cite[2003]{Jos 2003} paints a picture of how the Semantic Web can be
+brought about using ontologies;
+
+\begin{quotation}
+`Tim Berners-Lee, known as the inventor of the World Wide Web (WWW), has a
+vision for the future of the World Wide Web, which he calls
+\textquotedblleft\ The Semantic Web\textquotedblright\ [8]. In this Semantic
+Web, information will be presented in machine readable form. Right now most
+information processed on the WWW is presented in natural language and can
+only be understood by humans. And although there have been some advancements
+in the field of text recognition, there are still a lot of issues to be
+resolved before natural languages can be understood by computers [21].
+
+This means that a new way of recording information has to be found in order
+to make the information on the Web understandable by machines. A way to
+formally specify knowledge is to use ontologies, which are described above.
+An information source on the Web would contain a reference to an ontology or
+some sort of annotation (which also references some ontology), which
+contains the definition of the knowledge present in the information source.
+
+Intelligent agents can now gather information from different sources and
+combine the information, because of the formal relationships inside and
+between ontologies. Two related data sources can either use the same
+ontology, in which case it is straghtforward for an agent to combine the
+information, or they can use two different ontologies, which have been
+related to each other using formal mappings. These mappings enable the
+intelligent agent to combine data in different related sources to fulfill
+the information requests from the user' \cite[pp. 9]{de Bruijn 2003}.
+\end{quotation}
+
+\subsubsection{What the `Web' has done to asset markets.}
+
+To be sure, the Internet has had a dramatic affect on virtually all sectors
+of developed economies around the world. Aside from the increased
+availablility of information on products and prices, the emergence of
+e-commerce has meant that increasingly, retail outlets have moved from store
+sites to web sites. The asset market equivalent of online consumer goods
+stores in the U.S. is the recent wave of online brokerages, such as E*Trade,
+Ameritrade and Datek. Barber and Odean note that the growth is likely to
+continue,
+
+\begin{quote}
+`... Forrester Research Inc. [Punishill (1999)] projects \textquotedblleft
+that by 2003, 9.7 million U.S. households will manage more than \$3 trillion
+on-line--nearly 19 percent of total retail investment assets--in 20.4
+million on-line accounts.\textquotedblright\ The growth in online trading
+has been accompanied by a decrease in trading commissions. Lower
+commissions, greater ease of access, and speedier trade executions
+constitute reductions in market frictions. Such reductions of friction
+generally improve markets. However, while these changes can obviously
+benefit investors, to the extent that they ecourage excessive, speculative
+trading, this benefit is attenuated.' \cite[pp. 456]{Barber 2002}
+\end{quote}
+
+There has been much speculation that the introduction of online trading and
+so-called day-traders to markets will result in greater volatility and
+market fragmentation. Day Traders are defined by their strategy of buying
+round-trip in the same stocks and quantities in one day as they attempt to
+profit from small price changes. While the effect of day trading has
+received much attention in financial columns, internet chat rooms and news
+programs, it has drawn surprising little attention from researchers,
+although not for a lack of interest. As Barber and Odean \cite[2001]{Barber
+2001} point out `Little is known about their [day traders'] trading
+strategies, because firms that cater to day traders have been generally
+reluctant to provide access to the trading records of their clients.'\cite[%
+pp51]{Barber 2001}
+
+While the day trading phenomenon is prominent, it is not the only type of
+trading that bears an association with the advent of online trading. Choi,
+Laibson, and Metrick \cite[2001, pp. 419]{Choi 2001} find a strong effect in
+investor behavior in 401(k) plans in the U.S.. In particular they find that,
+on an 18 month horizon after the offering of a Web investment channel, about
+a 50\% increase in turnover and a doubling of trading frequency were
+realised by two firms.
+
+Pensions are not the only avenue through which households have made their
+way to the stock market. As reported by Barber and Odean \cite[2000, pp. 773]%
+{Barber 2000} as of 1996 `in the U.S. approximately 47 percent of equity
+investments in the United States were held directly by households, 23
+percent by pension funds, and 14 percent by mutual funds'. In their analysis
+of private equity holdings they find that
+
+\begin{quote}
+`After accounting for the fact that the average household tilts its common
+stock investments toward small value stocks with high market risk, the
+underperformance averages 31 basis points per month (or 3.7 percent
+annually). The average household turns over approximately 75 percent of its
+common stock portfolio annually. The poor performance of the average
+household can be traced to the costs associated with this high level of
+trading. Our most dramatic empirical evidence is provided by the 20 percent
+of households that trade most often. With average monthly turnover in excess
+of 20 percent, these households turn their common stock portfolios over more
+than twice annually. The gross returns earned by these high-turnover
+households are unremarkable, and their net returns are anemic. The net
+reurns lag a value-weighted market index by 46 basis points per month (or
+5.5 percent annually). After a reasonable accounting for the fact that the
+average high-turnover household tilts its common stock investments toward
+small value stocks with high market risk, the underperformance averages 86
+basis points per month (or 10.3 percent annually).' \cite[pp. 799-800]%
+{Barber 2000}
+\end{quote}
+
+Barber and Odean attribute the tendency of individual online investors to
+increase their trade frequency \ to `... a simple behavioral bias: People
+are overconfident, and overconfidence leads to too much trading.'\cite[pp.
+800]{Barber 2000}.
+
+The evidence from asset markets in the U.S. and Helsinki, while not
+conclusive, certainly hint at increased speculative behavior from online
+investors which could lead to increased market volatility and illiquidity in
+certain contexts.
+
+\subsubsection{What the Semantic Web will do to asset markets.}
+
+The key feature of the model discussed above is the assumption of the
+existence of a different type of agent. This agent is designed to more
+closely resemble humans in the way it makes decisions. The way in which the
+quasi-rational agent described above is made to be `more human' is to make
+him systematically overestimate or underestimate the expected returns to an
+asset at a given risk level. If these agents consistently mistake the price
+of risk then the overall effect of their decisions will be to exaggerate
+price fluctuations. Quasi-rational behaviour will be de-stabilising, despite
+the effect of rational arbitrage if rational agents react less quickly than
+quasi-rationals, either due to an inability to leverage in the short term or
+an unwillingness to gamble by short-selling. So the questions that must be
+asked are `Which actors in the market most likely resemble the
+quasi-rational agent' and `What effect will the Semantic Web have on such
+actors?'
+
+In response to the first question, it seems plausible that those investors
+that do not have a very deep understanding of CAPM and the theory behind it
+are more likely to alter its predictions to form their own expectations of
+future returns. These investors may be people very much like the types of
+online investors described above, i.e., pensioners, day traders, and
+individual households. One may argue that these investors obtain financial
+advise services from rational agents in an effort to make their own
+investment behaviour `more rational.' In response to this it should be
+pointed out that these investors still make decisions in their own way at
+the end of the day. At times these decisions will fly in the face of sound
+financial advice. It may also be that the cost of a financial planner may be
+prohibitive for many investors, especially those choosing between various
+stocks, funds, and bonds in their pension plans. It may be that those that
+understand financial markets the least also never end up `buying' rational
+advice.
+
+It is important to realise that there is no lack of information concerning
+asset markets in the world we live in. A quick internet search can yield
+pages upon pages of free information about stock prices, volume, company
+announcements, and other associated data. There are several cable television
+shows and stations that are dedicated solely to disseminating financial
+information. Barber and Odean \cite[2001]{Barber 2001} report;
+
+\begin{quote}
+`By one account, every on-line investor has access to over three billion
+pieces of financial data; those who are willing to pay have access to over
+280 billion pieces. However, when people are given more information on which
+to base a forecast or assessment, their confidence in the accuracy of their
+forecasts tends to increase much more quickly than the accuracy of those
+forecasts (Oskamp, 1965; Hoge, 1970; Slovic, 1973; Peterson and Pitz, 1988).
+In fact, at some point, actual predictive skill may decline as information
+rises, due to information overload (Stewart, Heideman, Moniger and
+Reagan-Cirincione, 1992; Keller and Staelin, 1987). Thus, additional
+information can lead to an illusion of knowledge.' \cite[pp. 46]{Barber 2001}
+\end{quote}
+
+The problem does not lie in the information itself, but in the presentation
+and organisation of that data and in the inability of investors to interpret
+it correctly due to biases and systematic error inherent in their own
+psychological makeup. Indeed, as Barber and Odean point out above, the
+increased availability of data may in fact dissuade agents from obtaining
+financial advice due to `an illusion of knowledge'. The market works
+properly, it's the investors that do not.
+
+What effect will the Semantic Web have on quasi-rational investors? If web
+agents could choose portfolios for those investors that have neither the
+time nor the expertise to do so, prices would more closely resemble those
+implied by models like the Capital Asset Pricing Model\ or Arbitrage Pricing
+Theory.\ In essence, the web agent would step into the role of the financial
+planner but with dramatically reduced costs. These costs need not be
+exclusively monetary in nature. The time savings and convenience of a web
+based financial planner would presumably be the largest factor in attracting
+quasi-rational business. Imagine an employee using his work computer on his
+lunch break to invest some of his paycheck in individual stocks, bonds, and
+funds. Imagine now that he does not have to choose from an extensive list,
+but can simply tell a web agent to invest his money at a certain level of
+risk while maximising his return over a specific planning horizon. The man
+doesn't even have to choose what proportion of his savings he wants in
+stocks, let alone which ones he wants! The agent finds all available
+information on various investments and uses this data to choose a fully
+diversified efficient portfolio. After `sorting out his finances' the man
+goes back to work on on a stubborn carburetor before that car's owner comes
+in to pick it up from the garage he works in.
+
+Aside from the convenience provided by web agents, there's also reason to
+believe that such systems will reduce principal-agent problems that arise
+from selling financial advise. In particular, some investors may choose not
+to buy financial advise in part because they do not believe that the
+financial planner's motives are in-line with their own. If the planner is a
+programme, however, and investors believe that financial organizations
+genuinely try to give good advice in order to protect their reputation, then
+web agents which represent that organization would be more trusted than
+human advisors. This of course hinges on the ability of the web agent to
+give `good advice' as perceived by the investor. An honest but incompetant
+web agent would be quite pointless.
+
+Web agents wouldn't necessarily give advice as much they would make
+decisions on behalf of their clients. Investors don't value the possesion of
+an asset. They value the risk and return characteristics that are contained
+within the asset. The quasi-rational investor is quasi-rational because he
+mistakes these qualities in a systematic way. If web agents surfing a
+semantic web can make the secondary decision of which mix of assets will
+yield a certain level of risk and return for an investor, then that leaves
+only the primary decision of what mix of risk and return is preferred for
+that investor. So in an artificial way, quasi-rational agents are
+transformed into rational ones. If the semantic web becomes a reality, asset
+markets could very well become less volatile and more efficient.
+
+\chapter{Data and Simulation}
+
+\section{The Data}
+
+The data used in the analysis is taken from the Irish Stock Exchange monthly
+reports which, as of the 9th of September 2004,\ are freely accessible at
+the ISE's website, \textit{http://www.ise.ie/index.asp?locID=128\&docID=36}
+or by going to the ISE homepage at \textit{www.ise.ie}. Follow the links for
+Information Products (near the top of the screen), Periodic Publications and
+Statistical Updates, Monthly and then choose the year and month that you
+would like to view. All the monthly reports are downloadable in .pdf format.
+The reports go back as far as January, 2001.
+
+The variables of interest were the share prices of individual stocks and of
+the ISEQ\ Overall Index Value at closing on the last trading day of the
+month, the ISEQ\ Overall Return data, and the listed 30-day Beta values for
+each stock. A time series was constructed in Excel by cutting and pasting
+the individual monthly reports into a workbook, cutting and pasting the
+columns of interest into a seperate workbook and transposing them such that
+the company names appeared as the top row and the date was the leftmost
+column of the newly constructed table. Particular care was taken to preserve
+the intergrity of the data tables in light of the fact that several
+companies did not list for the entire time period. Only companies that
+listed continuously between January of 2001 and January of 2004 were
+considered for analysis and companies with a sufficiently large number of
+Beta \ values missing were removed as well. For companies missing `the odd'
+Beta here and there, the average Beta for the company taken over the entire
+time period was inputed into every missing value. Another alteration was
+made to the Beta tables as well. Beta's equal to zero created calculation
+errors and so all zeroes were arbitrarly set to one one thousandth. All
+told, altered Betas constituted roughly 2 percent of all Betas. The actual
+Beta table that was used for the analysis is reproduced in the appendix
+below. The time period actually analysed was from August of 2001 to July of
+2004. The reason for starting mid-year was to allow the model, with its
+lagged variables, to `calibrate itself'. After all of this was done, there
+were 44 companies left to the analysis and these were examined over a 36
+month period. The risk free rate was assumed to be 1 percent throughout.
+
+\section{The Simulation}
+
+The simulation was carried out using the model from Chapter 3. The initial
+conditions for the model were taken from the data tables. In particular, the
+first three months of share price data were entered in directly, along with
+the Beta tables (revised as mentioned above) and with the actual ISEQ
+Overall Returns entered exactly for every month in the analysis. With these
+givens the model was constructed so that all the other data was computed
+automatically, i.e. no other inputs were required.
+
+There were several stages to constructing the model. Returns to each stock
+were calculated as the simple pecentage change in the share price. With the
+returns calculated, the next step was to construct a 3 period moving average
+return for each stock, $\overline{R}$, which was then used to calculate the
+quasi-rational alteration of the CAPM, gamma. Gamma was conditional on the
+sign of $\overline{R}$. The percentage change in $\beta $ was calculated and 
+$\beta _{P}$ was constructed from this, similarly being conditional on the
+sign of the change in $\beta $. For the purposes of this analysis, the ISEQ
+Overall Index fund was taken to be the market portfolio. The returns for the
+market portfolio were the ISEQ Return data divided by $10^{5}$\footnotetext{%
+The formula for the ISEQ Overall Index Value is
+\par
+$\frac{\sum_{i=1}^{n}I_{i_{t}}P_{i_{t}}}{\sum_{i-1}^{n}I_{i_{\sigma
+}}P_{i_{\sigma }}}\times 1,000$%
+\par
+Where
+\par
+$%
+\begin{array}{ll}
+I_{i_{t}} & =\text{ constituent number }is\text{ issued share capital at
+time }t \\ 
+P_{i_{t}} & =\text{ constituent number }is\text{ share price at time }t \\ 
+P_{i_{\sigma }} & =\text{ constituent number }is\text{ share price at the
+base date} \\ 
+I_{i_{\sigma }} & =\text{ constituent number }is\text{ issued share capital
+at the base date } \\ 
+n & =\text{ last component of the index}%
+\end{array}%
+$%
+\par
+\bigskip
+\par
+Calculation of Returns
+\par
+$R_{t}=Ry\times \left( \frac{I_{t}}{Iy}\right) $%
+\par
+Where:
+\par
+$%
+\begin{array}{ll}
+R_{t} & =\text{ ISEQ Return Index today} \\ 
+R_{y} & =\text{ ISEQ Return Index yesterday} \\ 
+I_{t} & =\text{ ISEQ Index today} \\ 
+I_{y} & =\text{ ISEQ Index yesterday}%
+\end{array}%
+$%
+\par
+on any day that is not an ex-dividend day. Dividing through by $1,000$ will
+yield the returns in percentage points, so dividing through again by $100$ \
+is necessary for calculation.}. The risk premium was then calculated and all
+the necessary components for the CAPM and for the Quasi-Rational model were
+in place. Each of those models are given above in Chapter 3. The returns
+that would actually be realised were a weighted combination of the two
+models. The weight $\alpha $ represents the influence of quasi-rational
+behaviour in the market. The $\alpha $ should move in a particular way.
+Specifically, as either the quasi-rational model or the CAPM\ model predict
+returns that venture too far from mean returns, the weight associated with
+each should vary. As quasi's make progressively outlandish predictions,
+their influence diminishes and rather quickly dies out, but not without
+having an effect on the overall returns for the market. To simulate this
+kind of behaviour, a log normal distribution was used for $\alpha $.
+
+\begin{equation}
+\alpha =LogNormDist(R_{q},0.08,0.2)
+\end{equation}
+
+(As input in Excel).
+
+The choice of the mean and standard deviation parameters was fairly
+arbitrary, being loosely based on the historical mean and variance of the
+market. A sensitivity analysis shows that the model is somewhat robust to
+the choice of mean and variance in the LogNormDist function.
+
+\section{Results}
+
+The methodology of the testing was as follows. The monthly returns for all
+stocks were averaged and the average returns were plotted as a time series.
+In addition to a quick visual test, the mean monthly returns from the CAPM\
+model, $R_{r}$, and the mean monthly returns from the combined model,$R_{c}$%
+, were compared to the mean monthly returns from the actual ISE data using a
+Wilcoxon signed ranks test. The test checks whether the median from one
+sample is from the same population as the median from another sample. This
+is a non-parametric test, so there is no need to assume that the the returns
+data is normally distributed. The hypotheses were
+
+\[
+\begin{array}{cc}
+H_{0}: & \text{Median 1}=\text{ Median 2} \\ 
+H_{1}: & \text{Median 1}\neq \text{ Median 2}%
+\end{array}%
+\]
+
+as Wilcoxon's is a two tailed test.
+
+The median CAPM\ model prediction was found to be significantly different
+from the median return from ISE data at the 95\% confidence level, with a
+difference between medians of -0.022 or -2.2 percent and a p-value of
+0.0076. Meanwhile the test was unable to reject the null for the combined
+model.
+
+How sensitive are these results to a change in the parameters of the model?
+Changing the standard deviation of the $\alpha $ equation from 0.2 to 0.132
+(the actual standard deviation of the data set) doubles the p-value of the
+combined model, and the distance between medians drops to 0.025 or 2.5
+percent. Changing the mean of the $a$ equation from 0.08 to 0 moves the
+medians closer together, the distance between them dropping to 0.021 or
+2.1\%. The p-value jumps to 0.2204. If the $\gamma $ term is altered so that
+the exaggeration of $\overline{R}$ is taken away\ (but the loss aversion is
+left), i.e.
+
+\[
+\gamma =\left\{ 
+\begin{array}{cc}
+(1+\overline{R}) & \overline{R}\geq 0 \\ 
+-2.5\left( 1+\left\vert \overline{R}\right\vert \right) & \overline{R}<0%
+\end{array}%
+\right. 
+\]
+
+then the effect on the results is more substantial. The combined model's
+null is rejected as the distance between medians increased to 0.030 or 3
+percent. In this situation, the combined model actually underperforms as
+compared to the CAPM\ although, this model also has its null rejected. If $%
+\overline{R}$ isn't calculated as a moving average of returns but simply
+last month's return, or if $\beta _{P}$ is not used in the quasi-rational
+model then the combined model has it's null rejected with of $<$ 0.0001 or
+equal to 0.0024 respectively. However, if $\overline{R}$ is calculated as a
+moving average of returns and the $\alpha $ equation is based on the
+percentage difference between the prices implied by the rational and the
+quasi-rational models, rather than on $R_{q}$, then even without $\beta _{P}$
+the model's null is not rejected with p-value of 0.3215 and a distance
+between medians of 0.010 or 1\%. It is worthwhile to note that the CAPM\
+model's null was rejected for \textit{every }test.
+
+\section{Strengths and Weaknesses}
+
+The testing done above is far from conclusive. Having the same median
+obviously does not prove that the distribution of prices or returns are the
+same. These tests were done on the monthly averages of each model and of the
+ISE\ data. While the combined model did perform reasonably well in these
+averages, it does not do as well at the individual stock level. The model
+also proved to be very sensitive to the $\overline{R}$ input, to the exact
+formulation of $\gamma $, and to the use of $\beta _{P}$ in the
+quasi-rational model. The combined model was not sensitive to the choice of
+parameters in the weight $a$. The time series plots are the most encouraging
+aspect of the combined model, with an impressive tendency to shadow the
+exact magnitude and direction of variation in several points on the plot,
+and in any case it did outperform the CAPM\ in every test and on the
+plots.[See Figure 6.9]
+
+This model is not a fantastic predictor of prices or returns, but it does
+seem to catch some of the variation that CAPM is missing. This is
+circumstantial evidence that some investors in the ISE at certain times use
+another model to pick their stocks rather than by using strictly the CAPM.
+This effect is significant in the Irish Stock Exchange, and must be
+accounted for. There are several additional heuristics and effects that
+could've been put into the model, but the ones that were highlighted were
+the tendency for overreaction, and loss aversion in both returns and in risk.
+
+\chapter{Conclusion and Further Work}
+
+\section{Conclusion}
+
+This paper focuses on the likely impact of the existence of quasi-rational
+agents in competitive markets with asset markets given as a prime example.
+The use of this approach should not imply an acceptance of rational
+behaviour from agents as realistic or proper. Indeed, the intention is to
+bring to light the need for an allowance of less than globally rational
+behaviour from at least some of the agents in economic models. Rational
+behaviour is not realistic and is only useful and appropriate as a
+simplification in certain situations. In most contexts, boundedly rational
+behaviour can and should be used in models that are meant to describe
+economic behaviour.
+
+When models assuming global rationality fail to describe observed behaviour
+it is possibly due to over-simplification and over-generalisation of
+economic actors' thought processes. There is no reason to believe that just
+because an assumption of global rationality does not hurt the predictive
+powers of a given model, that there will never be a problem with assuming
+global rationality in every context. The methodology should be to make
+assumptions that are based on the phenomena that a model is attempting to
+explain. These assumptions should include likely behaviour from actors in
+given situations. People do not make choices in a vacuum, they make them in
+an environment which affects the decision making process. Simplifying
+assumptions, though they can be a virtue in the way that Friedman sees them,
+can also be an incredible and crippling vice. The way to \textit{decide when
+to simplify} is to recognise environments in which the particular
+simplifications proposed are not likely to produce `anomalies' that are
+paradoxical and unexplainable within the model. Such decision rules are
+available within the rubric of \textit{Computable Economics}. It is not
+justified to start from a position of global rationality \textit{a priori.}
+
+Bounded rationality means pushing economists into real world situations to
+undertake direct observation of the phenomena they mean to study. That means
+observing actual choices as they are made. It means experimenting in the
+same tradition as studies in the cognitive sciences. It means learning how
+to conduct those experiments accurately and learning how to measure the
+results. Theories of bounded rationality must be more than a simple `plug
+and play' piece of theoretical hardware to be attached to the classical
+theory where and when it seems convenient. Bounded rationality must be a
+fundamental change in the way the subject is approached from theory to
+methodology to implementation.
+
+A mass movement away from rationality will not be painless. Neoclassical
+economic theory is a very powerful tool both because of its mathematical
+tractability and because it is a coherent framework within which the
+economist can consider economic problems. At the moment there is no neatly
+wrapped theory to replace the Neoclassical paradigm, but there is a large
+body of literature from which economics can draw in the field of cognitive
+psychology. This work can help lay a new path for economic discourse.
+
+Theories of Bounded Rationality are more than a change in a simple
+assumption. That is only where the difference begins. Bounded rationality
+means a shift in the attitudes of the economists that model the economy.
+Perhaps this is why it is met with such reluctance. It doesn't really mean
+changing the agents in economic models as much as it means changing the
+modeler. It means making economists design experiments and find better data
+which is, after all, a lot less fun than making models.
+
+\bigskip
+
+\section{Appendix}
+
+\begin{quotation}
+`Summary of Information Processing Systems
+\end{quotation}
+
+Humans are representable as information processing systems (IPS)
+
+IPS consists of an active processor, input (sensory) and output (motor)
+systems, and internal LTM and STM, and EM.
+
+How much processing an IPS can accomplish per unit of time depends on three
+parameters.
+
+1. The number of processes it can do simultaneously
+
+2. The time it takes to do each process
+
+3. The amount of work done by each individual process
+
+Human IPS is a serial system, meaning that it can execute one elementary
+information process at a time.
+
+Long-Term Memory (LTM)
+
+\textbullet \qquad Potentially infinite capacity.
+
+\textbullet \qquad Information is stored in LTM using symbols and relations
+among them.
+
+\textbullet \qquad Certain stimuli or patterns of stimuli become
+recognizable through learning. These are called chunks.
+
+\textbullet \qquad Retrieval (read) time is milliseconds to one second (or
+not much more).
+
+\textbullet \qquad Storing (write) time is much higher (in the neighborhood
+of 5-10 seconds per chunk).
+
+Short-Term Memory (STM)
+
+\textbullet \qquad Very small capacity, about 5-7 symbols.
+
+\textbullet \qquad Immediately and completely available to the IPS processes.
+
+\textbullet \qquad All processes take their inputs from and leave their
+outputs in STM.
+
+\textbullet \qquad Information in STM decays. Rehearsal processes are
+necessary to maintain information in STM.
+
+External Memory (EM)
+
+\textbullet \qquad The immediately available visual field.
+
+\textbullet \qquad Infinite capacity, accessed by means ranging from linear
+scanning to random accessing.
+
+\textbullet \qquad Its existence makes much difference.
+
+\textbullet \qquad As an example, adding two 10-digit numbers in head versus
+on paper.
+
+Perception of IPS - Has separate sensory systems for different kinds of
+information about the external environment.
+
+Problem solving in humans is goal-directed. It takes place by search in a
+problem space i.e., by considering one knowledge state after another until a
+desired knowledge state is reached. The search may involve backup (return to
+old knowledge states).' \cite[ ]{IPS}
+
+\FRAME{ftbpFU}{6.3105in}{8.6594in}{0pt}{\Qcb{Revised BETA\ values
+highlighted in red.}}{}{Figure}{\special{language "Scientific Word";type
+"GRAPHIC";maintain-aspect-ratio TRUE;display "USEDEF";valid_file "T";width
+6.3105in;height 8.6594in;depth 0pt;original-width 10.472in;original-height
+14.3879in;cropleft "0";croptop "1";cropright "1";cropbottom "0";tempfilename
+'I3SKVC19.bmp';tempfile-properties "PR";}}
+
+\FRAME{ftbpFU}{6.3105in}{8.6594in}{0pt}{\Qcb{Revised BETA\ values
+highlighted in red.}}{}{Figure}{\special{language "Scientific Word";type
+"GRAPHIC";maintain-aspect-ratio TRUE;display "USEDEF";valid_file "T";width
+6.3105in;height 8.6594in;depth 0pt;original-width 10.472in;original-height
+14.3879in;cropleft "0";croptop "1";cropright "1";cropbottom "0";tempfilename
+'I3SKVC1A.bmp';tempfile-properties "PR";}}
+
+\FRAME{ftbpFU}{6.3105in}{8.4907in}{0pt}{\Qcb{Revised BETA\ values
+highlighted in red.}}{}{Figure}{\special{language "Scientific Word";type
+"GRAPHIC";maintain-aspect-ratio TRUE;display "USEDEF";valid_file "T";width
+6.3105in;height 8.4907in;depth 0pt;original-width 10.472in;original-height
+14.1042in;cropleft "0";croptop "1";cropright "1";cropbottom "0";tempfilename
+'I3SKVC1B.bmp';tempfile-properties "PR";}}
+
+\FRAME{ftbpFU}{6.269in}{8.6594in}{0pt}{\Qcb{Revised BETA\ values highlighted
+in red.}}{}{Figure}{\special{language "Scientific Word";type
+"GRAPHIC";maintain-aspect-ratio TRUE;display "USEDEF";valid_file "T";width
+6.269in;height 8.6594in;depth 0pt;original-width 10.4028in;original-height
+14.3879in;cropleft "0";croptop "1";cropright "1";cropbottom "0";tempfilename
+'I3SKVC1C.bmp';tempfile-properties "PR";}}
+
+\FRAME{ftbpFU}{6.3105in}{8.6594in}{0pt}{\Qcb{Revised BETA\ values
+highlighted in red.}}{}{Figure}{\special{language "Scientific Word";type
+"GRAPHIC";maintain-aspect-ratio TRUE;display "USEDEF";valid_file "T";width
+6.3105in;height 8.6594in;depth 0pt;original-width 10.472in;original-height
+14.3879in;cropleft "0";croptop "1";cropright "1";cropbottom "0";tempfilename
+'I3SKVC1D.bmp';tempfile-properties "PR";}}
+
+\FRAME{ftbpFU}{6.2439in}{8.4907in}{0pt}{\Qcb{Revised BETA\ values
+highlighted in red.}}{}{Figure}{\special{language "Scientific Word";type
+"GRAPHIC";maintain-aspect-ratio TRUE;display "USEDEF";valid_file "T";width
+6.2439in;height 8.4907in;depth 0pt;original-width 10.3613in;original-height
+14.1042in;cropleft "0";croptop "1";cropright "1";cropbottom "0";tempfilename
+'I3SKVC1E.bmp';tempfile-properties "PR";}}
+
+\FRAME{ftbpFU}{2.9447in}{8.6594in}{0pt}{\Qcb{Revised BETA\ values
+highlighted in red.}}{}{Figure}{\special{language "Scientific Word";type
+"GRAPHIC";maintain-aspect-ratio TRUE;display "USEDEF";valid_file "T";width
+2.9447in;height 8.6594in;depth 0pt;original-width 4.8611in;original-height
+14.3879in;cropleft "0";croptop "1";cropright "1";cropbottom "0";tempfilename
+'I3SKVC1F.bmp';tempfile-properties "PR";}}
+
+\FRAME{ftbpFU}{6.3892in}{4.8196in}{0pt}{\Qcb{A Monthly Report from the ISE}}{%
+}{Figure}{\special{language "Scientific Word";type
+"GRAPHIC";maintain-aspect-ratio TRUE;display "USEDEF";valid_file "T";width
+6.3892in;height 4.8196in;depth 0pt;original-width 12.7223in;original-height
+9.5821in;cropleft "0";croptop "1";cropright "1";cropbottom "0";tempfilename
+'I3SKVC1G.bmp';tempfile-properties "PR";}}
+
+\FRAME{ftbpFU}{6.8779in}{4.5584in}{0pt}{\Qcb{Note the difference in
+predicted values for the CAPM\ and the Hybrid (aka Combined) models
+especially, in the middle portion of the figure.}}{}{Figure}{\special%
+{language "Scientific Word";type "GRAPHIC";maintain-aspect-ratio
+TRUE;display "USEDEF";valid_file "T";width 6.8779in;height 4.5584in;depth
+0pt;original-width 11.4164in;original-height 7.5524in;cropleft "0";croptop
+"1";cropright "1";cropbottom "0";tempfilename
+'I3SKVC1H.bmp';tempfile-properties "PR";}}
+
+\FRAME{ftbpFU}{3.5682in}{5.0254in}{0pt}{\Qcb{Simulation Runs}}{\Qlb{%
+Simulation Runs}}{Table }{\special{language "Scientific Word";type
+"GRAPHIC";maintain-aspect-ratio TRUE;display "USEDEF";valid_file "T";width
+3.5682in;height 5.0254in;depth 0pt;original-width 3.5215in;original-height
+4.9701in;cropleft "0";croptop "1";cropright "1";cropbottom "0";tempfilename
+'I3SKVC1I.wmf';tempfile-properties "PR";}}
+
+\begin{thebibliography}{99}
+\bibitem{Barber 2001} Barber, Brad M. and Terrance Odean (2001), `\textit{%
+The Internet and the Investor',} \textbf{Journal of Economic Perspectives},
+Vol. 15, No. 1, Winter, pp. 41-54.
+
+\bibitem{Barber 2002} Barber, Brad M. and Terrence Odean (2002), `\textit{%
+Online Investors: Do the Slow die First?',}. \textbf{The Review of Financial
+Studies}, Vol. 15, No. 2, pp. 455-87.
+
+\bibitem{Barber 2000} Barber, Brad M. and Terrance Odean (2000), `\textit{%
+Trading is Hazardous to Your Wealth: The Common Stock Investment Performance
+of Individual Investors}', \textbf{The Journal of Finance}, Vol. 55, No. 2,
+April, pp. 773-806.
+
+\bibitem{naive} Benartzi, Shlomo and Richard Thaler (2001), `\textit{Naive
+Diversification Strategies in Defined Contribution Savings Plans', }\textbf{%
+The American Economic Review},\ Vol. 91, No. 1, March, pp. 79-98.
+
+\bibitem{myopic} Benartzi, Shlomo and Richard H. Thaler (1995), `\textit{%
+Myopic Loss Aversion and the Equity Premium Puzzle',} \textbf{The Quarterly
+Journal of Economics}, Vol. 110, No.1, February, pp. 73-92.
+
+\bibitem{boland 1979} Boland, Lawrence A. (1979),.`\textit{A Critique of
+Friedman's Critics',}\textbf{\ Journal of Economic Literature}, Vol. 17, No.
+2, June, 1979, 503-22.
+
+\bibitem{boland 1983} Boland, Lawrence A. and William J. Frazer (1983), 
+\textit{`An Essay on the Foundations of Friedman's Methodology', }\textbf{%
+The American Economic Review}, Vol. 73, No. 1, March, pp. 129-44.
+
+\bibitem{Boylan} Boylan, Thomas A. and Paschal F. O'Gorman(1995), \textbf{%
+Beyond Rhetoric and Realism in Economics; Towards a Reformulation of
+Economic Methodology}, Routledge, London, UK.
+
+\bibitem{conlisk} Conlisk, John (1996), \textit{`Why Bounded Rationality?'},%
+\textit{\ }\textbf{Journal of Economic Literature}, Vol. 34,. June,
+pp.669-700.
+
+\bibitem{Choi 2001} Choi, James J., David Laibson and Andrew Metrick (2002), 
+\textit{`How does the Internet affect trading? Evidence from investor
+behavior in 401(k) plans'}, \textbf{Journal of Financial Economics}, Vol.
+64, No. 3, pp.397-421.
+
+\bibitem{overreact} De Bondt, Werner F.M. and Richard Thaler (1985), \textit{%
+`Does the Stock Market Overreact?'}, \textbf{The Journal of Finance}, Vol.
+40, No. 3, July, pp.793-805.
+
+\bibitem{de Bruijn} de Bruijn, Jos (2003), `\textit{Using Ontologies;
+Enabling Knowledge Sharing and Reuse on the Semantic Web'}, \textbf{DERI
+Working Papers}, October, Galway, Ireland.
+
+\bibitem{Ying Ding et al.} Ding, Y., D. Fensel, M. Klein, B. Omelayenko, and
+E. Schulten (2004), \textit{`The Role of Ontologies in eCommerce'}, in: 
+\textbf{Handbook on Ontologies}, edited by S. Staab and R. Studer,
+Springer-Verlag, Berlin, Heidelberg, Germany.
+
+\bibitem{Kahneman 2003} Kahneman, Daniel (2003), \textit{`Maps of Bounded
+Rationality'}, \textbf{The American Economic Review}, Vol. 93, No. 5,
+December, pp. 1449-75.
+
+\bibitem{prospect} Kahneman, Daniel and Amos Tversky (1979), \textit{%
+`Prospect Theory: An Analysis of Decision Under Risk'}, \textbf{Econometrica}%
+, Vol. 47, No. 2, March, pp. 263-92.
+
+\bibitem{Kreps 1990} Kreps, David M. (1990), \textbf{A Course in
+Microeconomic Theory,} Harvester Wheatsheaf, Hertfordshire, UK.
+
+\bibitem{evo} Nelson, Richard R., Sidney G. Winter and Herbert L. Schuette
+(1976), `Technical Change in an Evolutionary Model',\textit{\ }\textbf{The
+Quarterly Journal of Economics}, Vol. 90, No. 1, February, pp. 90-118.
+
+\bibitem{Russell} Russell, Bertrand.(1951), `\textit{An Outline of
+Intellectual Rubbish',} pp. 71, in: \textbf{Unpopular Essays}, Simon and
+Schuster, NY.
+
+\bibitem{Simon BMRC} Simon, Herbert A. (1955), `\textit{A Behavioral Model
+of Rational Choice',} \textbf{The Quarterly Journal of Economics}, Vol. 69,
+No. 1, February, pp.99-118.
+
+\bibitem{Simon} Simon, Herbert A.(1997), \textbf{Models of Bounded
+Rationality},\textit{\ }(Volume 3)\textit{,} The MIT Press, Cambridge, MA.
+
+\bibitem{quasi} Russell, Thomas and Richard Thaler, `\textit{The Relevance
+of Quasi Rationality in Competitive Markets',} \textbf{The American Economic
+Review}, Vol. 75, No. 5, December, pp. 1071-82.
+
+\bibitem{Vela 2000} Velupillai, Kumarswamy (2000), \textbf{Computable
+Economics; The Arne Ryde Memorial Lectures Series}, Oxford University Press,
+Oxford, UK.
+
+\bibitem{Vela 2005} Velupillai, K.Vela {\LARGE [}( forthcoming in 2005),%
+{\LARGE ]} \textit{`A Primer on the Tools and Concepts of Computable
+Economics'}, in: \textbf{Computability, Complexity and Constructivity in
+Economic Theory}, Edited by K. Vela Velupillai, {\LARGE [forthcoming],}%
+Blackwell Publishing, Oxford, UK.
+
+\bibitem{wong 1973} Wong, Stanley (1973), `\textit{The \textquotedblleft
+F-Twist\textquotedblright\ and the Methodology of Paul Samuelson',} \textbf{%
+The American Economic Review}, Vol. 63, No. 3, June, pp. 312-25.
+
+\bibitem{IPS} http://www.cc.gatech.edu/\symbol{126}%
+jimmyd/summaries/newell19---2.html
+
+\bibitem{Internet} www.oln.org/student\_services/definitions.php
+\end{thebibliography}
+
+\end{document}

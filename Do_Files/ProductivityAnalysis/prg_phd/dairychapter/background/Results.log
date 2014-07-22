@@ -1,0 +1,2018 @@
+----------------------------------------------------------------------
+       log:  d:\pglocal\data\data_NFSPanelAnalysis\OutData\dychap\Resu
+> lts.log
+  log type:  text
+ opened on:  18 Jul 2011, 17:16:17
+
+. gen familyfarmincome_pc = familyfarmincome/pers
+(1321 missing values generated)
+
+. 
+. foreach var in `subsidy1_vlist' {
+  2. 
+.         gen ffi_`var' = familyfarmincome - `var'
+  3.         gen wtffi_`var' = (familyfarmincome - `var')*wt
+  4.         gen wt_`var' = (`var')*wt
+  5.         sort year
+  6.         by year: egen twt_`var'1 = sum(wt_`var') if ncattle > 0 &
+>  fsizesu >= 2 & droporig == 0 & (system == 2 | system == 3) & cpagec
+> at != 0
+  7.         by year: egen twt_`var'2 = sum(wt_`var') if fsizesu >= 2 
+> & droporig == 0 
+  8. 
+.         sort year region
+  9.         by year region: egen rtwt_`var'1 = sum(wt_`var') if ncatt
+> le > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 3) 
+> & cpagecat != 0
+ 10.         by year region: egen rtwt_`var'2 = sum(wt_`var') if fsize
+> su >= 2 & droporig == 0 
+ 11. 
+.         * BI per Farm
+.         gen pf1_`var' = twt_`var'1/twt_nfarms1
+ 12.         gen bi_pf1_`var' = twt_`var'1/twt_nfarms1
+ 13.         gen bi_pf2_`var' = twt_`var'2/twt_nfarms2
+ 14. 
+.         * BI per Person
+.         gen pp1_`var' = `var'/pers
+ 15.         gen bi_pp1_`var' = twt_`var'1*pers/twt_pers1
+ 16.         gen bi_pp2_`var' = twt_`var'2*pers/twt_pers2
+ 17. 
+.         * BI per Adult
+.         gen pa1_`var' = `var'/adult
+ 18.         gen bi_pa1_`var' = twt_`var'1*adult/twt_adult1
+ 19.         gen bi_pa2_`var' = twt_`var'2*adult/twt_adult2
+ 20. 
+.         *BI per Hectare
+.         gen pha1_`var' = `var'/fsizuaa
+ 21.         gen bi_pha1_`var' = twt_`var'1*fsizuaa/twt_ha1
+ 22.         gen bi_pha2_`var' = twt_`var'2*fsizuaa/twt_ha2
+ 23. 
+.         *BI per Hectare (Region)
+.         gen bi_prha1_`var' = rtwt_`var'1*fsizuaa/rtwt_ha1
+ 24.         gen bi_prha2_`var' = rtwt_`var'2*fsizuaa/rtwt_ha2
+ 25. 
+.         *BI per LU
+.         gen plu1_`var' = `var'/cpnolu
+ 26.         gen bi_plu1_`var' = twt_`var'1*cpnolu/twt_lu1
+ 27.         gen bi_plu2_`var' = twt_`var'2*cpnolu/twt_lu2
+ 28. 
+.         tabstat  `var' pf1_`var' - bi_plu2_`var' if year == 2008 & n
+> cattle > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system ==
+>  3) & cpagecat != 0 [weight = wt], by(cpagecat) stats(mean)
+ 29.         tabstat  `var' pf1_`var' - bi_plu2_`var' if year == 2008 
+> & ncattle > 0 & fsizesu >= 2 & droporig == 0 [weight = wt], by(syste
+> m) stats(mean)
+ 30. 
+. 
+.         * Distributional Impact of Payment
+.         * BI per Farm   
+.         gen bbi_pf1_`var' = familyfarmincome - `var' + bi_pf1_`var' 
+ 31.         gen bbi_pf2_`var' = familyfarmincome - `var' + bi_pf2_`va
+> r' 
+ 32. 
+.         * BI per Person
+.         gen bbi_pp1_`var' = familyfarmincome - `var' + bi_pp1_`var' 
+ 33.         gen bbi_pp2_`var' = familyfarmincome - `var' + bi_pp2_`va
+> r' 
+ 34. 
+.         * BI per Adult
+.         gen bbi_pa1_`var' = familyfarmincome - `var' + bi_pa1_`var' 
+ 35.         gen bbi_pa2_`var' = familyfarmincome - `var' + bi_pa2_`va
+> r' 
+ 36. 
+.         *BI per Hectare
+.         gen bbi_ha1_`var' = familyfarmincome - `var' + bi_pha1_`var'
+>  
+ 37.         gen bbi_ha2_`var' = familyfarmincome - `var' + bi_pha2_`v
+> ar' 
+ 38. 
+.         *BI per Hectare (Region)
+.         gen bbi_rha1_`var' = familyfarmincome - `var' + bi_prha1_`va
+> r' 
+ 39.         gen bbi_rha2_`var' = familyfarmincome - `var' + bi_prha2_
+> `var' 
+ 40. 
+.         *BI per LU
+.         gen bbi_lu1_`var' = familyfarmincome - `var' + bi_plu1_`var'
+>  
+ 41.         gen bbi_lu2_`var' = familyfarmincome - `var' + bi_plu2_`v
+> ar' 
+ 42. 
+. }
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(12052 missing values generated)
+(951 missing values generated)
+(12052 missing values generated)
+(951 missing values generated)
+(12052 missing values generated)
+(12052 missing values generated)
+(951 missing values generated)
+(1321 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(1583 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(60 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(1212 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: cpagecat 
+
+cpagecat |       sfp   pf1_sfp  bi_pf1~p  bi_pf2~p   pp1_sfp  bi_pp1~p
+---------+------------------------------------------------------------
+       1 |   7000.78  10132.85  10132.85  11853.06  2893.342  11260.08
+       2 |  8168.587  10132.85  10132.85  11853.06  3504.836  10303.34
+       3 |  13640.48  10132.85  10132.85  11853.06  6506.651  9768.687
+       4 |   6983.57  10132.85  10132.85  11853.06  3490.781  8503.852
+       5 |  13195.13  10132.85  10132.85  11853.06  5222.471   10080.9
+       6 |  11022.93  10132.85  10132.85  11853.06  5406.825  7812.577
+       8 |  8981.775  10132.85  10132.85  11853.06   4222.57  7833.022
+       9 |   12781.2  10132.85  10132.85  11853.06  3694.502   14813.7
+---------+------------------------------------------------------------
+   Total |  10132.85  10132.85  10132.85  11853.06  4391.092  10132.85
+----------------------------------------------------------------------
+
+cpagecat |  bi_pp2~p   pa1_sfp  bi_pa1~p  bi_pa2~p  pha1_sfp  bi_pha1~
+---------+------------------------------------------------------------
+       1 |   12450.7  3731.861  10123.79  11454.95   264.929  9510.379
+       2 |   11392.8  4335.019  10235.81   11581.7  273.5338  10031.87
+       3 |  10801.61  7508.373  10034.64  11354.08  344.7853  12690.37
+       4 |  9403.033  3671.892  9753.166   11035.6  379.9452  6480.613
+       5 |  11146.83  6365.936  10285.14  11637.52  402.7366  10446.94
+       6 |  8638.664   6246.33   8827.69  9988.431  352.1528  9221.415
+       8 |   8661.27   4222.57  10466.39   11842.6   312.124  8211.834
+       9 |  16380.07  5436.652  12756.12   14433.4   326.251  12303.02
+---------+------------------------------------------------------------
+   Total |  11204.28   5284.87  10132.85  11465.21  326.0458  10132.85
+----------------------------------------------------------------------
+
+cpagecat |  bi_pha2~  bi_prh..  bi_prh..  plu1_sfp  b~u1_sfp  b~u2_sfp
+---------+------------------------------------------------------------
+       1 |  9268.154  9062.913  8927.851  290.6107  7368.672  9823.896
+       2 |  9776.367  9768.558  9503.245  246.2543  10462.72  13948.87
+       3 |  12367.15  13114.97  12726.75  279.1253  14344.05  19123.46
+       4 |  6315.554  6587.911  6363.627  386.6024  5421.391  7227.786
+       5 |  10180.86  10566.45  10256.73  345.1728  10655.22  14205.52
+       6 |  8986.549  9531.132  9233.467  337.1096  9847.643  13128.85
+       8 |  8002.682  7888.028  7841.803   212.472  11548.31  15396.18
+       9 |  11989.67  12456.27  11997.05   318.774  11694.34  15590.87
+---------+------------------------------------------------------------
+   Total |  9874.771  10132.85  9854.314  301.9929  10132.85  13509.09
+----------------------------------------------------------------------
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: system 
+
+  system |       sfp   pf1_sfp  bi_pf1~p  bi_pf2~p   pp1_sfp  bi_pp1~p
+---------+------------------------------------------------------------
+       0 |  15471.57         .         .  11853.06  5105.949         .
+       1 |  16601.82         .         .  11853.06  6671.635         .
+       2 |   8044.23  10132.85  10132.85  11853.06  3358.919  10603.71
+       3 |  11254.45  10132.85  10132.85  11853.06  4948.847   9883.62
+       4 |  10130.17         .         .  11853.06  3990.785         .
+       5 |  24879.57         .         .  11853.06   9097.51         .
+---------+------------------------------------------------------------
+   Total |  12110.14  10132.85  10132.85  11853.06  4834.044  10132.85
+----------------------------------------------------------------------
+
+  system |  bi_pp2~p   pa1_sfp  bi_pa1~p  bi_pa2~p  pha1_sfp  bi_pha1~
+---------+------------------------------------------------------------
+       0 |  14391.83  6861.242         .  13685.29  318.9772         .
+       1 |  12912.73  8461.318         .  12479.22  333.5817         .
+       2 |  11724.93  4198.632  10296.65  11650.54  268.8723  9854.122
+       3 |  10913.66  5866.673  10046.15  11364.26  357.0173  10280.38
+       4 |   10949.7  4926.683         .  11233.17  295.7195         .
+       5 |  13227.56  11882.19         .   13342.5  364.0381         .
+---------+------------------------------------------------------------
+   Total |  11920.19  6018.187  10132.85  11964.01  323.9787  10132.85
+----------------------------------------------------------------------
+
+  system |  bi_pha2~  bi_prh..  bi_prh..  plu1_sfp  b~u1_sfp  b~u2_sfp
+---------+------------------------------------------------------------
+       0 |  15366.17         .  15456.36  856.7194         .  12356.05
+       1 |  15478.69         .  15916.38  739.7611         .  16629.59
+       2 |  9603.141  9624.684  9404.222  270.6569  8814.262  11751.15
+       3 |  10015.31  10401.83  10083.94  318.7706  10830.79  14447.73
+       4 |  12107.06         .  11790.18  570.3019         .   8761.37
+       5 |  21120.81         .  21780.43  1221.272         .   15867.1
+---------+------------------------------------------------------------
+   Total |     11907  10132.85   11934.1  493.5709  10132.85  13156.28
+----------------------------------------------------------------------
+(12052 missing values generated)
+(1003 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(52 missing values generated)
+(12052 missing values generated)
+(951 missing values generated)
+(12052 missing values generated)
+(951 missing values generated)
+(12052 missing values generated)
+(12052 missing values generated)
+(951 missing values generated)
+(1321 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(1583 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(60 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(1212 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: cpagecat 
+
+cpagecat |  dirpayts  pf1_di~s  bi_pf1~s  bi_pf2~s  pp1_di~s  bi_pp1~s
+---------+------------------------------------------------------------
+       1 |  14061.79  15994.52  15994.52  17795.89    5736.2  17773.83
+       2 |  14531.73  15994.52  15994.52  17795.89  6412.731  16263.64
+       3 |  19439.63  15994.52  15994.52  17795.89  9319.432  15419.69
+       4 |  10799.18  15994.52  15994.52  17795.89  5190.339  13423.18
+       5 |  18509.67  15994.52  15994.52  17795.89  7477.478  15912.51
+       6 |  16081.64  15994.52  15994.52  17795.89  7935.068  12332.01
+       8 |  13153.96  15994.52  15994.52  17795.89  5962.444  12364.28
+       9 |  19811.43  15994.52  15994.52  17795.89  5764.123  23383.15
+---------+------------------------------------------------------------
+   Total |  15994.52  15994.52  15994.52  17795.89  6955.581  15994.52
+----------------------------------------------------------------------
+
+cpagecat |  bi_pp2~s  pa1_di~s  bi_pa1~s  bi_pa2~s  pha1_d~s  bi_pha..
+---------+------------------------------------------------------------
+       1 |  18693.18  7399.859  15980.21  17198.18  509.3871  15011.96
+       2 |  17104.87   7806.34  16157.03  17388.48  500.9796  15835.13
+       3 |  16217.27  10669.61   15839.5  17046.74  500.7137  20031.52
+       4 |  14117.48  5593.188   15395.2  16568.58  538.9191  10229.53
+       5 |  16735.58  9066.765   16234.9  17472.28  582.0228  16490.31
+       6 |  12969.88  9127.835  13934.35  14996.39  540.9249  14555.84
+       8 |  13003.82  5962.444  16521.01   17780.2  470.1989  12962.23
+       9 |  24592.64  8458.349   20135.3  21669.96   522.526  19420.09
+---------+------------------------------------------------------------
+   Total |  16821.83    8366.2  15994.52  17213.58  524.0144  15994.52
+----------------------------------------------------------------------
+
+cpagecat |  bi_pha..  bi_prh..  bi_prh..  plu1_d~s  bi_plu..  bi_plu..
+---------+------------------------------------------------------------
+       1 |  13914.98  14805.19  14052.41  605.7398  11631.31  14749.36
+       2 |     14678  15766.42  14970.87  453.9128  16515.21   20942.5
+       3 |  18567.74  20111.01  18787.08   412.451  22641.83  28711.49
+       4 |  9482.019  10225.55  9614.689  625.7214  8557.567  10851.62
+       5 |   15285.3  16549.53  15576.48  534.7949  16819.07  21327.81
+       6 |  13492.18  14888.66  13865.43  557.8577  15544.32  19711.34
+       8 |  12015.03  12842.16  11991.61  313.9411   18228.8  23115.45
+       9 |  18000.99  19304.99  18048.47  520.8613   18459.3  23407.75
+---------+------------------------------------------------------------
+   Total |  14825.74  15994.52  15056.23   516.485  15994.52  20282.22
+----------------------------------------------------------------------
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: system 
+
+  system |  dirpayts  pf1_di~s  bi_pf1~s  bi_pf2~s  pp1_di~s  bi_pp1~s
+---------+------------------------------------------------------------
+       0 |  20538.05         .         .  17795.89  6742.813         .
+       1 |     22057         .         .  17795.89  9199.883         .
+       2 |  14880.27  15994.52  15994.52  17795.89  6301.772  16737.76
+       3 |  16588.27  15994.52  15994.52  17795.89  7308.537  15601.12
+       4 |  18186.74         .         .  17795.89  7098.977         .
+       5 |   30304.2         .         .  17795.89  11094.45         .
+---------+------------------------------------------------------------
+   Total |  18017.37  15994.52  15994.52  17795.89  7274.788  15994.52
+----------------------------------------------------------------------
+
+  system |  bi_pp2~s  pa1_di~s  bi_pa1~s  bi_pa2~s  pha1_d~s  bi_pha..
+---------+------------------------------------------------------------
+       0 |  21607.55  9076.444         .  20546.76  440.3608         .
+       1 |  19386.85  11370.57         .     18736  476.4526         .
+       2 |  17603.52  7816.314  16253.07  17491.83  502.2357  15554.55
+       3 |   16385.5  8657.433  15857.67  17062.02  535.8588   16227.4
+       4 |  16439.62  8851.257         .   16865.2  589.7876         .
+       5 |  19859.54  14479.03         .  20032.11   469.023         .
+---------+------------------------------------------------------------
+   Total |  17896.67  9008.977  15994.52  17962.47  511.2184  15994.52
+----------------------------------------------------------------------
+
+  system |  bi_pha..  bi_prh..  bi_prh..  plu1_d~s  bi_plu..  bi_plu..
+---------+------------------------------------------------------------
+       0 |  23070.39         .  22523.43  1268.573         .  18551.07
+       1 |  23239.33         .  23072.17  1165.771         .  24967.26
+       2 |  14417.92  15365.57  14504.52   532.941  13913.15  17642.89
+       3 |  15036.75  16327.43  15348.92  507.3832   17096.2  21691.48
+       4 |  18177.25         .  18554.82  1168.811         .  13154.11
+       5 |  31710.26         .   31417.8  1693.173         .  23822.47
+---------+------------------------------------------------------------
+   Total |  17876.88  15994.52  17943.06  808.7118  15994.52  19752.52
+----------------------------------------------------------------------
+(12052 missing values generated)
+(1003 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+(12052 missing values generated)
+(1003 missing values generated)
+
+. 
+. 
+. 
+. *****************************************************
+. * Incentives
+. *****************************************************
+. 
+. * Farms can increase their stock through increasing births, or purch
+> asing
+. * try a 10% increase in each
+. * can we identify the average duration of each component? 
+. 
+. * Relate GO to change in stock, sales and purchases
+. 
+. gen newcgo = cosalesv - copurval + covalcno + cosubsid - cotffdvl + 
+> cotftdvl
+(52 missing values generated)
+
+. 
+. ** Now decompose purchases and sales
+. 
+. * sales
+. gen newcosalesv = coslcfvl + coslwnvl +  coslstvl + coslfcvl + coslb
+> hvl + coslocvl + coserrec
+(52 missing values generated)
+
+. gen homecons = cosalesv - newcosalesv
+(52 missing values generated)
+
+. 
+. * purchases
+. 
+. gen newcopurval = coprcfvl + coprwnvl + coprstvl  + coprbhvl + copro
+> cvl
+(52 missing values generated)
+
+. 
+. * to test incentives, do it on a per system basis
+. * Assume the cow is on the farm for the full length of the system
+. * Generate the costs and subsidy 
+. 
+. 
+. * Generate Purchase and Sales Prices
+. 
+. local price_vlist =  "coslcf coslwn coslst coslfc coslbh cosloc copr
+> cf coprwn coprst  coprbh coproc"
+
+. 
+. foreach var in `price_vlist' {
+  2. 
+.         gen `var'_p = `var'vl/`var'no
+  3. }
+(17543 missing values generated)
+(13852 missing values generated)
+(8466 missing values generated)
+(9074 missing values generated)
+(10379 missing values generated)
+(16357 missing values generated)
+(13692 missing values generated)
+(15639 missing values generated)
+(14422 missing values generated)
+(15437 missing values generated)
+(17909 missing values generated)
+
+. 
+. 
+. 
+. * Compare enterprise direct costs with total direct costs
+. 
+. tabstat prod_fc oth_fc farmdc fdpurcon fdpurblk fdferfil fdcrppro fd
+> pursed fdmachir fdtrans fdaifees fdvetmed fdcaslab fdmqleas fdmiscel
+>  fcatledc cdconcen cdpastur cdwinfor cdmilsub cdtotfed cdmiscdc cdto
+> tldc if ncattle > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | 
+> system == 3) & cpagecat != 0 [weight = wt], by(year) stats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: year 
+
+    year |   prod_fc    oth_fc    farmdc  fdpurcon  fdpurblk  fdferfil
+---------+------------------------------------------------------------
+    1994 |  2763.744  6311.429  9194.301  2752.394  702.1515  1926.251
+    1995 |  2229.831  5438.063  7309.943  2161.622  444.2328  1819.021
+    1996 |  1661.693  4185.396  5451.508  1340.849   374.376  1420.011
+    1997 |  1686.459  4137.994  5595.753  1306.467  287.7751  1276.409
+    1998 |  1799.856  4307.198  5739.823  1352.007  386.9747  1224.686
+    1999 |   1987.88  4790.756    6514.8  1775.709  476.2473  1365.836
+    2000 |  2233.661  5399.945  6654.631  1902.193  438.3605  1311.894
+    2001 |  2349.202  6221.802  7330.091  2288.973  368.9776  1524.803
+    2002 |  2421.263  6025.121  7542.921  2117.152  284.9894  1415.193
+    2003 |  2300.952  6262.027  7553.376  2153.639  318.4186  1518.202
+    2004 |  2186.218  6949.847  7581.596  2270.479   287.496  1421.517
+    2005 |  2387.768  7838.905  8159.093  2305.946  348.6617  1617.308
+    2006 |  2336.756  8246.622  8476.947  2481.504  400.3002  1715.441
+    2007 |  2331.272  8769.607      8835  2616.819  458.9771  1643.739
+    2008 |  2529.958  10160.57  10612.78  3426.912  413.1448  2187.929
+    2009 |  2463.162  8628.968  10703.32  3359.459  548.7212  2123.572
+---------+------------------------------------------------------------
+   Total |  2197.016  6478.977   7602.21  2186.743  392.1036  1563.254
+----------------------------------------------------------------------
+
+    year |  fdcrppro  fdpursed  fdmachir   fdtrans  fdaifees  fdvetmed
+---------+------------------------------------------------------------
+    1994 |  374.6239  225.9535  1027.817  137.0083  643.7372         0
+    1995 |  100.0187  119.4859  1241.753   125.927  501.7604         0
+    1996 |  70.41671  60.34783  1096.331  85.17603  104.6192  621.0561
+    1997 |  76.37899  57.52556  1188.744  90.38892  128.4053   731.693
+    1998 |  58.34655  49.50208   1158.36  82.96991  131.4081  719.8072
+    1999 |  71.80959   62.8534  1338.863  107.7197   113.489  728.7978
+    2000 |  59.87114  51.70337  1472.189  123.5339  135.4731  726.6379
+    2001 |   96.7307   68.1881  1661.807  112.3964  145.0865  855.8961
+    2002 |  81.40565  56.80849  1552.766   127.848  139.0944  922.9875
+    2003 |  106.0097  87.47366   1638.24   101.865  119.8306  962.7099
+    2004 |  89.07847  66.67209  1679.916  109.4287  118.3193  973.2742
+    2005 |  109.4137  73.78678    1845.4  123.4554  104.4044  1096.769
+    2006 |  117.2949  91.22352   1836.26  100.8954  100.7589  1027.985
+    2007 |  123.0992  77.24546  2071.647  102.0415   169.478  1099.953
+    2008 |  145.5033  83.85707  2184.545  123.1972  135.3373  1195.855
+    2009 |  149.2141  108.6358  2084.599  132.7834  116.4175  1144.763
+---------+------------------------------------------------------------
+   Total |  100.4443  74.83212  1599.047  109.7143  147.1627  864.2625
+----------------------------------------------------------------------
+
+    year |  fdcaslab  fdmqleas  fdmiscel  fcatledc  cdconcen  cdpastur
+---------+------------------------------------------------------------
+    1994 |  228.7322  137.0599  882.0568  3954.616  879.5758  412.9878
+    1995 |  19.24178         0  588.4374  6398.412  1475.701  896.8147
+    1996 |  22.15365         0  371.2369  4933.132  932.0078  682.7082
+    1997 |  38.54438         0  403.6917  4947.538  859.9233  647.2093
+    1998 |  23.90361         0  437.7332  5238.433  968.8552  646.2063
+    1999 |  24.84344         0  498.6884  5836.315  1553.059  971.1473
+    2000 |  37.08714         0  497.8201  5886.832  1521.414  943.7033
+    2001 |  18.09694         0  607.6499  6265.279   1753.42  1056.873
+    2002 |  14.62634         0  649.9139  6845.374  1914.397  1026.919
+    2003 |  22.19592  3.109942  618.3138  6898.701  1985.502   1136.88
+    2004 |  17.50371         0  556.0459  6958.346  2066.044   1055.01
+    2005 |  16.19866         0  490.9775  7452.379  2137.224  1185.171
+    2006 |  28.03656         0  528.9067  7821.594  2396.229  1271.332
+    2007 |  32.93923         0   693.946  8136.648  2524.845  1246.484
+    2008 |  31.93123         0  704.9033   9793.12   3320.23  1485.728
+    2009 |  22.24993         0  666.8793  9905.095  3303.357  1500.337
+---------+------------------------------------------------------------
+   Total |  28.03614  2.316933  556.6923  6822.081  1895.366  1039.699
+----------------------------------------------------------------------
+
+    year |  cdwinfor  cdmilsub  cdtotfed  cdmiscdc  cdtotldc
+---------+--------------------------------------------------
+    1994 |  1159.577   122.495  3269.787  684.8293  3954.616
+    1995 |  1680.733  35.73911  5193.015  1205.397  6398.412
+    1996 |  1446.096  12.97717  3903.713  1029.419  4933.132
+    1997 |    1471.9  16.79571  3804.702  1142.835  4947.538
+    1998 |  1577.658  21.24086  4081.729  1156.704  5238.433
+    1999 |  2078.238  18.10858  4620.553  1215.762  5836.315
+    2000 |  2160.658  22.53952  4648.315  1238.517  5886.832
+    2001 |  2038.462  13.09508  4861.849  1403.429  6265.279
+    2002 |  2336.829  30.30414  5308.449  1536.924  6845.374
+    2003 |  2270.366  19.49101  5412.239  1486.462  6898.701
+    2004 |  2363.144  23.69246   5507.89  1450.457  6958.346
+    2005 |   2657.68  16.02453  5996.101  1456.278  7452.379
+    2006 |  2724.814  6.166778  6398.543  1423.052  7821.594
+    2007 |  2782.752  11.48851   6565.57  1571.079  8136.648
+    2008 |  3252.379  23.33115  8081.668  1711.451   9793.12
+    2009 |  3444.318  7.620782  8255.632  1649.463  9905.095
+---------+--------------------------------------------------
+   Total |   2275.27  19.65482  5452.809  1369.272  6822.081
+------------------------------------------------------------
+
+. 
+. gen new_cdc = cdconcen + cdpastur + cdwinfor + cdmilsub + cdmiscdc 
+(52 missing values generated)
+
+. 
+. 
+. * DC Fixed and Variable-Fixed Costs
+. gen nonc_dc = farmdc - cdtotldc
+(52 missing values generated)
+
+. gen tot_cost = prod_fc + oth_fc + nonc_dc + cdtotldc
+(52 missing values generated)
+
+. 
+. * Gross Output
+. 
+. tabstat prod_fc oth_fc farmdc nonc_dc cdtotldc cosalesv copurval cov
+> alcno  cotffdvl cotftdvl cosubsid if ncattle > 0 & fsizesu >= 2 & dr
+> oporig == 0 & (system == 2 | system == 3) & cpagecat != 0       , by
+> (year) stats(mean)
+
+Summary statistics: mean
+  by categories of: year 
+
+    year |   prod_fc    oth_fc    farmdc   nonc_dc  cdtotldc  cosalesv
+---------+------------------------------------------------------------
+    1994 |  3904.303  9149.562  12661.52  7061.227  5600.293  12163.23
+    1995 |  2943.669   6617.43  9048.672  1672.766  7375.906  23937.74
+    1996 |  2284.405  5628.413  7162.844  817.8077  6345.036  16407.82
+    1997 |  2211.016  5532.569  7232.585   899.469  6333.116  16358.25
+    1998 |  2409.412  5847.289  7550.862  713.1071  6837.755  14813.79
+    1999 |  2740.499  6362.294  8571.305  966.6081  7604.697  20274.07
+    2000 |  3157.426  7515.147  8936.885  1054.354  7882.531  24651.44
+    2001 |  3134.896   8109.09  9679.355  1779.519  7899.836  20378.29
+    2002 |  3100.419  7296.146  9166.384  909.0489  8257.335  19937.67
+    2003 |  3035.244  7911.463  9497.818  924.6068  8573.211  20586.33
+    2004 |   2764.21  8586.538  9258.142  834.9813  8423.161  21104.78
+    2005 |  3089.206  9936.924  10245.31  971.6358  9273.676  23606.73
+    2006 |  3225.031  11295.99  11298.59  984.7232  10313.86  26575.92
+    2007 |  3274.775  12100.18  12106.48  1077.049  11029.43  30891.84
+    2008 |  3447.948  13378.59  13927.43    1087.2  12840.23  34468.71
+    2009 |  3461.135  11618.71  14620.79  1157.932  13462.86   31892.7
+---------+------------------------------------------------------------
+   Total |  3003.112  8834.541  10169.16  1169.908  8999.247  23301.05
+----------------------------------------------------------------------
+
+    year |  copurval  covalcno  cotffdvl  cotftdvl  cosubsid
+---------+--------------------------------------------------
+    1994 |  3053.233  468.4174  825.9247  797.0205  4329.589
+    1995 |  12035.06  279.5897  15.25424  15.25424  6472.725
+    1996 |  7802.289  1142.756  9.381443         0  6871.517
+    1997 |  7563.923  1154.616         0         0  6300.601
+    1998 |  5834.311  379.2192         0         0  7481.926
+    1999 |  7085.604 -1754.526  20.35409         0  7166.728
+    2000 |  10115.57 -1313.488  60.27238         0  10183.88
+    2001 |   7304.28 -1026.574   16.3626         0  9131.937
+    2002 |  8437.955  511.1871         0         0  10562.15
+    2003 |  8658.883 -474.8411  25.82781         0  11163.74
+    2004 |  8315.188   31.0911         0         0   9806.76
+    2005 |  9353.445  823.3306  116.2399         0  7826.905
+    2006 |  9369.875  61.26052  42.65731         0         0
+    2007 |   12650.3 -72.34034  206.3442         0         0
+    2008 |  13786.12  443.0257  52.85573         0  630.5692
+    2009 |   11989.1 -1173.018  30.83164         0         0
+---------+--------------------------------------------------
+   Total |  9317.453 -53.94862  61.41786   18.1216  5927.923
+------------------------------------------------------------
+
+. 
+. 
+. ********************************************************************
+> *********
+. * Incentives
+. ********************************************************************
+> *********
+. 
+. * trends in Cattle Numbers
+. tab year if ncattle > 0 & fsizesu >= 2 & droporig == 0 & (system == 
+> 2 | system == 3) & cpagecat != 0 [weight = wt], sum(cptotcno)
+(analytic weights assumed)
+
+            |               Summary of cptotcno
+       year |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+       1994 |   37.204154   39.847393   13412.975         146
+       1995 |   54.230348   35.754024    30564.56         236
+       1996 |   43.557853   33.743826       57190         388
+       1997 |   46.360371   37.997715   61501.977         404
+       1998 |   47.557879   38.434809   62035.466         363
+       1999 |   46.289311   39.286134   62109.075         398
+       2000 |   44.977845   41.216218   62126.122         395
+       2001 |   47.090396   38.891086   61928.651         388
+       2002 |   46.522966   41.522322   58663.907         449
+       2003 |   46.462689   40.700464   57891.483         453
+       2004 |   46.124026   40.221139   57173.296         483
+       2005 |   49.559573   45.517453       57159         496
+       2006 |   47.817292   42.271934       58563         499
+       2007 |    47.91158   43.039343   57502.767         523
+       2008 |   50.840486   44.098286   57045.604         506
+       2009 |   49.071291   44.707575   56292.161         493
+------------+------------------------------------------------
+      Total |   47.226061   40.738796   871160.04        6620
+
+. *Quintiles of Margins (Gross Enterprise and Gross Farm)
+. 
+. gen mkt_ecgm_ha = (fcatlegm - cosubsid)/fsizuaa
+(60 missing values generated)
+
+. gen mkt_fcgm_ha = (farmgm  - dirpayts)/fsizuaa
+(60 missing values generated)
+
+. gen mkt_fcgm1_ha = (farmgm  - dirpayts - prod_fc)/fsizuaa
+(60 missing values generated)
+
+. gen marketffi_ha = marketffi/fsizuaa
+(60 missing values generated)
+
+. 
+. gen marketgo_ha = marketgo/fsizuaa
+(60 missing values generated)
+
+. gen dirpayts_ha = dirpayts/fsizuaa
+(60 missing values generated)
+
+. gen prod_fc_ha  = prod_fc/fsizuaa
+(60 missing values generated)
+
+. gen oth_fc_ha  = oth_fc/fsizuaa
+(60 missing values generated)
+
+. gen farmdc_ha = farmdc/fsizuaa
+(60 missing values generated)
+
+. 
+. 
+. gen mkt_ecgm_lu = (fcatlegm - cosubsid)/fnocatlu
+(1212 missing values generated)
+
+. gen mkt_fcgm_lu = (farmgm  - dirpayts)/fnocatlu
+(1212 missing values generated)
+
+. gen mkt_fcgm1_lu = (farmgm  - dirpayts - prod_fc)/fnocatlu
+(1212 missing values generated)
+
+. gen marketffi_lu = marketffi/fnocatlu
+(1212 missing values generated)
+
+. 
+. gen marketgo_lu = marketgo/fnocatlu
+(1212 missing values generated)
+
+. gen dirpayts_lu = dirpayts/fnocatlu
+(1212 missing values generated)
+
+. gen prod_fc_lu  = prod_fc/fnocatlu
+(1212 missing values generated)
+
+. gen oth_fc_lu  = oth_fc/fnocatlu
+(1212 missing values generated)
+
+. gen farmdc_lu = farmdc/fnocatlu
+(1212 missing values generated)
+
+. 
+. gen mkt_fcgm1_q = .
+(18672 missing values generated)
+
+. local i = 1994
+
+. 
+. while `i' <= 2009 {
+  2. 
+.         xtile mkt_ecgm_q`i' = mkt_ecgm_ha if year == `i' & ncattle >
+>  0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 3) & cp
+> agecat != 0, nq(5)
+  3.         xtile mkt_fcgm_q`i' = mkt_fcgm_ha if year == `i' & ncattl
+> e > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 3) &
+>  cpagecat != 0, nq(5)
+  4.         xtile mkt_fcgm1_q`i' = mkt_fcgm1_ha if year == `i' & ncat
+> tle > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 3)
+>  & cpagecat != 0, nq(5)
+  5.         xtile marketffi_q`i'= marketffi_ha if year == `i' & ncatt
+> le > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 3) 
+> & cpagecat != 0, nq(5)
+  6.         xtile marketffi_lu_q`i'= marketffi_lu if year == `i' & nc
+> attle > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 
+> 3) & cpagecat != 0, nq(5)
+  7. 
+.         xtile mkt_tillage_fcgm1_q`i' = mkt_fcgm1_ha if year == `i' &
+>  fsizesu >= 2 & droporig == 0 & (system == 5), nq(5)
+  8.         replace mkt_fcgm1_q = mkt_fcgm1_q`i' if year == `i' & nca
+> ttle > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 3
+> ) & cpagecat != 0
+  9.         local i = `i' + 1
+ 10. }
+(146 real changes made)
+(236 real changes made)
+(388 real changes made)
+(404 real changes made)
+(363 real changes made)
+(398 real changes made)
+(395 real changes made)
+(388 real changes made)
+(449 real changes made)
+(453 real changes made)
+(483 real changes made)
+(496 real changes made)
+(499 real changes made)
+(523 real changes made)
+(506 real changes made)
+(493 real changes made)
+
+. 
+. tabstat  mkt_ecgm_ha mkt_fcgm_ha mkt_fcgm1_ha marketffi_ha dirpayts_
+> ha marketgo_ha farmdc_ha prod_fc_ha oth_fc_ha is65 isofffarmy if nca
+> ttle > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 3
+> ) & cpagecat != 0 [weight = wt], by( marketffi_q2008) stats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: marketffi_q2008 (5 quantiles of marketffi_ha )
+
+marketffi_q2008 |  mkt_ec~a  ~fcgm_ha  mkt~1_ha  mar~i_ha  dirpay~a
+----------------+--------------------------------------------------
+              1 |  105.6973  83.77942  -24.4404 -602.5132  617.0061
+              2 |  92.42602  115.0337  24.49304 -306.8634  516.1854
+              3 |  164.2261  188.0681  114.1548 -180.3727  528.1245
+              4 |  186.9609   234.543   168.456 -79.01219  477.9535
+              5 |  329.1917  405.7315  338.6409  131.9637  464.7912
+----------------+--------------------------------------------------
+          Total |  173.9618  202.0866  119.8225 -221.0864  524.0144
+-------------------------------------------------------------------
+
+marketffi_q2008 |  mar~o_ha  farmdc~a  prod_f~a  oth_fc~a      is65
+----------------+--------------------------------------------------
+              1 |  572.2584   488.479  108.2198  582.1299  .1681158
+              2 |  505.3648  390.3311  90.54068  332.7455  .3085054
+              3 |  518.0826  330.0145  73.91324  294.5275  .2541456
+              4 |  508.0922  273.5492  66.08702  247.4681  .3933835
+              5 |  715.6853  309.9538  67.09069  206.6772  .3361001
+----------------+--------------------------------------------------
+          Total |  565.7875  363.7009  82.26403  342.1242  .2882556
+-------------------------------------------------------------------
+
+marketffi_q2008 |  isofff~y
+----------------+----------
+              1 |  .5811952
+              2 |  .4359057
+              3 |  .5086337
+              4 |  .3502103
+              5 |  .3963687
+----------------+----------
+          Total |   .457998
+---------------------------
+
+. 
+. tabstat  mkt_ecgm_lu mkt_fcgm_lu mkt_fcgm1_lu marketffi_lu dirpayts_
+> lu marketgo_lu farmdc_lu prod_fc_lu oth_fc_lu is65 isofffarmy if nca
+> ttle > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 3
+> ) & cpagecat != 0 [weight = wt], by( marketffi_lu_q2008) stats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: marketffi_lu_q2008 (5 quantiles of marketffi_lu )
+
+marketffi_lu_q2008 |  mkt_ec~u  ~fcgm_lu  mkt~1_lu  mar~i_lu  dirpay~u
+-------------------+--------------------------------------------------
+                 1 |  35.56132  18.97236  -84.7324 -591.1802  629.7243
+                 2 |  90.79084  105.0113  25.39959 -301.9143  537.7608
+                 3 |  139.7948  165.4804  94.02208 -186.2908  524.6968
+                 4 |   191.664  231.5329  162.0807 -79.51561  470.2654
+                 5 |  259.4552  332.8108  279.3577  107.9409  419.4106
+-------------------+--------------------------------------------------
+             Total |   144.111  171.5393  96.04519 -209.4191   516.485
+----------------------------------------------------------------------
+
+marketffi_lu_q2008 |  mar~o_lu  farmdc~u  prod_f~u  oth_fc~u      is65
+-------------------+--------------------------------------------------
+                 1 |  394.2858  375.3134  103.7048  507.8273  .2663991
+                 2 |  450.4706  345.4593  79.61172  328.4735  .1869663
+                 3 |  481.2671  315.7867  71.45831  281.5127  .2642358
+                 4 |   504.938  273.4051  69.45218  241.5963  .4080223
+                 5 |  582.1083  249.2975  53.45312  171.4168  .3094665
+-------------------+--------------------------------------------------
+             Total |    483.03  311.4908  75.49408  306.2134  .2882556
+----------------------------------------------------------------------
+
+marketffi_lu_q2008 |  isofff~y
+-------------------+----------
+                 1 |  .5170352
+                 2 |  .5074588
+                 3 |  .5459122
+                 4 |  .2826222
+                 5 |  .4318367
+-------------------+----------
+             Total |   .457998
+------------------------------
+
+. 
+. tabstat  mkt_ecgm_lu mkt_fcgm_lu mkt_fcgm1_lu marketffi_lu dirpayts_
+> lu marketgo_lu farmdc_lu prod_fc_lu oth_fc_lu isofffarmy if ncattle 
+> > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 3) & c
+> pagecat != 0 & year == 2008 [weight = wt], by(cpagecat) stats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: cpagecat 
+
+cpagecat |  mkt_ec~u  ~fcgm_lu  mkt~1_lu  mar~i_lu  dirpay~u  mar~o_lu
+---------+------------------------------------------------------------
+       1 |  139.4912  135.3009  49.80026 -282.0596  605.7398   444.301
+       2 |  106.0681  123.4235  43.54178 -239.7941  453.9128  431.7315
+       3 |   164.376  175.1206  105.2005 -182.6496   412.451   478.589
+       4 |   116.219  151.8818   84.7534 -185.0455  625.7214  490.2062
+       5 |  157.3207  212.3623  135.7375 -197.1997  534.7949  540.4929
+       6 |  198.4182  248.9451  191.7696 -76.38118  557.8577  513.2848
+       8 |  178.0338  162.1774   85.9621 -172.6225  313.9411   549.561
+       9 |  149.3369  234.5914  144.6442 -285.0854  520.8613  581.7675
+---------+------------------------------------------------------------
+   Total |   144.111  171.5393  96.04519 -209.4191   516.485    483.03
+----------------------------------------------------------------------
+
+cpagecat |  farmdc~u  prod_f~u  oth_fc~u  isofff~y
+---------+----------------------------------------
+       1 |  309.0001  85.50064  331.8598  .5150023
+       2 |   308.308   79.8817  285.3458  .4587533
+       3 |  303.4684  69.92006  287.8501     .4887
+       4 |  338.3244   67.1284   269.799  .4846398
+       5 |  328.1306  76.62478  332.9373  .4088218
+       6 |  264.3397  57.17549  270.6355  .3788502
+       8 |  387.3836  76.21533  258.5846  .4418448
+       9 |  347.1761  89.94725  429.7296  .4438308
+---------+----------------------------------------
+   Total |  311.4908  75.49408  306.2134   .457998
+--------------------------------------------------
+
+.         
+. 
+. * Supplementary Statistics for BI paper 
+. gen gmperlu = fcatlegm/cpnolu
+(1212 missing values generated)
+
+. tabstat region1-region8 gmperha fsizuaa fulltime isofffarmy isspofff
+> army teagasc age_holder is65 pers adult if year == 2008 & ncattle > 
+> 0 & fsizesu >= 2 & droporig == 0 [weight = wt], by(system) stats(mea
+> n)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: system 
+
+  system |   region1   region2   region3   region4   region5   region6
+---------+------------------------------------------------------------
+       0 |  .1399824  .0061378  .1027359  .0610709  .0867824  .1619497
+       1 |  .1198393  .0160383  .0561294  .0607275  .1195619  .1669822
+       2 |  .1967901  .0097487  .0637132  .0996372  .1274448  .0791293
+       3 |  .1655138  .0013492  .0805334  .1525175  .0733516  .0763041
+       4 |  .2548842         0  .1904023  .0916667  .0079791  .0418068
+       5 |  .1663544  .0221577  .2204334  .1279115  .0433446  .2448924
+---------+------------------------------------------------------------
+   Total |  .1736004  .0057363  .0956159  .1111752  .0826319  .1012257
+----------------------------------------------------------------------
+
+  system |   region7   region8   gmperha   fsizuaa  fulltime  isofff~y
+---------+------------------------------------------------------------
+       0 |  .4122508  .0290901  298.7118  47.57723  .9543535  .1574811
+       1 |  .2925812  .1681401  269.1573  47.92563  .5628273  .3439743
+       2 |  .1983753  .2251614  180.2974  29.73356  .1593741  .4977894
+       3 |  .1803557  .2700747  218.8509  31.00974  .1729267  .4347718
+       4 |  .1281338  .2851272  123.6523  37.48628  .3437554  .4513031
+       5 |   .174906         0  217.3667  65.39493  .5726814  .3299659
+---------+------------------------------------------------------------
+   Total |   .226481  .2035336  218.0964  36.86684  .3661769  .3918741
+----------------------------------------------------------------------
+
+  system |  isspof~y   teagasc  age_ho~r      is65      pers     adult
+---------+------------------------------------------------------------
+       0 |         0  .6869286  51.64507   .125099   3.64658  2.536051
+       1 |         0   .584686  55.60462   .221052  3.271806  2.312552
+       2 |         0   .449557  55.00584  .2466991  2.970843  2.158987
+       3 |         0  .4056411  58.42331  .3087149  2.765286  2.105936
+       4 |         0  .4748509  55.78906   .259038  2.774419  2.081643
+       5 |         0  .5569027  56.74211  .2408272  3.351579  2.472529
+---------+------------------------------------------------------------
+   Total |         0  .4896819   55.9961  .2499252  3.020318  2.217076
+----------------------------------------------------------------------
+
+. 
+. tabstat spnolu cpnolu [weight=wt] if fsizesu >= 2 & droporig == 0 ,b
+> y(year) stats(sum)
+(analytic weights assumed)
+
+Summary statistics: sum
+  by categories of: year 
+
+    year |    spnolu    cpnolu
+---------+--------------------
+    1994 |  793345.8   2296775
+    1995 |  761472.3   2444702
+    1996 |    958394   3507187
+    1997 |  969003.8   3699650
+    1998 |   1000540   3912881
+    1999 |  945371.9   3653763
+    2000 |  855888.5   3533133
+    2001 |  937005.2   3619632
+    2002 |  979319.5   3494473
+    2003 |  952967.3   3397780
+    2004 |  939760.7   3291261
+    2005 |  941430.3   3431520
+    2006 |  870777.2   3238909
+    2007 |  812314.6   3169150
+    2008 |  702483.6   3129017
+    2009 |  630635.7   3034566
+---------+--------------------
+   Total |  1.41e+07  5.29e+07
+------------------------------
+
+. 
+. tabstat cpavnocw cpavno06 cpavno61 cpavno12 cpavno2p [weight=wt] if 
+> (system >= 2 & system <=3) & ncattle > 0 & fsizesu >= 2 & droporig =
+> = 0 ,by(year) stats(sum)
+(analytic weights assumed)
+
+Summary statistics: sum
+  by categories of: year 
+
+    year |  cpavnocw  cpavno06  cpavno61  cpavno12  cpavno2p
+---------+--------------------------------------------------
+    1994 |  126319.2  83275.81  82708.33  110804.3  38511.78
+    1995 |  390158.7  228725.5  267106.3  469622.4  250308.7
+    1996 |  690771.7  374950.3  396023.1  656844.5  288487.9
+    1997 |  750933.3  415085.4  471668.3  796706.2  333518.5
+    1998 |  786375.8  421257.7  476951.3  824966.9  358805.8
+    1999 |  801738.6  411276.5  446813.6  792704.2  348691.6
+    2000 |  780067.4  399630.6  423342.8  781314.3  336585.9
+    2001 |  876625.1  436631.6  457720.6  759437.9  292700.3
+    2002 |  793849.7  420565.3  444896.1  738947.6  243323.4
+    2003 |  793538.1  401731.1  433590.2  740756.6  236387.8
+    2004 |  751061.9  395358.3  446434.6  720702.9  236569.9
+    2005 |  761602.5    422088  476137.9  809288.2  269647.4
+    2006 |  751925.8    401092  461915.9  843914.7  253282.2
+    2007 |  737839.8  396325.1  424430.1  815121.6  287328.1
+    2008 |  684032.5  400259.8  467679.5  932261.8  349741.6
+    2009 |  631820.7  351317.9  439028.9  917953.7    353846
+---------+--------------------------------------------------
+   Total |  1.11e+07   5959571   6616447  1.17e+07   4477737
+------------------------------------------------------------
+
+. 
+. gen cpavno012 =  cpavno06 + cpavno61
+(52 missing values generated)
+
+. gen cpavn1224 = cpavno12 + cpavno2p
+(52 missing values generated)
+
+. 
+. local cattle1_vlist = "cpavnocw cpavnohc cpavno06 cpavno61 cpavno12 
+> cpavno2p cpavno012 cpavn1224"
+
+. 
+. gen tis2004 = year == 2004 & (ncattle > 0 & fsizesu >= 2 & droporig 
+> == 0 & (system == 2 | system == 3) & cpagecat != 0)
+
+. gen tis2009 = year == 2009 & (ncattle > 0 & fsizesu >= 2 & droporig 
+> == 0 & (system == 2 | system == 3) & cpagecat != 0)
+
+. 
+. *Exists in 2004 and 2009
+. sort farmcode
+
+. by farmcode: egen is2004 = max(tis2004)
+
+. by farmcode: egen is2009 = max(tis2009)
+
+. 
+. foreach var in `cattle1_vlist' {
+  2. 
+.         gen has_`var'_wt = `var' > 0
+  3.         gen t`var'_2004 = `var' if year == 2004
+  4.         gen t`var'_2009 = `var' if year == 2009
+  5.         replace t`var'_2004 = 0 if t`var'_2004 == .
+  6.         replace t`var'_2009 = 0 if t`var'_2009 == .
+  7.         sort farmcode
+  8.         by farmcode: egen `var'_2004 = max(t`var'_2004)
+  9.         by farmcode: egen `var'_2009 = max(t`var'_2009)
+ 10.         gen `var'_d =  `var'_2009 - `var'_2004 if is2004 == 1 & i
+> s2009 == 1
+ 11.         gen `var'_p =  `var'_d/`var'_2004
+ 12. }
+(17446 missing values generated)
+(17643 missing values generated)
+(17446 real changes made)
+(17643 real changes made)
+(15308 missing values generated)
+(15801 missing values generated)
+(17446 missing values generated)
+(17643 missing values generated)
+(17446 real changes made)
+(17643 real changes made)
+(15308 missing values generated)
+(16393 missing values generated)
+(17446 missing values generated)
+(17643 missing values generated)
+(17446 real changes made)
+(17643 real changes made)
+(15308 missing values generated)
+(15763 missing values generated)
+(17446 missing values generated)
+(17643 missing values generated)
+(17446 real changes made)
+(17643 real changes made)
+(15308 missing values generated)
+(15559 missing values generated)
+(17446 missing values generated)
+(17643 missing values generated)
+(17446 real changes made)
+(17643 real changes made)
+(15308 missing values generated)
+(15369 missing values generated)
+(17446 missing values generated)
+(17643 missing values generated)
+(17446 real changes made)
+(17643 real changes made)
+(15308 missing values generated)
+(16560 missing values generated)
+(17446 missing values generated)
+(17643 missing values generated)
+(17446 real changes made)
+(17643 real changes made)
+(15308 missing values generated)
+(15551 missing values generated)
+(17446 missing values generated)
+(17643 missing values generated)
+(17446 real changes made)
+(17643 real changes made)
+(15308 missing values generated)
+(15353 missing values generated)
+
+. 
+. tabstat has_cpavnocw has_cpavno06 has_cpavno61 has_cpavno12 has_cpav
+> no2p [weight=wt] if (system >= 2 & system <=3) & ncattle > 0 & fsize
+> su >= 2 & droporig == 0 ,by(year) stats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: year 
+
+    year |  has~w_wt  has~6_wt  has~1_wt  h~o12_wt  has~p_wt
+---------+--------------------------------------------------
+    1994 |  .8594065  .9182447  .8904978  .8688442  .5593726
+    1995 |   .857134  .8606111   .889222  .9781457  .6857514
+    1996 |   .839142  .8427158  .8894878  .9370824  .6351576
+    1997 |  .8061908  .8202305  .8802325  .9581084  .6618966
+    1998 |  .8211565  .8307558  .8786476  .9434361  .6796602
+    1999 |  .8252368   .826283  .8772307   .950135  .6942361
+    2000 |  .8176089  .8276001  .8906818  .9300429  .6660494
+    2001 |  .8444183  .8305871  .9053033  .9753344  .7158699
+    2002 |  .8146923  .8158733  .8815084  .9743525  .6340375
+    2003 |  .8188675  .8266258  .8911043  .9619577   .618298
+    2004 |  .7947879  .8015956  .8679149  .9545362   .609333
+    2005 |  .7605422  .7760646  .8659862  .9401419  .6380851
+    2006 |  .7612655  .7647519   .876283  .9563224  .6721808
+    2007 |   .767505  .7705111  .8575625  .9691949  .6568301
+    2008 |   .693342  .7141523  .8260055  .9449207   .691674
+    2009 |  .6632495   .686132  .8431262  .9475764  .6929322
+---------+--------------------------------------------------
+   Total |  .7923666  .8004449  .8748584  .9526689  .6616365
+------------------------------------------------------------
+
+. 
+. tabstat has_cpavnocw has_cpavno06 has_cpavno61 has_cpavno12 has_cpav
+> no2p [weight=wt] if (system >= 2 & system <=3) & ncattle > 0 & fsize
+> su >= 2 & droporig == 0 ,by(year) stats(sum)
+(analytic weights assumed)
+
+Summary statistics: sum
+  by categories of: year 
+
+    year |  has~w_wt  has~6_wt  has~1_wt  h~o12_wt  has~p_wt
+---------+--------------------------------------------------
+    1994 |   11527.2  12316.39  11944.23  11653.79  7502.851
+    1995 |  26197.92   26304.2  27178.68  29896.59  20959.69
+    1996 |  47990.53  48194.92  50869.81  53591.74  36324.66
+    1997 |  49582.33   50445.8  54136.04  58925.56  40707.95
+    1998 |  50940.83  51536.32  54507.32   58526.5  42163.04
+    1999 |  51254.69  51319.67  54483.99  59012.01  43118.36
+    2000 |  50794.87  51415.59   55334.6  57779.96  41379.06
+    2001 |  52293.68  51437.14  56064.21  60401.14  44332.86
+    2002 |  47793.03  47862.31  51712.72  57159.32  37195.12
+    2003 |  47405.45  47854.59  51587.35  55689.16  35794.19
+    2004 |  45440.64  45829.86  49621.56  54573.98  34837.57
+    2005 |  43471.83  44359.08  49498.91  53737.57  36472.31
+    2006 |  44581.99  44786.16  51317.76  56005.11  39364.92
+    2007 |  44133.66  44306.52  49312.22  55731.39  37769.55
+    2008 |  39680.87  40871.87  47273.38  54079.04  39585.41
+    2009 |  37335.75  38623.86  47461.39  53341.13  39006.65
+---------+--------------------------------------------------
+   Total |  690425.3  697464.3  762304.2    830104  576514.2
+------------------------------------------------------------
+
+. 
+. tab cpagecat year [iweight = wt] if (system >= 2 & system <=3) & nca
+> ttle > 0 & fsizesu >= 2 & droporig == 0  & year >= 2004 & cpagecat >
+>  0 & cpagecat <= 6
+
+           |                    year
+  cpagecat |      2004       2005       2006       2007 |     Total
+-----------+--------------------------------------------+----------
+         1 |  12,021.8  12,248.79 11,519.339  11,798.77 | 66,690.52 
+         2 |13,167.009  12,576.93  16,118.33  14,764.59 |81,987.846 
+         3 | 9,650.551  10,327.26  9,408.746  10,297.01 | 57,627.39 
+         4 | 3,891.854   4,693.48  4,601.235  4,549.109 | 29,405.49 
+         5 | 4,317.883  5,520.565  6,277.045  6,886.162 | 41,806.37 
+         6 | 5,956.996  5,902.498  4,937.863  5,265.643 | 35,130.42 
+-----------+--------------------------------------------+----------
+     Total |  49,006.1  51,269.52 52,862.553  53,561.29 |   312,648 
+
+
+           |         year
+  cpagecat |      2008       2009 |     Total
+-----------+----------------------+----------
+         1 | 9,969.117  9,132.705 | 66,690.52 
+         2 | 13,214.12  12,146.88 |81,987.846 
+         3 | 9,361.042  8,582.776 | 57,627.39 
+         4 | 5,287.975  6,381.837 | 29,405.49 
+         5 | 8,865.692  9,939.024 | 41,806.37 
+         6 | 6,507.496  6,559.923 | 35,130.42 
+-----------+----------------------+----------
+     Total | 53,205.44  52,743.14 |   312,648 
+
+
+. 
+. 
+. * Percentile Changes
+. 
+. 
+. local i = 2004
+
+. 
+. * Quintile in 2004
+. gen tmarketffi_q`i' = marketffi_q`i'
+(18189 missing values generated)
+
+. replace tmarketffi_q`i' =0 if tmarketffi_q`i' == .
+(18189 real changes made)
+
+. by farmcode: egen mtmarketffi_q`i' = max(tmarketffi_q`i')
+
+. 
+. * Number of Cattle in both years
+. 
+. tabstat  cpavnocw cpavnohc cpavno06 cpavno61 cpavno12 cpavno2p cpavn
+> ocw_d cpavnohc_d cpavno06_d cpavno61_d cpavno12_d cpavno2p_d if ncat
+> tle > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 3)
+>  & cpagecat != 0 & year == 2004 [weight = wt], by(mtmarketffi_q2004)
+>  stats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: mtmarketffi_q2004 
+
+mtmarketffi_q2004 |  cpavnocw  cpavnohc  cpavno06  cpavno61  cpavno12
+------------------+--------------------------------------------------
+                1 |  7.992258  .9647591   4.22076  6.146689  13.44236
+                2 |  13.66025   1.05931  7.092464  7.963154  14.42712
+                3 |  14.24074  1.245296  7.305014  9.762868  14.51902
+                4 |  16.08594  1.160348  8.522297  8.332436  10.30155
+                5 |  15.08255  1.027731  8.131214  7.404204  10.35726
+------------------+--------------------------------------------------
+            Total |  13.13659  1.082707  6.915087  7.808446  12.60559
+---------------------------------------------------------------------
+
+mtmarketffi_q2004 |  cpavno2p  cpav~w_d  cpav~c_d  cpav~6_d  cpav~1_d
+------------------+--------------------------------------------------
+                1 |  5.327575  .1021972 -.4974702 -.0242283 -1.068929
+                2 |   5.06602 -.7840739 -.0240166 -1.251419 -1.907686
+                3 |  4.148856  .3056419 -.1466446 -.4682942 -2.426467
+                4 |  2.695707  -.789999 -.2898052 -.8938518 -.3023647
+                5 |  3.198244   .066092 -.0155862 -.4652892  .2473352
+------------------+--------------------------------------------------
+            Total |  4.137769 -.1928128 -.2089948 -.5906017 -1.170779
+---------------------------------------------------------------------
+
+mtmarketffi_q2004 |  cp~o12_d  cpav~p_d
+------------------+--------------------
+                1 | -.7340803 -.1262054
+                2 | -1.233495  1.463873
+                3 |  .1486894  .8122012
+                4 |  .5891352   .302238
+                5 |  1.924468  .7282232
+------------------+--------------------
+            Total |  .0240065  .6163812
+---------------------------------------
+
+. 
+. tabstat  cpavnocw cpavnohc cpavno06 cpavno61 cpavno12 cpavno2p cpavn
+> ocw_d cpavnohc_d cpavno06_d cpavno61_d cpavno12_d cpavno2p_d if ncat
+> tle > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 3)
+>  & cpagecat != 0 & year == 2004 [weight = wt], by(mkt_fcgm1_q2004) s
+> tats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: mkt_fcgm1_q2004 (5 quantiles of mkt_fcgm1_ha )
+
+mkt_fcgm1_q2004 |  cpavnocw  cpavnohc  cpavno06  cpavno61  cpavno12
+----------------+--------------------------------------------------
+              1 |  7.181538  .8103302  3.358809  5.184102  12.96748
+              2 |  14.34654  1.215995  7.352473  7.301542  11.65916
+              3 |  12.70469  .9413489  6.557349  7.022873  10.36305
+              4 |  17.14609  1.284846   8.71104   9.99373  13.89139
+              5 |  15.52182  1.219546   9.16605  9.859217  13.84234
+----------------+--------------------------------------------------
+          Total |  13.13659  1.082707  6.915087  7.808446  12.60559
+-------------------------------------------------------------------
+
+mkt_fcgm1_q2004 |  cpavno2p  cpav~w_d  cpav~c_d  cpav~6_d  cpav~1_d
+----------------+--------------------------------------------------
+              1 |  5.290658  -.262016 -.3932806 -.2342471 -1.514409
+              2 |  4.492972 -.5139427 -.3998808  -1.10539 -1.221215
+              3 |  3.530914 -1.264454 -.1487731 -.1165818 -.8920479
+              4 |  4.123609 -.7443017 -.3396305 -1.123941 -2.237492
+              5 |  3.156675  1.681674  .2038757 -.5453618 -.1354655
+----------------+--------------------------------------------------
+          Total |  4.137769 -.1928128 -.2089948 -.5906017 -1.170779
+-------------------------------------------------------------------
+
+mkt_fcgm1_q2004 |  cp~o12_d  cpav~p_d
+----------------+--------------------
+              1 | -1.914028  .7591827
+              2 |  -1.37736  .1805985
+              3 |  .7721904  1.088588
+              4 |  1.523245  .7233327
+              5 |  1.306835  .2839179
+----------------+--------------------
+          Total |  .0240065  .6163812
+-------------------------------------
+
+. tabstat  cpavnocw cpavnohc cpavno06 cpavno61 cpavno12 cpavno2p if nc
+> attle > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 
+> 3) & cpagecat != 0 & (is2004 == 0 | is2009 == 0) [weight = wt], by(y
+> ear) stats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: year 
+
+    year |  cpavnocw  cpavnohc  cpavno06  cpavno61  cpavno12  cpavno2p
+---------+------------------------------------------------------------
+    1994 |  9.470289  1.088157   6.40223  6.341766  8.464467  3.026004
+    1995 |  12.28868  1.196622  6.850301  8.203494  14.16455  8.439965
+    1996 |  11.44621  1.131122  6.165483  6.581504  10.95234  4.961633
+    1997 |   11.2876  .9575841  6.200315  7.138267  12.02125  5.358788
+    1998 |  11.49338  .8828899  6.162578  7.042619  12.46147  5.480826
+    1999 |  12.32614  .8003909  6.035611   6.48118  11.85474  5.475991
+    2000 |  11.86495  .7167423  5.875492  6.067507  11.63344  5.226907
+    2001 |  13.95179  1.051957  6.638642  6.749679  11.46474  4.762729
+    2002 |  13.12222  1.063506  6.607428   6.82787  10.59759  4.063784
+    2003 |  13.14544   1.09166  6.530524  6.750986  11.26586  3.364862
+    2004 |  12.09497  .8967918  5.944662  5.792545   9.12308  3.535803
+    2005 |   12.6763  1.264472  6.826607  7.756248  12.92624  4.850942
+    2006 |  12.08204  1.126346  6.335319  7.236324   13.8242  4.621169
+    2007 |  12.29706  1.086027  6.626514  7.096986  15.15009  6.134198
+    2008 |  12.17437  1.132727  7.031635  8.868034  17.61838  8.150591
+    2009 |  11.36368   .836116  6.634018  8.666172  18.86793  7.732764
+---------+------------------------------------------------------------
+   Total |  12.11636  1.000987  6.374274  7.021143  12.49444  5.312579
+----------------------------------------------------------------------
+
+. 
+. tab mtmarketffi_q2004 if ncattle > 0 & fsizesu >= 2 & droporig == 0 
+> & (system == 2 | system == 3) & cpagecat != 0 & year == 2004 & is200
+> 4 == 1 & is2009 == 1
+
+mtmarketffi |
+     _q2004 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |         57       19.45       19.45
+          2 |         67       22.87       42.32
+          3 |         65       22.18       64.51
+          4 |         55       18.77       83.28
+          5 |         49       16.72      100.00
+------------+-----------------------------------
+      Total |        293      100.00
+
+. 
+. 
+. gen efficiency = farmdc_ha/marketgo_ha
+(61 missing values generated)
+
+. foreach var in `cattle1_vlist' {
+  2. 
+.         regress `var'_p `var' mkt_ecgm_ha marketffi_ha dirpayts_ha e
+> fficiency prod_fc_ha oth_fc_ha is65 isofffarmy if ncattle > 0 & fsiz
+> esu >= 2 & droporig == 0 & (system == 2 | system == 3) & cpagecat !=
+>  0 & year == 2004 & `var'_p < 1 & is2004 == 1 & is2009 == 1  [weight
+>  = wt]
+  3. 
+.         tab mtmarketffi_q2004 if ncattle > 0 & fsizesu >= 2 & dropor
+> ig == 0 & (system == 2 | system == 3) & cpagecat != 0 & year == 2004
+>  & `var'_p < 1 & is2004 == 1 & is2009 == 1 [weight = wt], sum(`var'_
+> p)
+  4. }
+(analytic weights assumed)
+(sum of wgt is   2.5027e+04)
+
+      Source |       SS       df       MS              Number of obs =
+>      239
+-------------+------------------------------           F(  9,   229) =
+>     1.11
+       Model |  1.79141372     9  .199045969           Prob > F      =
+>   0.3583
+    Residual |  41.1607605   229  .179741312           R-squared     =
+>   0.0417
+-------------+------------------------------           Adj R-squared =
+>   0.0040
+       Total |  42.9521742   238   .18047132           Root MSE      =
+>   .42396
+
+----------------------------------------------------------------------
+> --------
+  cpavnocw_p |      Coef.   Std. Err.      t    P>|t|     [95% Conf. I
+> nterval]
+-------------+--------------------------------------------------------
+> --------
+    cpavnocw |  -9.15e-06   .0021427    -0.00   0.997    -.0042311    
+> .0042128
+ mkt_ecgm_ha |   .0003276    .000424     0.77   0.440    -.0005078    
+> .0011631
+marketffi_ha |  -.0000682   .0003929    -0.17   0.862    -.0008425    
+>  .000706
+ dirpayts_ha |  -.0002072   .0001667    -1.24   0.215    -.0005356    
+> .0001212
+  efficiency |  -.0670144   .0731809    -0.92   0.361    -.2112084    
+> .0771796
+  prod_fc_ha |  -.0006837    .000639    -1.07   0.286    -.0019427    
+> .0005753
+   oth_fc_ha |   .0000549   .0004077     0.13   0.893    -.0007485    
+> .0008583
+        is65 |   -.021049   .0819922    -0.26   0.798    -.1826044    
+> .1405065
+  isofffarmy |  -.0142455   .0650547    -0.22   0.827    -.1424277    
+> .1139367
+       _cons |   .0450146   .1099245     0.41   0.683    -.1715781    
+> .2616074
+----------------------------------------------------------------------
+> --------
+
+mtmarketffi |              Summary of cpavnocw_p
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |  -.16830046   .44932424    4320.873          36
+          2 |  -.10560168   .47923605   5166.6699          55
+          3 |  -.09684001   .45759545   5512.4893          52
+          4 |  -.02633179   .36273166   5184.4377          53
+          5 |   .00725372    .3541244   4842.2718          43
+------------+------------------------------------------------
+      Total |  -.07623983   .42481916   25026.742         239
+(analytic weights assumed)
+(sum of wgt is   1.7089e+04)
+
+      Source |       SS       df       MS              Number of obs =
+>      167
+-------------+------------------------------           F(  9,   157) =
+>     0.83
+       Model |  2.72360395     9  .302622661           Prob > F      =
+>   0.5892
+    Residual |  57.2246814   157  .364488416           R-squared     =
+>   0.0454
+-------------+------------------------------           Adj R-squared =
+>  -0.0093
+       Total |  59.9482853   166  .361134249           Root MSE      =
+>   .60373
+
+----------------------------------------------------------------------
+> --------
+  cpavnohc_p |      Coef.   Std. Err.      t    P>|t|     [95% Conf. I
+> nterval]
+-------------+--------------------------------------------------------
+> --------
+    cpavnohc |  -.0494969   .0267053    -1.85   0.066     -.102245    
+> .0032512
+ mkt_ecgm_ha |   .0007407   .0006706     1.10   0.271    -.0005839    
+> .0020653
+marketffi_ha |  -.0001395   .0005657    -0.25   0.806     -.001257    
+> .0009779
+ dirpayts_ha |  -.0000102   .0002848    -0.04   0.971    -.0005727    
+> .0005523
+  efficiency |   .0495957   .0883423     0.56   0.575    -.1248969    
+> .2240884
+  prod_fc_ha |  -.0003548    .001052    -0.34   0.736    -.0024328    
+> .0017232
+   oth_fc_ha |   -.000083   .0005855    -0.14   0.888    -.0012394    
+> .0010734
+        is65 |  -.1188951   .1450131    -0.82   0.414    -.4053234    
+> .1675332
+  isofffarmy |  -.0388757   .1098935    -0.35   0.724    -.2559361    
+> .1781848
+       _cons |   -.432264   .1710607    -2.53   0.012    -.7701413   -
+> .0943867
+----------------------------------------------------------------------
+> --------
+
+mtmarketffi |              Summary of cpavnohc_p
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |  -.51055911   .63754299   3528.8475          30
+          2 |  -.51395604   .62752998   3070.5929          34
+          3 |  -.33652153   .59712292   3979.8799          41
+          4 |  -.62930862    .4683726   3548.9553          35
+          5 |  -.33034965   .64977951   2960.2664          27
+------------+------------------------------------------------
+      Total |  -.46408063   .60094446   17088.542         167
+(analytic weights assumed)
+(sum of wgt is   2.5264e+04)
+
+      Source |       SS       df       MS              Number of obs =
+>      240
+-------------+------------------------------           F(  9,   230) =
+>     0.55
+       Model |  1.02681493     9  .114090548           Prob > F      =
+>   0.8376
+    Residual |  47.8056088   230  .207850473           R-squared     =
+>   0.0210
+-------------+------------------------------           Adj R-squared =
+>  -0.0173
+       Total |  48.8324237   239  .204319765           Root MSE      =
+>   .45591
+
+----------------------------------------------------------------------
+> --------
+  cpavno06_p |      Coef.   Std. Err.      t    P>|t|     [95% Conf. I
+> nterval]
+-------------+--------------------------------------------------------
+> --------
+    cpavno06 |    .000476   .0037465     0.13   0.899    -.0069058    
+> .0078579
+ mkt_ecgm_ha |  -.0001861   .0004324    -0.43   0.667     -.001038    
+> .0006658
+marketffi_ha |   .0002631   .0003912     0.67   0.502    -.0005078    
+> .0010339
+ dirpayts_ha |  -.0000382   .0001701    -0.22   0.823    -.0003732    
+> .0002969
+  efficiency |  -.0166354   .0300053    -0.55   0.580    -.0757557    
+>  .042485
+  prod_fc_ha |   .0002474   .0006755     0.37   0.714    -.0010835    
+> .0015783
+   oth_fc_ha |   .0000814   .0004125     0.20   0.844    -.0007314    
+> .0008941
+        is65 |   .1329235   .0902419     1.47   0.142    -.0448829    
+>   .31073
+  isofffarmy |   .0321353    .069929     0.46   0.646    -.1056479    
+> .1699186
+       _cons |  -.1129445    .104202    -1.08   0.280     -.318257    
+> .0923681
+----------------------------------------------------------------------
+> --------
+
+mtmarketffi |              Summary of cpavno06_p
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |  -.15254956   .48943138   4269.6245          36
+          2 |  -.19915745   .48218886   5634.4009          56
+          3 |  -.12963268   .43534399   5775.7821          55
+          4 |  -.06628779   .42109518   4847.9935          51
+          5 |  -.05793139   .43368474   4735.8918          42
+------------+------------------------------------------------
+      Total |  -.12341473   .45201744   25263.693         240
+(analytic weights assumed)
+(sum of wgt is   2.6638e+04)
+
+      Source |       SS       df       MS              Number of obs =
+>      244
+-------------+------------------------------           F(  9,   234) =
+>     1.97
+       Model |  4.13478908     9  .459421009           Prob > F      =
+>   0.0441
+    Residual |  54.6780613   234  .233666929           R-squared     =
+>   0.0703
+-------------+------------------------------           Adj R-squared =
+>   0.0345
+       Total |  58.8128504   243  .242028191           Root MSE      =
+>   .48339
+
+----------------------------------------------------------------------
+> --------
+  cpavno61_p |      Coef.   Std. Err.      t    P>|t|     [95% Conf. I
+> nterval]
+-------------+--------------------------------------------------------
+> --------
+    cpavno61 |  -.0040821   .0028254    -1.44   0.150    -.0096487    
+> .0014844
+ mkt_ecgm_ha |  -.0000714   .0003869    -0.18   0.854    -.0008337    
+> .0006908
+marketffi_ha |   .0005849   .0003507     1.67   0.097    -.0001061    
+> .0012759
+ dirpayts_ha |   .0000321   .0001847     0.17   0.862    -.0003319    
+>  .000396
+  efficiency |  -.0195082   .0325706    -0.60   0.550    -.0836773    
+>  .044661
+  prod_fc_ha |   .0009129   .0006582     1.39   0.167    -.0003838    
+> .0022095
+   oth_fc_ha |   .0001893   .0003629     0.52   0.602    -.0005256    
+> .0009042
+        is65 |  -.0642156   .0915021    -0.70   0.484    -.2444888    
+> .1160575
+  isofffarmy |   .0264959   .0750623     0.35   0.724    -.1213884    
+> .1743802
+       _cons |  -.1094234   .1047761    -1.04   0.297    -.3158484    
+> .0970016
+----------------------------------------------------------------------
+> --------
+
+mtmarketffi |              Summary of cpavno61_p
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |  -.33426556   .47848362   5291.9962          42
+          2 |   -.1733057   .49349343    5753.389          57
+          3 |  -.09404409   .46238878   5840.4899          54
+          4 |  -.05223276    .4449611   4702.4676          49
+          5 |  -.00615055   .52898034   5049.8496          42
+------------+------------------------------------------------
+      Total |  -.13484297   .49196361   26638.192         244
+(analytic weights assumed)
+(sum of wgt is   2.7585e+04)
+
+      Source |       SS       df       MS              Number of obs =
+>      241
+-------------+------------------------------           F(  9,   231) =
+>     2.05
+       Model |  4.41649976     9  .490722195           Prob > F      =
+>   0.0348
+    Residual |  55.2390363   231  .239130027           R-squared     =
+>   0.0740
+-------------+------------------------------           Adj R-squared =
+>   0.0380
+       Total |  59.6555361   240  .248564734           Root MSE      =
+>   .48901
+
+----------------------------------------------------------------------
+> --------
+  cpavno12_p |      Coef.   Std. Err.      t    P>|t|     [95% Conf. I
+> nterval]
+-------------+--------------------------------------------------------
+> --------
+    cpavno12 |   .0005205   .0019254     0.27   0.787    -.0032731    
+> .0043141
+ mkt_ecgm_ha |   .0003854   .0002831     1.36   0.175    -.0001723    
+> .0009432
+marketffi_ha |   -.000436   .0002773    -1.57   0.117    -.0009824    
+> .0001104
+ dirpayts_ha |  -.0003831   .0001905    -2.01   0.046    -.0007586   -
+> 7.68e-06
+  efficiency |  -.0534506   .0286594    -1.87   0.063    -.1099178    
+> .0030167
+  prod_fc_ha |  -.0005481   .0006857    -0.80   0.425    -.0018991    
+> .0008028
+   oth_fc_ha |  -.0000793   .0002733    -0.29   0.772    -.0006177    
+> .0004591
+        is65 |  -.1331102   .0896212    -1.49   0.139    -.3096896    
+> .0434691
+  isofffarmy |  -.2053662   .0778986    -2.64   0.009    -.3588488   -
+> .0518837
+       _cons |   .1404758   .1044141     1.35   0.180    -.0652499    
+> .3462015
+----------------------------------------------------------------------
+> --------
+
+mtmarketffi |              Summary of cpavno12_p
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |  -.17690601   .60084611   6963.4423          49
+          2 |  -.09842338   .44352873   6122.2479          58
+          3 |  -.11779673   .45910667   5578.6449          53
+          4 |  -.09029463   .45420688   4476.5752          45
+          5 |  -.15741539   .50288704    4444.413          36
+------------+------------------------------------------------
+      Total |  -.13033826   .49856267   27585.323         241
+(analytic weights assumed)
+(sum of wgt is   1.4763e+04)
+
+      Source |       SS       df       MS              Number of obs =
+>      134
+-------------+------------------------------           F(  9,   124) =
+>     2.24
+       Model |  5.44065486     9  .604517207           Prob > F      =
+>   0.0235
+    Residual |  33.4496763   124  .269755454           R-squared     =
+>   0.1399
+-------------+------------------------------           Adj R-squared =
+>   0.0775
+       Total |  38.8903312   133  .292408505           Root MSE      =
+>   .51938
+
+----------------------------------------------------------------------
+> --------
+  cpavno2p_p |      Coef.   Std. Err.      t    P>|t|     [95% Conf. I
+> nterval]
+-------------+--------------------------------------------------------
+> --------
+    cpavno2p |   .0073645    .003696     1.99   0.049     .0000491    
+> .0146799
+ mkt_ecgm_ha |  -.0006182   .0004082    -1.51   0.132    -.0014261    
+> .0001897
+marketffi_ha |   .0000197   .0005428     0.04   0.971    -.0010547    
+>  .001094
+ dirpayts_ha |   .0003695   .0002988     1.24   0.219    -.0002219    
+> .0009609
+  efficiency |  -.0493641   .0763265    -0.65   0.519    -.2004355    
+> .1017074
+  prod_fc_ha |   .0004724    .000978     0.48   0.630    -.0014633    
+> .0024081
+   oth_fc_ha |  -.0003288   .0004631    -0.71   0.479    -.0012454    
+> .0005877
+        is65 |    .209266   .1196371     1.75   0.083    -.0275294    
+> .4460614
+  isofffarmy |   .0663622   .1107281     0.60   0.550    -.1527997    
+> .2855242
+       _cons |  -.6094023   .1542984    -3.95   0.000     -.914802   -
+> .3040026
+----------------------------------------------------------------------
+> --------
+
+mtmarketffi |              Summary of cpavno2p_p
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |   -.3596422   .50917859   3950.5422          25
+          2 |  -.47724901   .52662035   2992.6044          32
+          3 |  -.30004996   .61314322   3138.5499          33
+          4 |  -.64755515   .50030161   2714.6265          25
+          5 |  -.45385873   .51420088   1966.4535          19
+------------+------------------------------------------------
+      Total |  -.43630569    .5407481   14762.777         134
+(analytic weights assumed)
+(sum of wgt is   2.8120e+04)
+
+      Source |       SS       df       MS              Number of obs =
+>      261
+-------------+------------------------------           F(  9,   251) =
+>     1.16
+       Model |  1.73335059     9  .192594509           Prob > F      =
+>   0.3203
+    Residual |  41.6170971   251  .165805168           R-squared     =
+>   0.0400
+-------------+------------------------------           Adj R-squared =
+>   0.0056
+       Total |  43.3504477   260  .166732491           Root MSE      =
+>   .40719
+
+----------------------------------------------------------------------
+> --------
+ cpavno012_p |      Coef.   Std. Err.      t    P>|t|     [95% Conf. I
+> nterval]
+-------------+--------------------------------------------------------
+> --------
+   cpavno012 |  -.0005443   .0016277    -0.33   0.738    -.0037501    
+> .0026614
+ mkt_ecgm_ha |  -.0001558   .0003213    -0.48   0.628    -.0007887    
+> .0004771
+marketffi_ha |   .0003224   .0002908     1.11   0.269    -.0002503    
+> .0008951
+ dirpayts_ha |  -.0000793   .0001473    -0.54   0.591    -.0003694    
+> .0002108
+  efficiency |  -.0298631   .0270662    -1.10   0.271    -.0831689    
+> .0234427
+  prod_fc_ha |   .0005437    .000547     0.99   0.321    -.0005335    
+>  .001621
+   oth_fc_ha |   .0000231   .0003016     0.08   0.939    -.0005709    
+> .0006171
+        is65 |   .0449735   .0757104     0.59   0.553    -.1041352    
+> .1940821
+  isofffarmy |   .0980881   .0613533     1.60   0.111    -.0227449    
+> .2189211
+       _cons |  -.0811334   .0879291    -0.92   0.357    -.2543063    
+> .0920394
+----------------------------------------------------------------------
+> --------
+
+mtmarketffi |             Summary of cpavno012_p
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |  -.20190332   .45421264   5662.0885          46
+          2 |  -.16429169   .40033605   6114.0874          61
+          3 |   -.1096581    .3921215   6163.4098          58
+          4 |  -.06838918   .35182065   4872.3726          51
+          5 |  -.02857331   .42411149   5307.6588          45
+------------+------------------------------------------------
+      Total |  -.11765562    .4083289   28119.617         261
+(analytic weights assumed)
+(sum of wgt is   2.8201e+04)
+
+      Source |       SS       df       MS              Number of obs =
+>      247
+-------------+------------------------------           F(  9,   237) =
+>     1.52
+       Model |  2.91620497     9  .324022775           Prob > F      =
+>   0.1414
+    Residual |   50.517949   237  .213155903           R-squared     =
+>   0.0546
+-------------+------------------------------           Adj R-squared =
+>   0.0187
+       Total |   53.434154   246  .217212008           Root MSE      =
+>   .46169
+
+----------------------------------------------------------------------
+> --------
+ cpavn1224_p |      Coef.   Std. Err.      t    P>|t|     [95% Conf. I
+> nterval]
+-------------+--------------------------------------------------------
+> --------
+   cpavn1224 |    .000761   .0012582     0.60   0.546    -.0017177    
+> .0032397
+ mkt_ecgm_ha |  -.0001279   .0002657    -0.48   0.631    -.0006514    
+> .0003956
+marketffi_ha |  -.0000439   .0002626    -0.17   0.867    -.0005613    
+> .0004735
+ dirpayts_ha |  -.0005343   .0001801    -2.97   0.003     -.000889   -
+> .0001796
+  efficiency |  -.0360855   .0269377    -1.34   0.182    -.0891533    
+> .0169823
+  prod_fc_ha |  -.0003969   .0006314    -0.63   0.530    -.0016409    
+>  .000847
+   oth_fc_ha |   .0003368   .0002585     1.30   0.194    -.0001725    
+> .0008461
+        is65 |  -.0884568   .0832292    -1.06   0.289    -.2524204    
+> .0755068
+  isofffarmy |  -.0398897   .0731257    -0.55   0.586    -.1839492    
+> .1041697
+       _cons |    .185907   .0992691     1.87   0.062    -.0096556    
+> .3814695
+----------------------------------------------------------------------
+> --------
+
+mtmarketffi |             Summary of cpavn1224_p
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |   -.0524677   .48709608   6972.6056          48
+          2 |  -.07799191   .39917755   6298.0237          60
+          3 |   .03522072   .45357948   5877.0651          56
+          4 |  -.07442724   .48720587   4350.8925          44
+          5 |  -.08964075   .52015247   4702.2221          39
+------------+------------------------------------------------
+      Total |  -.04947988   .46606009   28200.809         247
+
+. 
+. 
+. * Balanced
+. tabstat  cpavnocw cpavnohc cpavno06 cpavno61 cpavno12 cpavno2p if nc
+> attle > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 
+> 3) & cpagecat != 0 & (is2004 == 1 & is2009 == 1) & year >= 2004 [wei
+> ght = wt], by(year) stats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: year 
+
+    year |  cpavnocw  cpavnohc  cpavno06  cpavno61  cpavno12  cpavno2p
+---------+------------------------------------------------------------
+    2004 |  13.88869  1.216948  7.615786  9.264034  15.12014   4.57242
+    2005 |  13.82693  1.099005  7.817184  8.775174  15.11446   4.61398
+    2006 |  13.40875  .9917445  7.234738  8.376719  14.85075  4.102412
+    2007 |  13.25554  1.244381   7.10325  7.606526  13.40157  4.093851
+    2008 |  11.85487  .8852679  6.918307  7.518997  15.19607  4.631992
+    2009 |  11.13336  .8166088  5.986141  7.236945  14.64652  5.347785
+---------+------------------------------------------------------------
+   Total |   12.8824  1.040084  7.104205  8.126881  14.72592  4.565894
+----------------------------------------------------------------------
+
+. tabstat  cpavnocw_p cpavnohc_p cpavno06_p cpavno61_p cpavno12_p cpav
+> no2p_p if ncattle > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 
+> | system == 3) & cpagecat != 0 & (is2004 == 1 & is2009 == 1) & year 
+> >= 2004 & cpavnocw_p < 1 & cpavnohc_p < 1 & cpavno06_p < 1 & cpavno6
+> 1_p < 1 & cpavno12_p < 1 & cpavno2p_p < 1 [weight = wt], by(year) st
+> ats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: year 
+
+    year |  cpav~w_p  cpav~c_p  cpav~6_p  cpav~1_p  cp~o12_p  cpav~p_p
+---------+------------------------------------------------------------
+    2004 | -.0888901 -.4040196  -.139916 -.0356928 -.0610185 -.4554575
+    2005 | -.0850162 -.3897167 -.1503612 -.0491104 -.0551223  -.460904
+    2006 | -.0804473 -.4155277 -.1220513 -.0416111 -.0564896   -.53418
+    2007 | -.0776677 -.4194657 -.1379471 -.0505114 -.0643993  -.521391
+    2008 | -.0892884 -.4839629 -.1542888 -.0348874 -.0822136 -.4777905
+    2009 | -.0942478 -.4519216 -.1559985 -.0504553 -.0920097 -.4847257
+---------+------------------------------------------------------------
+   Total | -.0860018   -.42716 -.1433422 -.0436707 -.0685255 -.4888993
+----------------------------------------------------------------------
+
+. 
+. foreach var in `cattle1_vlist' {
+  2. 
+.         tab mtmarketffi_q2004 if ncattle > 0 & fsizesu >= 2 & dropor
+> ig == 0 & (system == 2 | system == 3) & cpagecat != 0 & year == 2004
+>  & is2004 == 1 & is2009 == 1 [weight = wt], sum(`var'_d)
+  3.         tab mtmarketffi_q2004 if ncattle > 0 & fsizesu >= 2 & dro
+> porig == 0 & (system == 2 | system == 3) & cpagecat != 0 & year == 2
+> 004 & is2004 == 1 & is2009 == 1 [weight = wt], sum(`var')
+  4. 
+. 
+. }
+
+mtmarketffi |              Summary of cpavnocw_d
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |   .10219718   6.9246194   8199.8912          57
+          2 |  -.78407391   7.2046245   6870.4651          67
+          3 |   .30564195   8.4587131   6904.8029          65
+          4 |  -.78999898   6.5940457   5495.7689          55
+          5 |   .06609202   10.120704   5729.7262          49
+------------+------------------------------------------------
+      Total |  -.19281282   7.8534773   33200.654         293
+
+mtmarketffi |               Summary of cpavnocw
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |   7.3597842   9.5581098   8199.8912          57
+          2 |   15.216172   17.744348   6870.4651          67
+          3 |   14.416622   12.254017   6904.8029          65
+          4 |   18.237996   13.319572   5495.7689          55
+          5 |   16.832599   14.696106   5729.7262          49
+------------+------------------------------------------------
+      Total |   13.888688   14.096159   33200.654         293
+
+mtmarketffi |              Summary of cpavnohc_d
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |  -.49747021   1.6996411   8199.8912          57
+          2 |  -.02401656   1.9112505   6870.4651          67
+          3 |  -.14664456   2.1626066   6904.8029          65
+          4 |   -.2898052   2.3266952   5495.7689          55
+          5 |  -.01558617   2.1309333   5729.7262          49
+------------+------------------------------------------------
+      Total |  -.20899483    2.025028   33200.654         293
+
+mtmarketffi |               Summary of cpavnohc
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |   1.0570597   1.7238185   8199.8912          57
+          2 |   1.1204195   1.6671413   6870.4651          67
+          3 |   1.3807818   2.1545215   6904.8029          65
+          4 |   1.3760383   1.4173475   5495.7689          55
+          5 |   1.2114846   1.7468401   5729.7262          49
+------------+------------------------------------------------
+      Total |   1.2169479   1.7632747   33200.654         293
+
+mtmarketffi |              Summary of cpavno06_d
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |  -.02422827   2.8592799   8199.8912          57
+          2 |  -1.2514192   7.8864798   6870.4651          67
+          3 |  -.46829415   3.8641927   6904.8029          65
+          4 |   -.8938518   5.3287727   5495.7689          55
+          5 |  -.46528918   6.4099592   5729.7262          49
+------------+------------------------------------------------
+      Total |  -.59060168   5.4380851   33200.654         293
+
+mtmarketffi |               Summary of cpavno06
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |   3.9159844   5.7048889   8199.8912          57
+          2 |   8.3267362   10.726888   6870.4651          67
+          3 |   7.9239973   6.5518219   6904.8029          65
+          4 |   10.075246   8.0583697   5495.7689          55
+          5 |   9.3276752   8.8011771   5729.7262          49
+------------+------------------------------------------------
+      Total |   7.6157862    8.309044   33200.654         293
+
+mtmarketffi |              Summary of cpavno61_d
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |  -1.0689286   5.4534876   8199.8912          57
+          2 |  -1.9076861   7.5332914   6870.4651          67
+          3 |  -2.4264674   11.534889   6904.8029          65
+          4 |  -.30236469   5.2201184   5495.7689          55
+          5 |   .24733519   7.2208141   5729.7262          49
+------------+------------------------------------------------
+      Total |  -1.1707791   7.7714143   33200.654         293
+
+mtmarketffi |               Summary of cpavno61
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |   6.6769869   8.7682148   8199.8912          57
+          2 |    9.975854   9.8197192   6870.4651          67
+          3 |   11.782522   18.372776   6904.8029          65
+          4 |   8.9973483    8.417305   5495.7689          55
+          5 |   9.3336608   8.9979657   5729.7262          49
+------------+------------------------------------------------
+      Total |   9.2640338   11.670089   33200.654         293
+
+mtmarketffi |              Summary of cpavno12_d
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |  -.73408028   10.454871   8199.8912          57
+          2 |  -1.2334953   10.587958   6870.4651          67
+          3 |   .14868941   13.665134   6904.8029          65
+          4 |   .58913523   5.8888789   5495.7689          55
+          5 |   1.9244678   10.418648   5729.7262          49
+------------+------------------------------------------------
+      Total |   .02400648   10.636483   33200.654         293
+
+mtmarketffi |               Summary of cpavno12
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |   15.316878    17.62499   8199.8912          57
+          2 |   17.474708   21.377508   6870.4651          67
+          3 |   16.597849   18.772919   6904.8029          65
+          4 |    11.73033   13.712568   5495.7689          55
+          5 |   13.485877   15.474613   5729.7262          49
+------------+------------------------------------------------
+      Total |    15.12014   17.798841   33200.654         293
+
+mtmarketffi |              Summary of cpavno2p_d
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |  -.12620543   7.7932197   8199.8912          57
+          2 |   1.4638732   6.9570657   6870.4651          67
+          3 |   .81220115   6.9809233   6904.8029          65
+          4 |   .30223804   4.8959768   5495.7689          55
+          5 |    .7282232   7.6669342   5729.7262          49
+------------+------------------------------------------------
+      Total |   .61638115    6.992428   33200.654         293
+
+mtmarketffi |               Summary of cpavno2p
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |   6.1326445    11.25459   8199.8912          57
+          2 |   5.4078814   12.461093   6870.4651          67
+          3 |   4.5336158   8.6045375   6904.8029          65
+          4 |   2.8283415   5.0827203   5495.7689          55
+          5 |   3.0573924   7.9507331   5729.7262          49
+------------+------------------------------------------------
+      Total |   4.5724199   9.7161018   33200.654         293
+
+mtmarketffi |             Summary of cpavno012_d
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |  -1.0931568   6.3118308   8199.8912          57
+          2 |  -3.1591054   11.558886   6870.4651          67
+          3 |  -2.8947615   11.500519   6904.8029          65
+          4 |  -1.1962164   7.4655688   5495.7689          55
+          5 |  -.21795378   12.574468   5729.7262          49
+------------+------------------------------------------------
+      Total |  -1.7613807    10.06811   33200.654         293
+
+mtmarketffi |              Summary of cpavno012
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |   10.592971   12.543144   8199.8912          57
+          2 |    18.30259   17.079794   6870.4651          67
+          3 |    19.70652   21.170809   6904.8029          65
+          4 |   19.072594    15.75362   5495.7689          55
+          5 |   18.661336   16.718417   5729.7262          49
+------------+------------------------------------------------
+      Total |    16.87982   17.064243   33200.654         293
+
+mtmarketffi |             Summary of cpavn1224_d
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |  -.86028585   11.911964   8199.8912          57
+          2 |   .23037807   11.345891   6870.4651          67
+          3 |   .96089049    15.30103   6904.8029          65
+          4 |   .89137326   7.7874976   5495.7689          55
+          5 |    2.652691   15.344251   5729.7262          49
+------------+------------------------------------------------
+      Total |   .64038762   12.654697   33200.654         293
+
+mtmarketffi |              Summary of cpavn1224
+     _q2004 |        Mean   Std. Dev.       Freq.        Obs.
+------------+------------------------------------------------
+          1 |   21.449522   24.474163   8199.8912          57
+          2 |   22.882589   32.643819   6870.4651          67
+          3 |   21.131465   24.643279   6904.8029          65
+          4 |   14.558671   17.852184   5495.7689          55
+          5 |    16.54327   19.421728   5729.7262          49
+------------+------------------------------------------------
+      Total |    19.69256   24.778157   33200.654         293
+
+. *Attrition and new entrants
+. tabstat  cpavnocw cpavnohc cpavno06 cpavno61 cpavno12 cpavno2p if nc
+> attle > 0 & fsizesu >= 2 & droporig == 0 & (system == 2 | system == 
+> 3) & cpagecat != 0 & (is2004 == 0 | is2009 == 0) & year >= 2004 [wei
+> ght = wt], by(year) stats(mean)
+(analytic weights assumed)
+
+Summary statistics: mean
+  by categories of: year 
+
+    year |  cpavnocw  cpavnohc  cpavno06  cpavno61  cpavno12  cpavno2p
+---------+------------------------------------------------------------
+    2004 |  12.09497  .8967918  5.944662  5.792545   9.12308  3.535803
+    2005 |   12.6763  1.264472  6.826607  7.756248  12.92624  4.850942
+    2006 |  12.08204  1.126346  6.335319  7.236324   13.8242  4.621169
+    2007 |  12.29706  1.086027  6.626514  7.096986  15.15009  6.134198
+    2008 |  12.17437  1.132727  7.031635  8.868034  17.61838  8.150591
+    2009 |  11.36368   .836116  6.634018  8.666172  18.86793  7.732764
+---------+------------------------------------------------------------
+   Total |  12.12971  1.062277  6.567222  7.552432  14.52647  5.805684
+----------------------------------------------------------------------
+
+. 
+. 
+. capture log close

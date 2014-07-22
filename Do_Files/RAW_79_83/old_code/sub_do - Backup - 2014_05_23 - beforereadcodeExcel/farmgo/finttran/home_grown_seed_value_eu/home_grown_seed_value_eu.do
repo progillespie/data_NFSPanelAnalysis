@@ -1,0 +1,15 @@
+/* IB style formula
+
+HOME_GROWN_SEED_VALUE_EU
+CURRENT RAW DATA POSITION
+14_12
+
+
+79 RAW DATA POSITION
+NOT SHEET 14! POSSIBLY 4 OR 5?
+
+*/
+
+
+* Stata translation (using SAS codes)
+

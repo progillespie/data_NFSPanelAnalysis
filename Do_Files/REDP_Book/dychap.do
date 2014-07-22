@@ -1,0 +1,374 @@
+/****************************************************
+*****************************************************
+
+ REDP Book - Dairy Chapter (2012)
+
+ Patrick R. Gillespie, Walsh Fellow
+
+   Thesis Supervisors: 
+
+ 	Cathal O'Donoghue , REDP Teagasc
+	Thia Hennessy	  , REDP Teagasc
+	Stephen Hynes	  , NUIG 
+	Fiona Thorne 	  , REDP Teagasc
+
+*****************************************************
+****************************************************/
+
+
+/*------------------------------------------------------------
+ P.Gillespie: 
+ Required input files -
+
+   * nfs_data.dta  	  <-- usual NFS panel file (old system)
+
+   * regional_weights.dta <-- see the local macro 
+                               Regional_outdatadir 
+                               defined below
+
+   * doFarmDerivedVars.do <-- creates Derived vars (see COD)
+
+   * education.csv 	  <-- Obtained from Anne Kinsella.
+------------------------------------------------------------*/
+
+clear
+set mem 700m
+set more off
+set matsize 500
+
+capture log close
+capture cmdlog close
+
+
+*********************************
+*01* Directory macros
+*********************************
+
+/* path to data_NFSPanelAnalysis (i.e. the main 
+    directory) all subsequent filepath macros 
+    depend on this one */
+local paneldir F:/Data/data_NFSPanelAnalysis
+
+
+* filepaths of subdirectories of `paneldir'
+local nfsdatadir `paneldir'/OutData 
+
+
+local origdatadir `paneldir'/OrigData 
+
+
+local Regional_outdatadir `paneldir'/OutData/RegionalAnalysis 
+
+
+local outdatadir `paneldir'/OutData/REDP_Book/DairyChapter
+
+
+* keep a global version for various sub_do files
+global outdatadir `outdatadir' 
+
+
+local dodir `paneldir'/Do_Files/REDP_Book
+
+
+/*-----------------------------------------------
+ P.Gillespie:
+  Name intermediate datasets that you'll create
+    below. this will be important if you're going
+    to collapse data (because you can't undo a 
+    collapse), but is also handy for avoiding 
+    having to run doFarmDerivedVars.do more than 
+    once, as that file's very long. 
+-----------------------------------------------*/
+local  intdata 	nfs_9508 	 // nfs w/ derived vars
+
+
+local  intdata2 "cm_9508" 	 // creamery milk only
+
+
+global intdata2 `intdata2' 	 /* keep a global version 
+				    for various sub_do files */
+
+local  intdata3 "cm_9508_ctgrps" // adds cost groupings
+
+
+global intdata3 `intdata3' 	 /* keep a global version for
+				     ct_cat.do */
+
+* variable lists
+global gl2lt_vlist "lt_lu doslcmgl dosllmgl domkfdgl doslmkgl"
+
+
+global gl2lt_plist "p_doslcm p_dosllm p_domkfd"
+
+
+global fdairy = "fdairygo fdairygm fdairydc"
+
+
+global farm = "farmgo farmgm farmdc farmffi"
+
+
+global go_vlist = "daforare doslcmgl  domlkbon  domlkpen  dosllmgl  domkfdgl  domkalvl  docftfvl docftfno docfslvl docfslno  doschbvl  dotochbv dotochbn  dopchbvl dopchbno  dotichbv dotichbn  dovlcnod" 
+
+
+global go_plist = "p_doslcm p_dosllm p_domkfd p_docftfvl p_docfslvl p_dotochbv p_dopchbvl p_dotichbv" 
+
+
+global ct_vlist = "dpnolu ddconvalq ddpasturq ddwinforq d_othmiscdcq ivmalldyq iaisfdyq itedairyq imiscdryq flabccdyq"
+
+
+global ct_plist = "PCattleFeed PTotalFert POtherInputs PVetExp PMotorFuels PLabour"
+
+
+global excel doslmkgl fdairygo fdairygm fdairydc farmgo farmgm farmdc farmffi daforare doslcmgl domlkbon domlkpen dosllmgl domkfdgl domkalvl docftfvl docftfno docfslvl docfslno doschbvl dotochbv dotochbn dopchbvl dopchbno dotichbv dotichbn dovlcnod p_doslcm p_dosllm p_domkfd p_docftfvl p_docfslvl p_dotochbv p_dopchbvl p_dotichbv dpnolu ddconvalq ddpasturq ddwinforq d_othmiscdcq ivmalldyq iaisfdyq itedairyq imiscdryq flabccdyq PCattleFeed PTotalFert POtherInputs PVetExp PMotorFuels PLabour fsizuaa
+
+
+* Make directories for output if they don't exist
+capture mkdir `paneldir'/code_R
+capture mkdir `paneldir'/OutData/REDP_Book
+capture mkdir `paneldir'/OutData/REDP_Book/DairyChapter
+capture mkdir `paneldir'/OutData/REDP_Book/DairyChapter/tab_logs
+capture mkdir `dodir'/dy_sub_do
+
+
+
+*********************************
+*02* Set working directory and start logs
+*********************************
+
+cd `dodir'
+
+
+local logname dychap
+
+
+log using `outdatadir'/`logname'.log, replace 
+
+
+di  "Job  Started  at  $S_TIME  on $S_DATE"
+
+
+*********************************
+*03* Merge in weights
+*********************************
+
+use `nfsdatadir'/nfs_data.dta, clear
+
+
+sort farmcode year
+merge farmcode year using `Regional_outdatadir'/regional_weights.dta
+drop _merge
+
+
+*drop if region == . //turned off until regional_weights.dta gets 95-96
+tabstat wt region, by(year) 
+
+
+
+*********************************
+*04* Get derived variables
+*********************************
+
+/*-----------------------------------------------
+ P.Gillespie:
+   Runs analysis starting from nfs_data.dta takes
+    a long time, but only needs to be run once 
+    (and possibly again on the final program 
+    run). 
+-----------------------------------------------*/
+*do doFarmDerivedVars.do 
+
+
+*save `outdatadir'/`intdata', replace * turn off when skipping doFarmDerivedVars.do 
+
+
+/* Closes any logs the previous do-file may have left
+    open restarts this file's log */
+capture log close
+log using `outdatadir'/`logname'.log, append
+
+
+/* Start from the intermediate dataset as a shortcut 
+    turn on when skipping doFarmDerivedVars.do */
+use `outdatadir'/`intdata', clear  
+
+
+
+*********************************
+*05 & 06* 
+* Subset to Dairy Creamery Producers
+*********************************
+
+do dy_sub_do/dysubset.do
+
+
+
+*********************************
+*07* Check for proper units
+*********************************
+
+do dy_sub_do/checkunits.do
+save `outdatadir'/`intdata2'.dta, replace
+
+
+
+*********************************
+*08* Subset and collapse data to relevant var's per year 
+*********************************
+
+do dy_sub_do/sector_units.do 
+
+
+outsheet year *_ha *_lu *_lt *_i stkrate using `outdatadir'/sector_units.csv, comma replace
+
+
+
+*********************************
+*09* Obtain means per farm
+*********************************
+
+do dy_sub_do/Farm_measures.do
+
+outsheet year $excel using `outdatadir'/farm_measures.csv, comma replace
+
+macro drop excel
+
+
+*********************************
+*10* Obtain cost groupings for each year 
+*********************************
+
+use `outdatadir'/`intdata2', clear
+
+
+do dy_sub_do/ct_cat.do
+
+
+/* multiple outsheet commands in ct_cat.do
+    ct_cat.do also creates intdata3 */
+
+
+*********************************
+*11* Creamery producer sex
+*********************************
+
+use `outdatadir'/`intdata2', clear
+
+
+do dy_sub_do/sex.do
+
+
+outsheet year ogsexhld wt yr_wt_tot sex_pct using `outdatadir'/sex.csv, comma replace
+
+
+
+*********************************
+*12* Creamery producer age
+*********************************
+
+use `outdatadir'/`intdata2', clear
+
+
+do dy_sub_do/age.do
+
+
+outsheet year ogagehld10 wt yr_wt_tot age_pct using `outdatadir'/age.csv, comma replace
+
+
+
+*********************************
+*13* Creamery producer marital status
+*********************************
+
+use `outdatadir'/`intdata2', clear
+
+
+do dy_sub_do/yr_marst.do
+
+
+outsheet year ogmarsth wt yr_wt_tot marst_pct using `outdatadir'/marst.csv, comma replace
+
+
+
+*********************************
+*14* Creamery producer households - age distribution
+*********************************
+
+use `outdatadir'/`intdata2', clear
+
+
+do dy_sub_do/npers.do
+
+
+outsheet using `outdatadir'/npers.csv, comma replace
+
+
+
+*********************************
+*15* Creamery producer education
+*********************************
+
+* educ.csv and intdata2 called by educ.do
+do dy_sub_do/educ.do
+
+
+* multiple outsheet commands in ct_cat.do
+
+
+
+*********************************
+*16* Creamery producer off-farm employment - holder
+*********************************
+
+use `outdatadir'/`intdata2', clear
+
+
+do dy_sub_do/ofjh.do
+
+
+outsheet year isofffarmy wt yr_wt_tot ofjh_pct using `outdatadir'/ofjh.csv, comma replace
+
+
+
+*********************************
+*17* Creamery producer off-farm employment - spouse
+*********************************
+
+use `outdatadir'/`intdata2', clear
+
+
+do dy_sub_do/ofjs.do
+
+
+outsheet year isspofffarmy wt yr_wt_tot ofjs_pct using `outdatadir'/ofjs.csv, comma replace
+
+
+
+*********************************
+*18* Creamery producer off-farm employment - both
+*********************************
+
+use `outdatadir'/`intdata2', clear
+
+
+do dy_sub_do/ofjb.do
+
+
+outsheet year bothwork wt yr_wt_tot ofjb_pct using `outdatadir'/ofjb.csv, comma replace
+
+
+
+*********************************
+*19* Creamery producer extension services
+*********************************
+
+use `outdatadir'/`intdata2', clear
+
+
+do dy_sub_do/teagasc.do
+
+
+outsheet year teagasc wt yr_wt_tot teagasc_pct using `outdatadir'/teagasc.csv, comma replace
+
+
+capture log close
+

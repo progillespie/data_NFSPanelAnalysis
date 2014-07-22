@@ -1,0 +1,14 @@
+The do file in this directory is a "linking" do file. It's my solution to the following problem.
+
+
+The same derived variable may be required by several variables, but duplicate do files (one for each
+ variable that requires some derived variable) is dangerous and labour intensive if there are updates
+ or corrections to variable definitions.  
+
+It's far better to have a single do file deriving the variable, and to "link" to it where ever 
+ necessary afterward. This way ensures consistency of definitions, preserves the informative 
+ nature of the file structure, and reduces the alterations from the basic template for all of
+ these do files. 
+
+One drawback to this approach is that the location that the "link" files point to will have to 
+ be updated if the do file is moved, so that should not be done lightly.
