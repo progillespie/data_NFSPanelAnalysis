@@ -6,7 +6,7 @@ local startdir: pwd // Save current working directory location
 
 
 * Move into the root of the variable's directory
-local this_file_calculates "filename"
+local this_file_calculates "D_template"
 qui cd  `this_file_calculates'
 local vardir: pwd 
 

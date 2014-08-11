@@ -1,0 +1,2 @@
+(/root/svy_cattle/@mth12_total_dairy_stock_bulls_no + /root/svy_cattle/@mth12_total_beef_stock_bulls_no) div 12
+

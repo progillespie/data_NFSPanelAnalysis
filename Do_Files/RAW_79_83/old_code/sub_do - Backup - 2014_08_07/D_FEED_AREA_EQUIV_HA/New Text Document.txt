@@ -1,0 +1,58 @@
+(: For 2006 calculation  we will need to change this top line to 
+   D_FORAGE_AREA_HA + (CONC_ALLOC_DAIRY_50KGBAGS_NO / 98.84)  :)
+
+
+                                               --------------------
+
+D_FORAGE_AREA_HA                                             Term 1
+
+                   +                           --------------------
+
+(CONC_ALLOC_DAIRY_HERD_50KGBAGS_NO / 100)                    Term 2
+
+                   +                           --------------------
+
+sum($i in root/svy_crop_disposal return                      Term 3
+  if(                                                         
+     matches('111[0-9]') or 
+     matches('115[0-9]') or 
+     matches('114[0-9]') or 
+     matches('157[0-9]') or 
+     matches('131[0-9]') or 
+     matches('132[0-9]')
+    )
+  then
+    sum(
+        if (sum($i/@crop_code/@CY_SALES_QTY_TONNES_HA) <= 0) 
+        then 0 
+        else 
+          if (
+              (sum($i/@crop_code/@CY_TOTAL_YIELD) / 
+               sum($i/@crop_code/@CY_SALES_QTY_TONNES_HA)
+              ) <=0
+             ) 
+          then 0
+          else  
+            $i/@FED_DAIRY_TONNES_HA /
+            (
+             sum($i/@crop_code/@CY_TOTAL_YIELD) / 
+             sum($i/@crop_code/@CY_SALES_QTY_TONNES_HA)
+            )
+       )
+  else
+    0	
+)
+                   +                           --------------------
+
+(D_PURCHASED_FEED_BULKY_FEED_ALLOC_DAIRY_HA)                 Term 4
+                    
+                   +                           --------------------
+
+if (D_FARM_TOTAL_LU_BOARDING_NET <= 0)                       Term 5
+then 0                                                       
+else (
+      (D_DAIRY_LU_BOARDING_NET / D_FARM_TOTAL_LU_BOARDING_NET) * 
+      D_FARM_ADJUSTED_PASTURE
+     )
+)
+

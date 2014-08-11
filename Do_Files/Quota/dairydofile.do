@@ -8,7 +8,7 @@ local outdatadir    ///
    "D:\Data\data_NFSPanelAnalysis\OutData"
 
 local sub_do ///
-   "D:\Data\data_NFSPanelAnalysis\OrigData\RAW_79_83\sub_do"
+   "D:\Data\data_NFSPanelAnalysis\Do_Files\RAW_79_83\sub_do"
 
 
 /*-----------TURNED OFF---------------------------------------------
