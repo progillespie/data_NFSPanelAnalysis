@@ -59,8 +59,8 @@ foreach var of local nonexist_vlist {
 
 
 
-local vlist "`vlist' "
-
+local vlist "`vlist' D_ALL_BULLS_AVG_NO "
+local vlist "`vlist' D_MALE_CATTLE_GT2YRS_AVG_NO"
 foreach var of local vlist{
 
     * Ensure no missing values in the terms of the equation
@@ -72,7 +72,7 @@ foreach var of local vlist{
 
 capture drop `this_file_calculates'
 gen double `this_file_calculates' =    ///
-  D_ALL_BULLS_AVG_NO + 
+  D_ALL_BULLS_AVG_NO + ///
   D_MALE_CATTLE_GT2YRS_AVG_NO
   
 

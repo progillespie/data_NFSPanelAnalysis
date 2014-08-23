@@ -72,7 +72,7 @@ foreach var of local vlist{
 
 capture drop `this_file_calculates'
 gen double `this_file_calculates' =    ///
-  MTH12_TOTAL_CATTLE_FEMALE_GT2YRS_NO / 12
+  MTH12_TOTAL_CATTLE_F_GT2YRS_NO / 12
 
 
 

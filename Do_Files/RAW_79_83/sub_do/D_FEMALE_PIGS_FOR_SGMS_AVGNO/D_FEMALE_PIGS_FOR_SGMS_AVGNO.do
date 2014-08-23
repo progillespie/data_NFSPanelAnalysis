@@ -19,8 +19,22 @@ local vars_needed: dir "." dirs *
 
 
 foreach var_needed of local vars_needed {
+  * Have to make this conditional on var being in the data already
+  *  The reason is that for svy_pigs, the MTH12 variables are not
+  *  present, but the averages are, so I can't (and don't need to)
+  *  re-calculate them. The following reconstructs the varname from
+  *  the link directory name (varname without leading D_ and ending
+  *  in _linkD).  
+  local dvar = substr("`var_needed'", 1, length("`var_needed'") - 6)
+  local dvar = upper("D_`dvar'")
+
+  * Then test for variable's existence before attempting to 
+  *  reconstruct
+  capture confirm variable `dvar'
+  if _rc!=0{
 	di "Deriving `var_needed'"
 	qui do `var_needed'/`var_needed'.do
+  }
 }
 
 
