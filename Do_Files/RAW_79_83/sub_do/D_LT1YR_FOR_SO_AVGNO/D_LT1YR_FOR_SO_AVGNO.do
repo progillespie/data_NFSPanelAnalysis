@@ -69,47 +69,11 @@ foreach var of local vlist{
 }
 
 
-capture confirm variable MTH12_TOTAL_SUCKLER_COWS_NO
 
-if _rc==0{
+capture drop `this_file_calculates'
+egen `this_file_calculates' = ///
+  rowtotal(D_CALVES_LT6MTHS_AVG_NO D_CALVES_6_12MTHS_AVG_NO)
 
-  capture drop condition
-  gen byte condition =                      ///
-    ((MTH12_TOTAL_CALVES_LT6MTHS_NO          + ///
-      MTH12_TOTAL_CALVES_6_12MTHS_NO) / 12)  > ///
-    ((MTH12_TOTAL_SUCKLER_COWS_NO            + ///
-      MTH12_TOTAL_OTHER_COWS_NO) / 12)
-  
-  
-  capture drop `this_file_calculates'
-  gen double `this_file_calculates' = 0 
-  replace `this_file_calculates' =             ///
-    ((MTH12_TOTAL_CALVES_LT6MTHS_NO          + ///
-      MTH12_TOTAL_CALVES_6_12MTHS_NO) / 12)  - ///
-    ((MTH12_TOTAL_SUCKLER_COWS_NO            + ///
-      MTH12_TOTAL_OTHER_COWS_NO) / 12)         ///
-    if condition==1
-
-}
-
-else{
-
-  capture drop condition
-  gen byte condition =                      ///
-    ((MTH12_TOTAL_CALVES_LT6MTHS_NO          + ///
-      MTH12_TOTAL_CALVES_6_12MTHS_NO) / 12)  > ///
-    (MTH12_TOTAL_OTHER_COWS_NO / 12)
-  
-  
-  capture drop `this_file_calculates'
-  gen double `this_file_calculates' = 0 
-  replace `this_file_calculates' =             ///
-    ((MTH12_TOTAL_CALVES_LT6MTHS_NO          + ///
-      MTH12_TOTAL_CALVES_6_12MTHS_NO) / 12)  - ///
-     (MTH12_TOTAL_OTHER_COWS_NO / 12)         ///
-    if condition==1
-
-}
 
 
 replace `this_file_calculates' = 0 /// 

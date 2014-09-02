@@ -6,6 +6,7 @@ sort FARM_CODE YE_AR
 
 *replace ORIGINAL_COST_EU = ORIGINAL_COST_EU * sc_p_fert_orig_cost
 
+capture drop FERT_USED_VALUE_EU 
 gen FERT_USED_VALUE_EU = ( QUANTITY_ALLOCATED_50KGBAGS / ORIGINAL_QUANTITY_50KGBAGS)* ORIGINAL_COST_EU
 
 ****The following sums by crop code so it can be merged with the other crop multicard tables

@@ -105,7 +105,7 @@ label define FARM_SYSTEM 1 "Dairying", modify
 
 
 
-replace FARM_SYSTEM = 2       ///
+replace FARM_SYSTEM = 2   ///
   if ParticularType == 412 | ///
      ParticularType == 431 | ///
      ParticularType == 432 | ///
@@ -117,29 +117,29 @@ label define FARM_SYSTEM 2 "Dairy/Other", modify
 
 
 
-replace FARM_SYSTEM = 4 ///
+replace FARM_SYSTEM = 4   ///
   if ParticularType == 421
 label define FARM_SYSTEM 4 "Cattle Rearing", modify
 
 
 
-replace FARM_SYSTEM = 5        ///
+replace FARM_SYSTEM = 5   ///
   if ParticularType == 422 | ///
      ParticularType == 712
 label define FARM_SYSTEM 5 "Cattle Other", modify
 
 
 
-replace FARM_SYSTEM = 6 ///
+replace FARM_SYSTEM = 6   ///
   if ParticularType == 441 | ///
      ParticularType == 442
 label define FARM_SYSTEM 6 "Mainly Sheep", modify
 
 
 
-replace FARM_SYSTEM = 7 ///
-  if PrincipalType == 11  | ///
-     PrincipalType == 12  | ///
+replace FARM_SYSTEM = 7   ///
+  if PrincipalType == 11   | ///
+     PrincipalType == 12   | ///
      ParticularType == 813 | ///
      ParticularType == 814 | ///
      ParticularType == 822

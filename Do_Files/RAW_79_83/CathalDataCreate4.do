@@ -3,12 +3,12 @@ set mem 500m
 set more off
 cd d:
 use "D:\data\data_NFSPanelAnalysis\OrigData\2010\unpaid_labour_allyears.dta", clear
-capture gen farmcode =  FARM_CODE
-capture gen year =  YE_AR
-capture gen ogagehld =  year - YEAR_BORN
-capture gen oojobhld = EMPLOYMENT_OUTSIDE_HOLDING  == 1
+capture gen farmcode  = FARM_CODE
+capture gen year      = YE_AR
+capture gen ogagehld  = year - YEAR_BORN
+capture gen oojobhld  = EMPLOYMENT_OUTSIDE_HOLDING  == 1
 capture gen toojobsps = EMPLOYMENT_OUTSIDE_HOLDING if  WORKER_CODE == 2 &  MARITIAL_STATUS == 1
-replace toojobsps = 0 if toojobsps == .
+replace toojobsps     = 0 if toojobsps == .
 capture drop oojobsps
 sort farmcode year
 by farmcode year: egen oojobsps = max(toojobsps)
@@ -24,10 +24,10 @@ gen farmcode =  FARM_CODE
 
 gen year =  YE_AR
 
-capture gen wt =  UAA_WEIGHT
+capture gen wt       = UAA_WEIGHT
 capture gen flabsmds = 220
-gen ftotallu = D_TOTAL_LIVESTOCK_UNITS
-gen fsizuaa = UAA_SIZE
+gen ftotallu         = D_TOTAL_LIVESTOCK_UNITS
+gen fsizuaa          = UAA_SIZE
 
 gen oanolt5y =  FARM_AGED_IN_DEC_LT5YRS_MALE_NO  + FARM_AGE_IN_DEC_LT5YRS_FEMALE_NO
 gen oano515y =  FARM_AGED_IN_DEC_5_15YRS_MALE_NO + FARM_AGE_IN_DEC_5_15YRS_FEMLE_NO
@@ -42,7 +42,7 @@ gen ooinchld = FARM_MD_INCOME_RECEIVED_CODE
 
 *todo
 gen ffszsyst = 1
-gen system = 1
+gen system   = 1
 *todo get more detailed variable
 gen ffsolcod = D_SOIL_GROUP*100
 
@@ -86,24 +86,24 @@ gen dotomkvl = D_TOTAL_MILK_PRODUCTION_EU
 gen dovalclf = D_DARY_VAL_DRPD_CLVS_SLD_TRNS_EU
 gen favlfrey = D_SALES_ANIMALS_DAIRY_HERD_EU
 
-gen favlfrby =  LAND_VALUE_EST_BEG_OF_YEAR_EU
+gen favlfrby = LAND_VALUE_EST_BEG_OF_YEAR_EU
 gen fsizldow = LAND_OWNED_HA
-gen fsizldrt =  LAND_RENTED_IN_HA
+gen fsizldrt = LAND_RENTED_IN_HA
 gen fsizldlt = LAND_LET_OUT_HA
-gen faprldvl = LAND_VALUE_PURCHASES_EU 
-gen faprldac = LAND_VALUE_PURCHASES_HA 
+gen faprldvl = LAND_VALUE_PURCHASES_EU
+gen faprldac = LAND_VALUE_PURCHASES_HA
 gen faslldvl = LAND_VALUE_SALES_EU
 gen faslldac = LAND_VALUE_SALES_HA
-gen daforare =  D_FORAGE_AREA_HA
-gen cpforacs =  D_CATTLE_FORAGE_AREA
+gen daforare = D_FORAGE_AREA_HA
+gen cpforacs = D_CATTLE_FORAGE_AREA
 gen spforacs = D_SHEEP_FORAGE_AREA_HA
 gen hpforacs = D_TOTAL_FORAGE_HECTARES_HA
 gen fsizfort = FARM_FORESTRY_HA
 gen fsizfrac = D_FARM_TOTAL_FORAGE_AREA_HA
 
-gen dpnolu = D_DAIRY_LVESTCK_UNITS_INCL_BULLS
-gen spnolu = D_SHEEP_LIVESTOCK_UNITS
-gen cpnolu = D_CATTLE_LIVESTOCK_UNITS
+gen dpnolu   = D_DAIRY_LVESTCK_UNITS_INCL_BULLS
+gen spnolu   = D_SHEEP_LIVESTOCK_UNITS
+gen cpnolu   = D_CATTLE_LIVESTOCK_UNITS
 gen fsizeadj = D_TOTAL_FORAGE_HECTARES_HA
 gen flivstgm = D_TOTAL_LIVESTOCK_GROSS_MARGIN
 
@@ -134,9 +134,9 @@ gen doprdhrd = DAIRY_COWS_SH_BULLS_PURCHASES_EU
 gen dovlcnod = D_DAIRY_HERD_VALUE_CHANGE_EU
 gen docftfvl = DAIRY_CALVES_TRANSFER_EU
 gen docftfno = DAIRY_COWS_SH_BULLS_PURCHASES_NO
-gen ddmiscdc =  D_DAIRY_PROD_MISC_DIRECT_COST_EU
+gen ddmiscdc = D_DAIRY_PROD_MISC_DIRECT_COST_EU
 gen ivmalldy = VET_MED_ALLOC_DAIRY_HERD_EU
-gen iaisfdy = AI_SER_FEES_ALLOC_DAIRY_HERD_EU
+gen iaisfdy  = AI_SER_FEES_ALLOC_DAIRY_HERD_EU
 gen itedairy = TRANSPORT_ALLOC_DAIRY_HERD_EU
 gen imiscdry = MISCELLANEOUS_ALLOC_DAIRY_HRD_EU
 gen flabccdy = CASUAL_LABOUR_ALLOC_DAIRY_HRD_EU
@@ -173,13 +173,13 @@ gen covalcno = D_VALUE_OF_CHANGE_OF_NUMBERS_EUR
 
 gen coslmfno = CATTLE_FINISHED_MALE_SALES_NO
 gen cdmiscdc = D_LIVESTOCK_MISC_DIRECT_COSTS_EU
-gen ivmallc = VET_MED_ALLOC_CATTLE_EU
+gen ivmallc  = VET_MED_ALLOC_CATTLE_EU
 gen iaisfcat = AI_SERVICE_FEES_ALLOC_CATTLE_EU
-gen itecattl =  TRANSPORT_ALLOC_CATTLE_EU
+gen itecattl = TRANSPORT_ALLOC_CATTLE_EU
 gen imiscctl = MISCELLANEOUS_ALLOC_CATTLE_EU
 gen flabccct = CASUAL_LABOUR_ALLOC_CATTLE_EU
 gen cdconcen = D_CONCENTRATES_FED_CATTLE_EU
-gen cdpastur = D_TOTAL_PASTURE_EU 
+gen cdpastur = D_TOTAL_PASTURE_EU
 gen cdwinfor = D_CATTLE_WINTER_FORAGE_EU
 gen cdmilsub = D_MILK_AND_MILK_SUBSTITUTES_NO
 
@@ -232,16 +232,16 @@ gen coslffvl = CATTLE_FINISHED_FEMALE_SALES_EU
 *local sheep1_vlist = "sosalean sdother ivmallsp iaisfshp itesheep imiscshp flabccsh sdconval sdwinfor sdroots sdpastur" 
 
 gen sosalean = D_SHEEP_SALES_EU
-gen sdother = D_OTHER_DIRECT_COSTS_EU
+gen sdother  = D_OTHER_DIRECT_COSTS_EU
 gen ivmallsp = VET_MED_ALLOC_SHEEP_EU
 gen iaisfshp = AI_SERVICE_FEES_ALLOC_SHEEP_EU
 gen itesheep = TRANSPORT_ALLOC_SHEEP_EU
 gen imiscshp = MISCELLANEOUS_ALLOC_SHEEP_EU
 gen flabccsh = CASUAL_LABOUR_ALLOC_SHEEP_EU
 gen sdconval = D_CONCENTRATES_FED_SHEEP_EU
-gen sdwinfor = D_SHEEP_WINTER_FORAGE_EU 
-gen sdroots = D_ROOTS_DIRECT_COSTS_EU
-gen sdpastur = D_SHEEP_PASTURE_EU 
+gen sdwinfor = D_SHEEP_WINTER_FORAGE_EU
+gen sdroots  = D_ROOTS_DIRECT_COSTS_EU
+gen sdpastur = D_SHEEP_PASTURE_EU
 
 gen soslflno = FAT_LAMBS_SALES_NO
 gen soslslno = STORE_LAMBS_SALES_NO
@@ -266,20 +266,20 @@ gen soprbdvl =  BREEDING_HOGGETS_PURCHASES_EU
 
 *DC
 
-gen fdpurcon = D_PURCHASED_CONCENTRATES_EU 
+gen fdpurcon = D_PURCHASED_CONCENTRATES_EU
 gen fdpurblk = D_PURCHASED_BULKY_FEED_EU
-gen fdferfil =  FERT_USED_VALUE_EU
+gen fdferfil = FERT_USED_VALUE_EU
 gen fdcrppro = s_CROP_PROTECTION_EU
 gen fdpursed = s_PURCHASED_SEED_EU
 gen fdmachir = s_MACHINERY_HIRE_EU
-gen fdtrans = D_TRANSPORT_COSTS_EU
+gen fdtrans  = D_TRANSPORT_COSTS_EU
 gen fdlivmnt = D_LIVESTOCK_MAINTENANCE_EU
 gen fdcaslab = D_TOTAL_CASUAL_LABOUR_EU
 gen fdmiscel = D_MISC_DIRECT_COSTS_EU
 gen fdfodadj = D_FODDER_ADJUSTMENT_EU
 gen fdvetmed = D_VET_AND_MEDICINE_EU
 gen fdaifees = D_AI_AND_SERVICE_FEES_EU
-gen forntcon = LAND_RENTED_IN_EU 
+gen forntcon = LAND_RENTED_IN_EU
 gen focarelp = D_CAR_ELECTRICITY_TELEPHONE_EU
 gen fohirlab = D_HIRED_LABOUR_CASUAL_EXCL_EU
 gen fointpay = D_INTRST_PAY_INCL_HP_INTEREST_EU
@@ -291,7 +291,7 @@ gen fodprlim = D_DEPRECIATION_OF_LAND_IMPS_EU
 gen foupkpld = LAND_GENERAL_UPKEEP_EU
 gen foannuit = ANNUITIES_EU
 gen fomiscel = D_MISC_OVERHEAD_COSTS_EU
-gen forates = D_MACHINERY_RATES_EU
+gen forates  = D_MACHINERY_RATES_EU
 gen fortfmer = LAND_VALU_RENT_PAID_TO_FAMILY_EU
 
 
@@ -303,14 +303,14 @@ foreach var in `pigs_vlist' {
 } 
 */
 
-gen pdmiscdc = D_PIGS_MISC_DIRECT_COSTS_EU 
-gen pdtotfed = D_PIGS_TOTAL_FEED_EU 
-gen pdvetmed = VET_MED_ALLOC_PIGS_EU 
-gen pdtrans = TRANSPORT_ALLOC_PIGS_EU 
-gen iaisfpig = AI_SERVICE_FEES_ALLOC_PIGS_EU 
-gen imiscpig = MISCELLANEOUS_ALLOC_PIGS_EU 
-gen flabccpg = CASUAL_LABOUR_ALLOC_PIGS_EU 
-gen fpigsdc = D_PIGS_TOTAL_DIRECT_COSTS_EU
+gen pdmiscdc = D_PIGS_MISC_DIRECT_COSTS_EU
+gen pdtotfed = D_PIGS_TOTAL_FEED_EU
+gen pdvetmed = VET_MED_ALLOC_PIGS_EU
+gen pdtrans  = TRANSPORT_ALLOC_PIGS_EU
+gen iaisfpig = AI_SERVICE_FEES_ALLOC_PIGS_EU
+gen imiscpig = MISCELLANEOUS_ALLOC_PIGS_EU
+gen flabccpg = CASUAL_LABOUR_ALLOC_PIGS_EU
+gen fpigsdc  = D_PIGS_TOTAL_DIRECT_COSTS_EU
 gen iballpig = s_ALLOC_PIGS_QTY
 
 *dont have vars for below hay, silage, straw allocated to pigs so = 0
@@ -329,11 +329,11 @@ foreach var in `po_inp_vlist' {
 */
 
 gen fpoultdc = D_POULTRY_DIRECT_COSTS_EU
-gen ivmallpy = VET_MED_ETC_ALLOC_POULTRY_EU 
-gen itepolty = TRANSPORT_ALLOC_POULTRY_EU 
-gen imiscpty = MISCELLANEOUS_ALLOC_POULTRY_EU 
-gen flabccpy = CASUAL_LABOUR_ALLOC_POULTRY_EU 
-gen icallpyv = CONC_ALLOC_POULTRY_50KGBAGS_EU 
+gen ivmallpy = VET_MED_ETC_ALLOC_POULTRY_EU
+gen itepolty = TRANSPORT_ALLOC_POULTRY_EU
+gen imiscpty = MISCELLANEOUS_ALLOC_POULTRY_EU
+gen flabccpy = CASUAL_LABOUR_ALLOC_POULTRY_EU
+gen icallpyv = CONC_ALLOC_POULTRY_50KGBAGS_EU
 gen edtotldc = fpoultdc
 
 
@@ -347,10 +347,10 @@ foreach var in `h_inp_vlist' {
 
 gen fhorsedc = D_HORSES_DIRECT_COSTS_EU
 gen icallhvl = CONC_ALLOC_HORSES_50KGBAGS_EU
-gen ivmallh = VET_MED_ALLOC_HORSES_EU 
-gen iaisfhrs = AI_SERVICE_FEES_ALLOC_HORSES_EU 
-gen itehorse = TRANSPORT_ALLOC_HORSES_EU 
-gen imischrs = MISCELLANEOUS_ALLOC_HORSES_EU 
+gen ivmallh  = VET_MED_ALLOC_HORSES_EU
+gen iaisfhrs = AI_SERVICE_FEES_ALLOC_HORSES_EU
+gen itehorse = TRANSPORT_ALLOC_HORSES_EU
+gen imischrs = MISCELLANEOUS_ALLOC_HORSES_EU
 gen iballhrs = s_ALLOC_HORSES_QTY
 *dont have vars for below hay, silage, straw allocated to horses so = 0
 gen ibhayhvl = 0
@@ -359,32 +359,32 @@ gen ibsilhvl = 0
 gen hdtotldc = fhorsedc
 
 
-gen farmgo = D_FARM_GROSS_OUTPUT
-gen farmffi = D_FARM_FAMILY_INCOME
+gen farmgo   = D_FARM_GROSS_OUTPUT
+gen farmffi  = D_FARM_FAMILY_INCOME
 gen fdairygo = D_DAIRY_GROSS_OUTPUT_EU
-gen fcatlego =  D_GROSS_OUTPUT_CATTLE_EU
-gen fsheepgo =  D_GROSS_OUTPUT_SHEEP_AND_WOOL_EU
-gen fpigsgo =  D_GROSS_OUTPUT_PIGS_EU
-gen fpoultgo =  D_POULTRY_GROSS_OUTPUT_EU
-gen fhorsego =  D_GROSS_OUTPUT_HORSES_EU
-gen fothergo =  D_OTHER_GROSS_OUTPUT_EU
+gen fcatlego = D_GROSS_OUTPUT_CATTLE_EU
+gen fsheepgo = D_GROSS_OUTPUT_SHEEP_AND_WOOL_EU
+gen fpigsgo  = D_GROSS_OUTPUT_PIGS_EU
+gen fpoultgo = D_POULTRY_GROSS_OUTPUT_EU
+gen fhorsego = D_GROSS_OUTPUT_HORSES_EU
+gen fothergo = D_OTHER_GROSS_OUTPUT_EU
 gen fcropsgo = D_TOTAL_CROPS_GROSS_OUTPUT_EU
-gen farmdc =  D_FARM_DIRECT_COSTS
-gen farmohct =  D_FARM_TOTAL_OVERHEAD_COSTS_EU
-gen fdairygm = D_DAIRY_GROSS_MARGIN_EU 
-gen fcatlegm = D_CATTLE_GROSS_MARGIN_EU 
-gen fsheepgm =  D_SHEEP_GROSS_MARGIN_EU 
-gen fpigsgm =  D_PIGS_GROSS_MARGIN_EU 
-gen fpoultgm =  D_POULTRY_GROSS_MARGIN_EU 
-gen fhorsegm =  D_HORSES_GROSS_MARGIN_EU 
-gen fothergm =  D_OTHER_GROSS_MARGIN_EU 
-gen fcropsgm = D_TOTAL_CROPS_GROSS_MARGIN_EU 
-gen fdairydc = D_DAIRY_TOTAL_DIRECT_COSTS_EU 
-gen fcatledc = D_CATTLE_TOTAL_DIRECT_COSTS_EU 
+gen farmdc   = D_FARM_DIRECT_COSTS
+gen farmohct = D_FARM_TOTAL_OVERHEAD_COSTS_EU
+gen fdairygm = D_DAIRY_GROSS_MARGIN_EU
+gen fcatlegm = D_CATTLE_GROSS_MARGIN_EU
+gen fsheepgm = D_SHEEP_GROSS_MARGIN_EU
+gen fpigsgm  = D_PIGS_GROSS_MARGIN_EU
+gen fpoultgm = D_POULTRY_GROSS_MARGIN_EU
+gen fhorsegm = D_HORSES_GROSS_MARGIN_EU
+gen fothergm = D_OTHER_GROSS_MARGIN_EU
+gen fcropsgm = D_TOTAL_CROPS_GROSS_MARGIN_EU
+gen fdairydc = D_DAIRY_TOTAL_DIRECT_COSTS_EU
+gen fcatledc = D_CATTLE_TOTAL_DIRECT_COSTS_EU
 gen fsheepdc = D_SHEEP_TOTAL_DIRECT_COSTS_EU
 
-gen frhiremh = HIRED_MACHINERY_IN_CASH_EU + HIRED_MACHINERY_IN_KIND_EU 
-gen frevoth = OTHER_RECEIPTS_IN_CASH_EU + OTHER_RECEIPTS_IN_KIND_EU 
+gen frhiremh = HIRED_MACHINERY_IN_CASH_EU + HIRED_MACHINERY_IN_KIND_EU
+gen frevoth  = OTHER_RECEIPTS_IN_CASH_EU + OTHER_RECEIPTS_IN_KIND_EU
 gen finttran = D_INTER_ENTERPISE_TRANSFERS_EU
 
 gen dafedare = D_FEED_AREA_EQUIV_HA

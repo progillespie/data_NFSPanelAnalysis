@@ -1,0 +1,93 @@
+2.01.01.01.    | Common wheat and spelt                                                                                         | 120. Common wheat and spelt
+2.01.01.02.    | Durum wheat                                                                                                    | 121. Durum wheat
+2.01.01.03.    | Rye                                                                                                            | 122. Rye (including meslin)
+2.01.01.04.    | Barley                                                                                                         | 123. Barley
+2.01.01.05.    | Oats                                                                                                           | 124. Oats 125. Summer cereal mixes
+2.01.01.06.    | Grain maize                                                                                                    | 126. Grain maize (including humid grain maize)
+2.01.01.07.    | Rice                                                                                                           | 127. Rice
+2.01.01.99.    | Other cereals for the production of grain                                                                      | 128. Other cereals
+2.01.02.       | Dried pulses and protein crops for the production of grain (including seed and mixtures of cereals and pulses) | 129. Protein crops
+2.01.02.01.    | Of which peas, field beans and sweet lupins                                                                    | 360. Peas, field beans and sweet lupins 361. Lentils, chickpeas and vetches 330. Other protein crops
+2.01.03.       | Potatoes (including early potatoes and seed potatoes)                                                          | 130. Potatoes (including early potatoes and seed)
+2.01.04.       | Sugar beet (excluding seed)                                                                                    | 131. Sugar beet (excluding seed)
+2.01.05.       | Fodder roots and brassicas (excluding seed)                                                                    | 144. Fodder roots and brassicas (excluding seeds)
+2.01.06.01.    | Tobacco                                                                                                        | 134. Tobacco
+2.01.06.02.    | Hops                                                                                                           | 133. Hops
+2.01.06.03.    | Cotton                                                                                                         | 347. Cotton
+2.01.06.04.    | Rape and turnip rape                                                                                           | 331. Rape
+2.01.06.05.    | Sunflower                                                                                                      | 332. Sunflower
+2.01.06.06.    | Soya                                                                                                           | 333. Soya
+2.01.06.07.    | Linseed (oil flax)                                                                                             | 364. Flax other than fibre flax
+2.01.06.08.    | Other oil seed crops                                                                                           | 334. Other oil seeds
+2.01.06.09.    | Flax                                                                                                           | 373. Flax
+2.01.06.10.    | Hemp                                                                                                           | 374. Hemp
+2.01.06.11.    | Other fibre crops                                                                                              | 
+2.01.06.12.    | Aromatic plants, medicinal and culinary plants                                                                 | 345. Medicinal plants condiments, aromatics and spices, including tea, coffee and coffee chicory
+2.01.06.99.    | Other industrial crops not mentioned elsewhere                                                                 | 346. Sugar cane 348. Other industrial crops
+2.01.07.       | Fresh vegetables, melons and strawberries of which                                                             | 
+2.01.07.01.    | Outdoor or under low (not accessible) protective cover                                                         | 
+2.01.07.01.01. | Open field                                                                                                     | 136. Field scale fresh vegetables, melons and strawberries grown in the open
+2.01.07.01.02. | Market gardening                                                                                               | 137. Fresh vegetables, melons, strawberries grown in market gardens in the open
+2.01.07.02.    | Under glass or other (accessible) protective cover                                                             | 138. Fresh vegetables, melons and strawberries under shelter
+2.01.08.       | Flowers and ornamental plants (excluding nurseries):                                                           | 
+2.01.08.01.    | Outdoor or under low (not accessible) protective cover                                                         | 140. Flowers and ornamental plants grown in the open (excluding nurseries)
+2.01.08.02.    | Under glass or other (accessible) protective cover                                                             | 141. Flowers and ornamental plants grown under shelter
+2.01.09.       | Plants harvested green                                                                                         | 
+2.01.09.01.    | Temporary grass                                                                                                | 147. Temporary grass
+2.01.09.02.    | Other plants harvested green                                                                                   | 145. Other fodder plants
+2.01.09.02.01. | Green maize                                                                                                    | 326. Fodder maize
+2.01.09.02.02. | Leguminous plants AND                                                                                          | 327. Other silage cereals AND
+2.01.09.02.99. | Other plants harvested green not mentioned elsewhere                                                           | 328. Other fodder plants
+2.01.10.       | Arable land seeds and seedlings                                                                                | 142. Grass seeds 143. Other seeds
+2.01.11.       | Other arable land crops                                                                                        | 148. Other arable crops not included in headings 120 to 147 149. Land ready for sowing leased to others, including land made available to employees as a benefit in kind
+2.01.12.01.    | Fallow land without any subsidies                                                                              | 146. Fallows — Missing data Code 3: Fallow land without financial aid
+2.01.12.02.    | Fallow land subject to the payment of subsidies, with no economic use                                          | 146. Fallows — Missing data Code 8: Not-cultivated land no longer used for production purposes for which the holding is entitled to financial aid
+2.03.01.       | Pasture and meadow, excluding rough grazing                                                                    | 150. Meadows and permanent pasture
+2.03.02.       | Rough grazing                                                                                                  | 151. Rough grazing
+2.03.03.       | Permanent grassland no longer used for production purposes and eligible for the payment of subsidies           | 314. Permanent grassland no longer used for production purposes and eligible for the payment of subsidies
+2.04.01.       | Fruit and berry plantations                                                                                    | 152. Fruit and berry orchards
+2.04.01.01.    | Fruit species of which                                                                                         | 
+2.04.01.01.01. | Fruit of temperate climate zones                                                                               | 349. Pome fruit 350. Stone fruit
+2.04.01.01.02. | Fruit of subtropical climate zones                                                                             | 353. Tropical and subtropical fruit
+2.04.01.02.    | Berry species                                                                                                  | 352. Small fruit and berries
+2.04.01.03.    | Nuts                                                                                                           | 351. Nuts
+2.04.02.       | Citrus plantations                                                                                             | 153. Citrus fruit orchards
+2.04.03.       | Olive plantations                                                                                              | 154. Olive groves
+2.04.03.01.    | Normally producing table olives                                                                                | 281. Table olives
+2.04.03.02.    | Normally producing olives for oil production                                                                   | 282. Olives for oil production 283. Olive oil
+2.04.04.       | Vineyards, of which normally producing:                                                                        | 155. Vines
+2.04.04.01.    | Quality wine                                                                                                   | 286. Grapes for quality wine with PDO 292. Grapes for quality wine with PGI 289. Quality wine with PDO 294. Quality wine with PGI
+2.04.04.02.    | Other wines                                                                                                    | 293. Grapes for other wines 288. Miscellaneous products of vines: grape must, juice, brandy, vinegar and others produced on the farm 295. Other wines
+2.04.04.03.    | Table grapes                                                                                                   | 285. Table grapes
+2.04.04.04.    | Raisins                                                                                                        | 291. Raisins
+2.04.05.       | Nurseries                                                                                                      | 157. Nurseries
+2.04.06.       | Other permanent crops                                                                                          | 158. Other permanent crops
+2.04.07.       | Permanent crops under glass                                                                                    | 156. Permanent crops grown under shelter
+2.06.01.       | Mushrooms                                                                                                      | 139. Mushrooms
+3.01.          | Equidae                                                                                                        | 22. Equidae (all ages)
+3.02.01.       | Bovine animals, under one year old, male and female                                                            | 23. Calves for fattening 24. Other cattle less than one year old
+3.02.02.       | Bovine animals, one but less than two years old, male                                                          | 25. Male cattle, from one to less than two years old
+3.02.03.       | Bovine animals, one but less than two years old, female                                                        | 26. Female cattle, from one to less than two years old
+3.02.04.       | Male bovine animals, two years old and over                                                                    | 27. Male cattle, two years old or more
+3.02.05.       | Heifers, two years old and over                                                                                | 28. Breeding heifers 29. Heifers for fattening
+3.02.06.       | Dairy cows                                                                                                     | 30. Dairy cows 31. Cull dairy cows
+3.02.99.       | Other cows                                                                                                     | 32. Other cows
+3.03.01.       | Sheep (all ages)                                                                                               | 
+3.03.01.01.    | Breeding females                                                                                               | 40. Ewes
+3.03.01.99.    | Other sheep                                                                                                    | 41. Other sheep
+3.03.02.       | Goats (all ages)                                                                                               | 
+3.03.02.01.    | Breeding females                                                                                               | 38. Goats, breeding females
+3.03.02.99.    | Other goats                                                                                                    | 39. Other goats
+3.04.01.       | Piglets having a live weight of under 20 kilograms                                                             | 43. Piglets
+3.04.02.       | Breeding sows weighing 50 kilograms and over                                                                   | 44. Breeding sows
+3.04.99.       | Other pigs                                                                                                     | 45. Pigs for fattening 46. Other pigs
+3.05.01.       | Broilers                                                                                                       | 47. Table chickens
+3.05.02.       | Laying hens                                                                                                    | 48. Laying hens
+3.05.03.       | Other poultry                                                                                                  | 49. Other poultry
+3.05.03.01.    | Turkeys                                                                                                        | 
+3.05.03.02.    | Ducks                                                                                                          | 
+3.05.03.03.    | Geese                                                                                                          | 
+3.05.03.04.    | Ostriches                                                                                                      | 
+3.05.03.99.    | Other poultry, not mentioned elsewhere                                                                         | 
+3.06.          | Rabbits, breeding females                                                                                      | 34. Rabbits, breeding females
+3.07.          | Bees                                                                                                           | 33. Bees

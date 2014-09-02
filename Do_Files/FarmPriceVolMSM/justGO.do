@@ -4,12 +4,21 @@ scalar sc_simulation = 1
 
 * Directory macros
 
-local OrigData = "D:\DATA\Data_NFSPanelANalysis\OrigData\FarmPriceVolMSM"
+*local OrigData = "D:\DATA\Data_NFSPanelANalysis\OrigData\FarmPriceVolMSM"
+local OrigData ///
+  "D:\DATA\Data_NFSPanelANalysis\OutData\RAW_79_83\svy_tables_7983"
 
 
 local s = sc_simulation
-local OutData = "D:\data\Data_NFSPanelANalysis\OutData\FarmPriceVolMSM"
-local OutDataO = "D:\data\Data_NFSPanelANalysis\OutData\FarmPriceVolMSM\\`s'"
+local OutData ///
+ "D:\data\Data_NFSPanelANalysis\OutData\RAW_79_83\justGO"
+local OutDataO = "`OutData'\\`s'"
+
+*local OutData = "D:\data\Data_NFSPanelANalysis\OutData\FarmPriceVolMSM"
+*local OutDataO = "D:\data\Data_NFSPanelANalysis\OutData\FarmPriceVolMSM\\`s'"
+
+capture mkdir `OutData'
+capture mkdir `OutData0'
 
 
 ***************************************************************

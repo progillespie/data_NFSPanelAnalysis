@@ -1,6 +1,7 @@
 capture log close
 
-
+use "D:/Data/data_NFSPanelAnalysis/OrigData/nfs_all/dataallyears_out1.dta", clear
+replace year = YE_AR
 *--------------------------------------------------------------------
 * Directories
 *--------------------------------------------------------------------
@@ -8,7 +9,7 @@ local weight_dodir  "./_createWeights"
 local estat_outdatadir "D:/Data/data_EUROSTAT/OutData/RAW_79_83"
 local outdatadir "D:/Data/data_NFSPanelAnalysis/OutData/MakeWeights"
 *--------------------------------------------------------------------
-
+/*
 *TODO: Fix directories s.t. everything comes from FarmPriceVolMSM or
 *       a subdirectory of it. Want to create a packet that has 
 *       everything it needs. 
@@ -119,6 +120,29 @@ log using `outdatadir'/Logs/sgm_5to7.txt, text replace
 *   The system definitions are in finer detail as you progress
 *   from one table to the next.
 
+* Create a dummy ob for every system to ensure the tables
+*  always have a row for each (even when really empty).
+set obs `=_N+8' // add some blank rows to the data
+replace YE_AR = 1 if _n >= _N - 7 //
+
+replace FARM_SYSTEM = 1 if _n==_N
+replace FARM_SYSTEM = 2 if _n==_N - 1
+replace FARM_SYSTEM = 4 if _n==_N - 2
+replace FARM_SYSTEM = 5 if _n==_N - 3
+replace FARM_SYSTEM = 6 if _n==_N - 4
+replace FARM_SYSTEM = 7 if _n==_N - 5
+
+replace FARM_SYSTEM_HISTORIC = 1 if _n==_N
+replace FARM_SYSTEM_HISTORIC = 2 if _n==_N - 1
+replace FARM_SYSTEM_HISTORIC = 3 if _n==_N - 2
+replace FARM_SYSTEM_HISTORIC = 4 if _n==_N - 3
+replace FARM_SYSTEM_HISTORIC = 5 if _n==_N - 4
+replace FARM_SYSTEM_HISTORIC = 6 if _n==_N - 5
+replace FARM_SYSTEM_HISTORIC = 7 if _n==_N - 6
+replace FARM_SYSTEM_HISTORIC = 8 if _n==_N - 7
+
+
+
 * * * * * * * * * * * * * * * * * * * * * * * 
 * NFS systems (modern)
 * * * * * * * * * * * * * * * * * * * * * * * 
@@ -148,13 +172,22 @@ table PrincipalType YE_AR
 table ParticularType YE_AR
 
 
+* YE_AR = 1 column is just to ensure that every system gets a row
+*  in the table (even when there are no farms there)
+
+* Remove the dummy obs. IMPORTANT --- fake year will cause error in 
+*   sgm_8_assignWeights.do
+drop if YE_AR == 1
+
+* Creating dummy obs should become redundant once the calculation of 
+*  SGMs and assignment of farms is correct. There will always be 
+*  more than one farm in each system.
 
 log close
 view `outdatadir'/Logs/sgm_5to7.txt
 
 *--------------------------------------------------------------------
-
-
+*/
 
 
 *--------------------------------------------------------------------
@@ -199,16 +232,19 @@ view `outdatadir'/Logs/sgm_5to7.txt
 
 capture mkdir `outdatadir'/Logs
 capture erase `outdatadir'/Logs/sgm_8_assignWeights.txt
-
+capture drop WTvalue
+gen WTvalue = .
 * Get list of years to apply weights to (only applies from 1984 on)
 levelsof year if year > 1983, local(datayears) 
 foreach YYYY of local datayears {
 
+    macro list _YYYY
     * Assign weights, passing in YYYY and outdatadir macros
     do `weight_dodir'/sgm_8_assignWeights.do `YYYY' `outdatadir'
 
 }	
 
+capture tw sc WTvalue UAA_WEIGHT if UAA_WEIGHT > 0 & FARM_SYSTEM==1
 
 * Matrices left in memory. Check the dimensions are as expected.
 matrix dir

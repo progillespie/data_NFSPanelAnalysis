@@ -5,7 +5,8 @@
 local origdatadir "D:\\Data/data_NFSPanelAnalysis/OrigData/FarmPriceVolMSM"
 local outdatadir "D:/Data/data_NFSPanelAnalysis/OutData"
 
-
+ 
+local cat_sgms ""
 
 *-------------------------------------------------------------------- 
 * Calculate SGMs
@@ -30,6 +31,7 @@ capture drop SGM_`category'
 egen SGM_`category' = rowtotal(`vlist')
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -51,6 +53,8 @@ capture drop SGM_`category'
 egen SGM_`category' = rowtotal(`vlist')
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+local cat_sgms "`cat_sgms' SGM_`category'"
+
 
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -70,6 +74,8 @@ foreach code of local crop_codes{
 capture drop SGM_`category'
 egen SGM_`category'= rowtotal(`vlist')
 replace SGM_`category'= SGM_`category' * `coef_var'
+
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -91,6 +97,8 @@ capture drop SGM_`category'
 egen SGM_`category'= rowtotal(`vlist')
 replace SGM_`category'= SGM_`category' * `coef_var'
 
+local cat_sgms "`cat_sgms' SGM_`category'"
+
 
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -110,6 +118,8 @@ foreach code of local crop_codes{
 capture drop SGM_`category'
 egen SGM_`category'= rowtotal(`vlist')
 replace SGM_`category'= SGM_`category' * `coef_var'
+
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -131,6 +141,8 @@ capture drop SGM_`category'
 egen SGM_`category' = rowtotal(`vlist')
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+local cat_sgms "`cat_sgms' SGM_`category'"
+
 
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -151,6 +163,7 @@ capture drop SGM_`category'
 egen SGM_`category' = rowtotal(`vlist')
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+*local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -172,6 +185,7 @@ capture drop SGM_`category'
 egen SGM_`category' = rowtotal(`vlist')
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -193,6 +207,7 @@ capture drop SGM_`category'
 egen SGM_`category' = rowtotal(`vlist')
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -214,6 +229,7 @@ capture drop SGM_`category'
 egen SGM_`category' = rowtotal(`vlist')
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -235,6 +251,7 @@ capture drop SGM_`category'
 egen SGM_`category' = rowtotal(`vlist')
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+*local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -256,6 +273,7 @@ capture drop SGM_`category'
 egen SGM_`category' = rowtotal(`vlist')
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+*local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -270,6 +288,8 @@ gen SGM_`category' = .
 replace SGM_`category' = TOTAL_PASTURE_HA
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+*local cat_sgms "`cat_sgms' SGM_`category'"
+
 
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -282,6 +302,8 @@ capture drop SGM_`category'
 gen SGM_`category' = . 
 replace SGM_`category' = ROUGH_GRAZING_HA
 replace SGM_`category'= SGM_`category' * `coef_var'   
+
+*local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -303,6 +325,7 @@ capture drop SGM_`category'
 egen SGM_`category' = rowtotal(`vlist')
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -328,7 +351,7 @@ replace SGM_`category'= SGM_`category' * `coef_var'
 *  values are in the thousands!
 replace SGM_`category'= SGM_`category'
 
-
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -343,6 +366,8 @@ gen double SGM_`category' = .
 replace SGM_`category' = FALLOW_SETASIDE_HA
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+local cat_sgms "`cat_sgms' SGM_`category'"
+
 
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -356,6 +381,8 @@ gen double SGM_`category' = .
 replace SGM_`category' = D_HORSES_FOR_SGMS_AVGNO
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+local cat_sgms "`cat_sgms' SGM_`category'"
+
 
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -366,8 +393,24 @@ local coef_var "j02_ecu_per_head"
 * - - - - - - - - - - - - - - - - - - - - - - - - - - -
 capture drop SGM_`category'
 gen double SGM_`category' = .
-replace SGM_`category' = D_LT1YR_FOR_SO_AVGNO
+* - - - - - - - - - - - - - - - - - - - - - - - - - - -
+* Only surplus calves are counted! Defined as 
+*  calves - dairy cows - other cows 
+* - - - - - - - - - - - - - - - - - - - - - - - - - - -
+mvencode D_LT1YR_FOR_SO_AVGNO  ///
+         D_HERD_SIZE_AVG_NO    ///
+         D_COWS_AVG_NO         ///
+  , mv(0) override
+
+replace SGM_`category' = ///
+  D_LT1YR_FOR_SO_AVGNO    - ///
+  D_HERD_SIZE_AVG_NO      - ///
+  D_COWS_AVG_NO
+replace SGM_`category' = 0 if SGM_`category' < 0 
+* - - - - - - - - - - - - - - - - - - - - - - - - - - -
 replace SGM_`category'= SGM_`category' * `coef_var'   
+
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -383,6 +426,8 @@ replace SGM_`category' = D_MALE_CATTLE_1_2YRS_AVG_NO
 replace SGM_`category'= SGM_`category' * `coef_var' if year > 1983
 * DONE: this category doesn't exist for 79-83 data, turn on for > 83
 
+local cat_sgms "`cat_sgms' SGM_`category'"
+
 
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -397,6 +442,9 @@ replace SGM_`category' = D_FEMALE_CATTLE_1_2YRS_AVG_NO
 replace SGM_`category'= SGM_`category' * `coef_var' if year > 1983  
 * DONE: this category doesn't exist for 79-83 data, turn on for > 83
 
+local cat_sgms "`cat_sgms' SGM_`category'"
+
+
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - - -
 *Bovine 2 years and older - males
@@ -409,6 +457,8 @@ gen double SGM_`category' = .
 replace SGM_`category' = D_MALEGT2YRS_FOR_SGMS_AVGNO
 replace SGM_`category'= SGM_`category' * `coef_var' if year > 1983   
 * DONE: this category doesn't exist for 79-83 data, turn on for > 83
+
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -424,6 +474,8 @@ replace SGM_`category' = D_FEMALEGT2YRS_FOR_SGMS_AVGNO
 replace SGM_`category'= SGM_`category' * `coef_var' if year > 1983
 * DONE: this category doesn't exist for 79-83 data, turn on for > 84
 
+local cat_sgms "`cat_sgms' SGM_`category'"
+
 
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -436,6 +488,8 @@ capture drop SGM_`category'
 gen double SGM_`category' = .
 replace SGM_`category' = D_HERD_SIZE_AVG_NO
 replace SGM_`category'= SGM_`category' * `coef_var'   
+
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -450,6 +504,9 @@ gen double SGM_`category' = .
 replace SGM_`category' = D_COWS_AVG_NO
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+local cat_sgms "`cat_sgms' SGM_`category'"
+
+
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - - -
 *Sheep - total
@@ -460,7 +517,11 @@ local coef_var "j09_ecu_per_head"
 capture drop SGM_`category'
 gen double SGM_`category' = .
 replace SGM_`category' = D_TOTAL_SHEEP_AVG_NO
+replace SGM_`category' = D_EWES_AVG_NO ///
+  if D_EWES_AVG_NO > 0
 replace SGM_`category'= SGM_`category' * `coef_var'   
+
+*local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -475,6 +536,8 @@ gen double SGM_`category' = .
 replace SGM_`category' = D_EWES_AVG_NO
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+local cat_sgms "`cat_sgms' SGM_`category'"
+
 
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -486,7 +549,11 @@ local coef_var "j09b_ecu_per_head"
 capture drop SGM_`category'
 gen double SGM_`category' = .
 replace SGM_`category' = D_SHEEP_FOR_SGMS_AVGNO
+replace SGM_`category' = 0 ///
+  if D_EWES_AVG_NO > 0
 replace SGM_`category'= SGM_`category' * `coef_var'   
+
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -499,7 +566,11 @@ local coef_var "j11_ecu_per_head"
 capture drop SGM_`category'
 gen double SGM_`category' = .
 replace SGM_`category' = D_WEANERS_AVG_NO
+replace SGM_`category' = D_FEMALE_PIGS_FOR_SGMS_AVGNO ///
+  if D_FEMALE_PIGS_FOR_SGMS_AVGNO > 0
 replace SGM_`category'= SGM_`category' * `coef_var'   
+
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -514,6 +585,8 @@ gen double SGM_`category' = .
 replace SGM_`category' = D_FEMALE_PIGS_FOR_SGMS_AVGNO
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+local cat_sgms "`cat_sgms' SGM_`category'"
+
 
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -525,7 +598,11 @@ local coef_var "j13_ecu_per_head"
 capture drop SGM_`category'
 gen double SGM_`category' = .
 replace SGM_`category' = D_BOARS_PIGSGT20KG_SGMS_AVGNO
+replace SGM_`category' = 0 ///
+  if D_FEMALE_PIGS_FOR_SGMS_AVGNO > 0
 replace SGM_`category'= SGM_`category' * `coef_var'   
+
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -540,6 +617,8 @@ gen double SGM_`category' = .
 replace SGM_`category' = D_POULTRY1_FOR_SGMS_AVGNO
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+local cat_sgms "`cat_sgms' SGM_`category'"
+
 
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -552,6 +631,8 @@ capture drop SGM_`category'
 gen double SGM_`category' = .
 replace SGM_`category' = D_POULTRY2_FOR_SGMS_AVGNO
 replace SGM_`category'= SGM_`category' * `coef_var'   
+
+local cat_sgms "`cat_sgms' SGM_`category'"
 
 
 
@@ -566,11 +647,242 @@ gen double SGM_`category' = .
 replace SGM_`category' = D_POULTRY3_FOR_SGMS_AVGNO
 replace SGM_`category'= SGM_`category' * `coef_var'   
 
+local cat_sgms "`cat_sgms' SGM_`category'"
+
+
 
 *-------------------------------------------------------------------- 
 * All relevant SGM cateogories have now been calculated
 *-------------------------------------------------------------------- 
 
+
+
+*-------------------------------------------------------------------- 
+* Formula SGMs for which relevant Irish SGMs are parts (i.e. 
+*   these categories would contain other parts in other Member States
+*   but in Ireland those parts are effectively 0). 
+*-------------------------------------------------------------------- 
+capture drop SGM_ForagePlants  
+egen double SGM_ForagePlants  = rowtotal(SGM_GreenMaize SGM_OtherGreenFodder)
+capture drop SGM_PastureMeadow 
+egen double SGM_PastureMeadow = rowtotal(SGM_Pasture SGM_RoughGrazing)
+capture drop SGM_Industrial    
+gen  double SGM_Industrial    = SGM_Oilseed
+capture drop SGM_DriedVeg      
+gen  double SGM_DriedVeg      = SGM_Peas  
+
+*-------------------------------------------------------------------- 
+
+
+
+*-------------------------------------------------------------------- 
+* SGMs which aren't relevant for Ireland, but are needed for 
+*   calculating poles
+*-------------------------------------------------------------------- 
+capture drop SGM_Durum
+gen double SGM_Durum          = 0
+
+capture drop SGM_Rye
+gen double SGM_Rye            = 0
+
+capture drop SGM_GrainMaize
+gen double SGM_GrainMaize     = 0
+
+capture drop SGM_Rice
+gen double SGM_Rice           = 0
+
+capture drop SGM_OtherCereals
+gen double SGM_OtherCereals   = 0
+
+capture drop SGM_VegMarket
+gen double SGM_VegMarket      = 0
+
+capture drop SGM_FlowersOutdoor
+gen double SGM_FlowersOutdoor = 0
+
+capture drop SGM_FlowersGlass
+gen double SGM_FlowersGlass   = 0
+
+capture drop SGM_Seeds
+gen double SGM_Seeds          = 0
+
+capture drop SGM_OtherCrops
+gen double SGM_OtherCrops     = 0
+
+capture drop SGM_NonFodder
+gen double SGM_NonFodder      = 0
+
+capture drop SGM_FruitBerry
+gen double SGM_FruitBerry     = 0
+
+capture drop SGM_Citrus
+gen double SGM_Citrus         = 0
+
+capture drop SGM_Olive
+gen double SGM_Olive          = 0
+
+capture drop SGM_Vineyards
+gen double SGM_Vineyards      = 0
+
+capture drop SGM_OtherPerm
+gen double SGM_OtherPerm      = 0
+
+capture drop SGM_PermGlass
+gen double SGM_PermGlass      = 0
+
+capture drop SGM_GoatsBreedF
+gen double SGM_GoatsBreedF    = 0
+
+capture drop SGM_GoatsOther
+gen double SGM_GoatsOther     = 0
+
+capture drop SGM_Rabbits
+gen double SGM_Rabbits        = 0
+
+capture drop SGM_Bees
+gen double SGM_Bees           = 0
+
+*-------------------------------------------------------------------- 
+
+
+
+*-------------------------------------------------------------------- 
+* Calculate poles 
+*-------------------------------------------------------------------- 
+
+* Adapted from doc to match just what's relevant to IE.
+
+capture drop P1
+gen     P1   =        ///
+  SGM_CommonWheat      + ///
+  SGM_Durum            + ///
+  SGM_Rye              + ///
+  SGM_Barley           + ///
+  SGM_Oats             + ///
+  SGM_GrainMaize       + ///
+  SGM_Rice             + ///
+  SGM_OtherCereals     + ///
+  SGM_Peas             + ///
+  SGM_Potatoes         + ///
+  SGM_SugarBeet        + ///
+  SGM_FodderRoots      + ///
+  SGM_Industrial       + ///
+  SGM_VegOpenField     + ///
+  SGM_ForagePlants     + ///
+  SGM_Seeds            + ///
+  SGM_OtherCrops       + ///
+  SGM_NonFodder
+
+
+capture drop P2
+gen     P2   =        ///
+  SGM_VegMarket        + ///
+  SGM_VegUnderGlass    + ///
+  SGM_FlowersOutdoor   + ///
+  SGM_FlowersGlass     + ///
+  SGM_Mushrooms        
+  
+
+capture drop P3
+gen     P3   =        ///
+  SGM_FruitBerry       + ///
+  SGM_Citrus           + ///
+  SGM_Olive            + ///
+  SGM_Vineyards        + ///
+  SGM_Nurseries        + ///
+  SGM_OtherPerm        + ///
+  SGM_PermGlass
+
+
+capture drop P4
+gen     P4   =        ///
+  SGM_Pasture          + ///
+  SGM_RoughGrazing     + ///
+  SGM_Equidae          + ///
+  SGM_BovineLT1        + ///  
+  SGM_Bovine1_2M       + ///
+  SGM_Bovine1_2F       + ///
+  SGM_BovineGT2F       + ///
+  SGM_DairyCows        + ///
+  SGM_OtherCows        + ///
+  SGM_SheepBreedingF   + ///
+  SGM_SheepOthers      + ///
+  SGM_GoatsBreedF      + ///
+  SGM_GoatsOther       
+
+
+capture drop P5
+gen     P5   =        ///
+  SGM_PigsLT20kg       + ///
+  SGM_PigsGT50kg       + ///
+  SGM_PigsOther        + ///
+  SGM_PoultryBroil     + ///
+  SGM_PoultryHens      + ///
+  SGM_PoultryOther     + ///
+  SGM_Rabbits        
+
+
+capture drop P11
+gen     P11  =        ///
+  SGM_CommonWheat      + ///
+  SGM_Durum            + ///
+  SGM_Rye              + ///
+  SGM_Barley           + ///
+  SGM_Oats             + ///
+  SGM_GrainMaize       + ///
+  SGM_OtherCereals     + ///
+  SGM_Rice
+
+
+capture drop P41
+gen     P41  =        ///
+  SGM_BovineLT1        + ///  
+  SGM_Bovine1_2F       + ///
+  SGM_BovineGT2F       + ///
+  SGM_DairyCows
+
+
+capture drop P42
+gen     P42  =        ///
+  SGM_BovineLT1        + ///  
+  SGM_Bovine1_2M       + ///
+  SGM_Bovine1_2F       + ///
+  SGM_BovineGT2M       + ///
+  SGM_BovineGT2F       + ///
+  SGM_DairyCows        + ///
+  SGM_OtherCows
+
+
+capture drop P51
+gen     P51  =        /// 
+  SGM_PigsLT20kg       + ///
+  SGM_PigsGT50kg       + ///
+  SGM_PigsOther 
+
+
+capture drop P52
+gen     P52  =        ///
+  SGM_PoultryBroil     + ///
+  SGM_PoultryHens      + ///
+  SGM_PoultryOther
+
+
+capture drop P111
+gen     P111 =        ///
+  SGM_CommonWheat      + ///
+  SGM_Durum            + ///
+  SGM_Rye              + ///
+  SGM_Barley           + ///
+  SGM_Oats             + ///
+  SGM_GrainMaize       + ///
+  SGM_OtherCereals
+
+
+capture drop P121
+gen     P121 =        ///
+  SGM_Potatoes         + ///
+  SGM_SugarBeet        + ///
+  SGM_FodderRoots
 
 
 
@@ -579,19 +891,12 @@ replace SGM_`category'= SGM_`category' * `coef_var'
 *-------------------------------------------------------------------- 
 * Calculate whole farm SGMs
 *-------------------------------------------------------------------- 
-qui ds SGM_*
-local cat_sgms `r(varlist)'
 
-* Print the list in single column (more readable)
-foreach cat of local cat_sgms {
 
-    local i=`i'+1
-    di "`i')" _column(5) "`cat'" 
-
-}
+* Pole method
+mvencode P1 P2 P3 P4 P5 SGM_Bees, mv(0) override
 capture drop SGM_Farm
-egen SGM_Farm = rowtotal(`cat_sgms')
-
+gen SGM_Farm = P1 + P2 + P3 + P4 + P5 + SGM_Bees
 
 
 
@@ -600,8 +905,8 @@ egen SGM_Farm = rowtotal(`cat_sgms')
 *  where possible. 
 tw sc SGM_Farm TOTAL_SGMS if TOTAL_SGMS > 0 ///
   , aspect(1)                               ///
-    xscale(range(0 500000))                 ///
-    yscale(range(0 500000))
+    xscale(range(0 400000))                 ///
+    yscale(range(0 400000))
 
 *TODO: I'm systematically overestimating the total SGMs. 
 *       Check with Brian.

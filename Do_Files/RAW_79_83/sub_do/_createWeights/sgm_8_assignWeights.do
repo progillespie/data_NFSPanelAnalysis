@@ -1,3 +1,4 @@
+args YYYY outdatadir
 * Implemented code to create farm weights. Uses matrix approach
 * TODO: calc weight tables for 91 and 92. Currently just copies of 93
 
@@ -8,7 +9,6 @@
 quietly {
 *-------------------------------------------------------------------
 
-  args YYYY outdatadir
 
   
 
@@ -31,6 +31,24 @@ quietly {
   
   
 
+
+  *TODO: Stop using FARM_SYSTEM packaged with data
+  capture gen int FARM_SYSTEM = .
+  replace FARM_SYSTEM =1 if D_SAMPLE_CELL>0 & D_SAMPLE_CELL  <= 6
+  replace FARM_SYSTEM =2 if D_SAMPLE_CELL>6 & D_SAMPLE_CELL  <= 12
+  replace FARM_SYSTEM =4 if D_SAMPLE_CELL>18 & D_SAMPLE_CELL <= 24
+  replace FARM_SYSTEM =5 if D_SAMPLE_CELL>24 & D_SAMPLE_CELL <= 30 
+  replace FARM_SYSTEM =6 if D_SAMPLE_CELL>30 & D_SAMPLE_CELL <= 36 
+  replace FARM_SYSTEM =7 if D_SAMPLE_CELL>36 & D_SAMPLE_CELL <= 42
+  capture gen FARM_SYSTEM_HISTORIC = FARM_SYSTEM
+
+  capture gen tableBcol = .
+  replace tableBcol = 1 if UAA_SIZE >    0 & UAA_SIZE <  10
+  replace tableBcol = 2 if UAA_SIZE >=  10 & UAA_SIZE <  20
+  replace tableBcol = 3 if UAA_SIZE >=  20 & UAA_SIZE <  30
+  replace tableBcol = 4 if UAA_SIZE >=  30 & UAA_SIZE <  50
+  replace tableBcol = 5 if UAA_SIZE >=  50 & UAA_SIZE < 100
+  replace tableBcol = 6 if UAA_SIZE >= 100
 
 
 
@@ -100,9 +118,14 @@ quietly {
       matrix rownames M_WTS_`YYYY'  = `rownames'
 
   
+      * TODO: Stop using D_SAMPLE_CELL that came packaged with the 
+      *        data 
+
+
       * Choose the appropriate cell index number
       capture drop cell_number
-      gen int cell_number = D_SAMPLE_CELL_HISTORIC
+      *gen int cell_number = D_SAMPLE_CELL_HISTORIC
+      gen int cell_number = D_SAMPLE_CELL
   }
   
   *------------------------------------------------------------------
@@ -116,14 +139,16 @@ quietly {
   * Use matrices to assign weight variable
   *------------------------------------------------------------------
 
-  capture drop WTvalue
-  gen WTvalue = .
-  forvalues i= 1/6 {
+  local numrows = rowsof(M_WTS_`YYYY')
+  local numcols = colsof(M_WTS_`YYYY')
+
+  forvalues i= 1/`numrows' {
   
-    forvalues j=1/6 {
+    forvalues j=1/`numcols' {
   	
       qui replace WTvalue = M_WTS_`YYYY'[`i',`j'] ///
-        if cell_number == M_SAMPLE_CELL[`i',`j']
+        if cell_number == M_SAMPLE_CELL[`i',`j']   & ///
+           year == `YYYY'
       
       * Uncomment the following to get a message detailing the 
       *   assignment of each cell for this year 
@@ -188,7 +213,6 @@ if `YYYY' >= 1993 {
 
 
 else {
-
   log on
   * Use historic system definitions
   table FARM_SYSTEM_HISTORIC tableBcol      ///

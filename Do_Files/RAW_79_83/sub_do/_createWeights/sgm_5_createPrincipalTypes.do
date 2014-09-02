@@ -3,118 +3,181 @@
 *   See 78/443/EEC and subsequent amendments. 
 
 
+qui mvencode _all, mv(0) override
 
-
-* Recreate the list of category SGMs available so far
-qui ds SGM_*
-local cat_sgms `r(varlist)'
-* Remove SGM_farm from the list
-local rm "SGM_farm"
-local cat_sgms: list cat_sgms - rm
-macro drop _rm 
-
-* Print the list in single column (more readable)
-foreach cat of local cat_sgms {
-
-    local i=`i'+1
-    di "`i')" _column(5) "`cat'" 
-
-}
-
-label var year "Year"
+label var YE_AR  "Year"
+label var YE_AR "Year"
 
 *-------------------------------------------------------------------- 
 * Reference material
 *-------------------------------------------------------------------- 
+* CELEX-31985D0377
 
 
 
-* - - - - - - - - - - - - - - - - - - - - - - - - - - -
-* From Commission Decision 78/463/EEC
-* Composition and thresholds
-* - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-* For reference to original document's formulae
-*SGM_CommonWheat    E01
-*SGM_Durum          E02
-*SGM_Rye            E03
-*SGM_Barley         E04
-*SGM_Oats           E05
-*SGM_GrainMaize     E06
-*SGM_Rice           E07
-*SGM_OtherCereals   E08
-*SGM_DriedVeg       E09
-*SGM_Potatoes       E10
-*SGM_SugarBeet      E11
-*SGM_FodderRoots    E12
-*SGM_Industrial     E13
-*SGM_VegOpenField   E14a
-*SGM_VegMarket      E14b
-*SGM_VegUnderGlass  E15
-*SGM_FlowersOutdoor E16
-*SGM_FlowersGlass   E17
-*SGM_ForagePlants   E18
-*SGM_Seeds          E19
-*SGM_OtherCrops     E20
-*SGM_PastureMeadow  G01
-*SGM_FruitBerry     H01
-*SGM_Citrus         H02
-*SGM_Olive          H03
-*SGM_Vineyards      H04
-*SGM_Nurseries      H05
-*SGM_OtherPerm      H06
-*SGM_PermGlass      H07
-*SGM_Equidae        K01
-*SGM_BovineLT1      K02
-*SGM_Bovine1_2M     K03
-*SGM_Bovine1_2F     K04 
-*SGM_BovineGT2M     K05 
-*SGM_BovineGT2F     K06
-*SGM_DairyCows      K07
-*SGM_OtherCows      K08 
-*SGM_Sheep          K09
-*SGM_Goats          K10
-*SGM_PigsLT20kg     K11
-*SGM_PigsGT50kg     K12
-*SGM_PigsOther      K13
-*SGM_PoultryBroil   K14
-*SGM_PoultryHens    K15
-*SGM_PoultryOther   K16
+*-------------------------------------------------------------------- 
+* Assignment of General Types
+*-------------------------------------------------------------------- 
+* Create empty variable for General Type codes. 
+capture drop GeneralType
+gen int GeneralType = .
+label var GeneralType ///
+  "General Type per CELEX-31985D0377"
 
 
+* ... and Threshold variables
+capture drop Threshol*
+gen double Threshold = .
+gen double Threshold2= . 
+label var Threshold ///
+  "Threshold for farm types. Delete if found in data."
+label var Threshold2 ///
+  "Threshold for farm types. Delete if found in data."
 
-* - - - - - - - - - - - - - - - - - - - - - - - - - - -
-* Formula SGMs for which relevant Irish SGMs are parts (i.e. 
-*   these categories would contain other parts in other Member States
-*   but in Ireland those parts are effectively 0). 
-* - - - - - - - - - - - - - - - - - - - - - - - - - - -
-egen double SGM_ForagePlants = rowtotal(SGM_GreenMaize SGM_OtherGreenFodder)
-egen double SGM_PastureMeadow = rowtotal(SGM_Pasture SGM_RoughGrazing)
-gen  double SGM_Industrial    = SGM_Oilseed
-gen  double SGM_DriedVeg      = SGM_Peas  
 
-* - - - - - - - - - - - - - - - - - - - - - - - - - - -
-* SGMs which aren't relevant for Ireland, but are needed for 
-*   calculated Principal Types
-* - - - - - - - - - - - - - - - - - - - - - - - - - - -
-gen double SGM_Durum          = 0
-gen double SGM_Rye            = 0
-gen double SGM_GrainMaize     = 0
-gen double SGM_Rice           = 0
-gen double SGM_OtherCereals   = 0
-gen double SGM_VegMarket      = 0
-gen double SGM_FlowersOutdoor = 0
-gen double SGM_FlowersGlass   = 0
-gen double SGM_Seeds          = 0
-gen double SGM_OtherCrops     = 0
-gen double SGM_FruitBerry     = 0
-gen double SGM_Citrus         = 0
-gen double SGM_Olive          = 0
-gen double SGM_Vineyards      = 0
-gen double SGM_OtherPerm      = 0
-gen double SGM_PermGlass      = 0
-gen double SGM_Goats          = 0
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+local title "Spec. field crops"
+local code  = 1
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+  * Relevant threshold(s) 
+  replace Threshold = (2/3) * SGM_Farm
+  
+  * Update farm type variable
+  replace GeneralType = `code' ///
+    if P`code' > Threshold
 
+  label define GeneralType `code' "`title'", modify
+  label values GeneralType GeneralType 
+
+
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+local title "Spec. horticulture"
+local code  = 2
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+  * Relevant threshold(s) 
+  replace Threshold = (2/3) * SGM_Farm
+  
+  * Update farm type variable
+  replace GeneralType = `code' ///
+    if P`code' > Threshold
+
+  label define GeneralType `code' "`title'", modify
+  label values GeneralType GeneralType 
+
+
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+local title "Spec. permanent crops"
+local code  = 3
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+  * Relevant threshold(s) 
+  replace Threshold = (2/3) * SGM_Farm
+  
+  * Update farm type variable
+  replace GeneralType = `code' ///
+    if P`code' > Threshold
+
+  label define GeneralType `code' "`title'", modify
+  label values GeneralType GeneralType 
+
+
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+local title "Spec. grazing livestock"
+local code  = 4
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+  * Relevant threshold(s) 
+  replace Threshold = (2/3) * SGM_Farm
+  
+  * Update farm type variable
+  replace GeneralType = `code' ///
+    if P`code' > Threshold
+
+  label define GeneralType `code' "`title'", modify
+  label values GeneralType GeneralType 
+
+
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+local title "Spec. granivores"
+local code  = 5
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+  * Relevant threshold(s) 
+  replace Threshold = (2/3) * SGM_Farm
+  
+  * Update farm type variable
+  replace GeneralType = `code' ///
+    if P`code' > Threshold
+
+  label define GeneralType `code' "`title'", modify
+  label values GeneralType GeneralType 
+
+
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+local title "Mixed cropping"
+local code  = 6
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+  * Relevant threshold(s) 
+  replace Threshold = (2/3) * SGM_Farm
+  
+  * Update farm type variable
+  replace GeneralType = `code'    ///
+    if (P1 + P2 + P3) >  Threshold & ///
+        P1            <= Threshold & ///
+        P2            <= Threshold & ///
+        P3            <= Threshold
+
+  label define GeneralType `code' "`title'", modify
+  label values GeneralType GeneralType 
+
+
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+local title "Mixed livestock holdings"
+local code  = 7
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+  * Relevant threshold(s) 
+  replace Threshold = (2/3) * SGM_Farm
+  
+  * Update farm type variable
+  replace GeneralType = `code' ///
+    if (P4 + P5)      >  Threshold & ///
+        P4            <= Threshold & ///
+        P5            <= Threshold
+
+  label define GeneralType `code' "`title'", modify
+  label values GeneralType GeneralType 
+
+
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+local title "Mixed crops -livestock"
+local code  = 8
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+  * Relevant threshold(s) 
+  replace Threshold = (1/3) * SGM_Farm
+  
+  * Update farm type variable. Do after classes 1 - 7!
+  replace GeneralType = `code' ///
+    if  P1            >  Threshold & ///
+        P4            >  Threshold & ///
+        missing(GeneralType) // only from missing, excludes 1-7.
+
+  label define GeneralType `code' "`title'", modify
+  label values GeneralType GeneralType 
+
+
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+local title "Non-classified holdings"
+local code  = 9
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+  * Relevant threshold(s) - none
+  
+  * Update farm type variable
+  replace GeneralType = `code' ///
+    if SGM_Farm == 0
+
+  label define GeneralType `code' "`title'", modify
+  label values GeneralType GeneralType 
+
+
+table GeneralType YE_AR, missing
 
 
 *-------------------------------------------------------------------- 
@@ -125,700 +188,360 @@ gen double SGM_Goats          = 0
 capture drop PrincipalType
 gen int PrincipalType = .
 label var PrincipalType ///
-  "Principal Type per 78/463/EEC"
-
-
-* ... and Threshold variables
-capture drop Threshold
-gen double Threshold = .
-gen double Threshold2= . 
-label var Threshold ///
-  "Threshold for farm types, overwritten for each system"
-label var Threshold2 ///
-  "Another threshold for farm types, overwritten for each system"
-
-
-
-* The following code calculates the SGMs for comparing to the 
-*  relevant threshold for each Principal Type, then does the 
-*  comparison, and assigns fills in PrincipalType.
-
+  "Principal Type per CELEX-31985D0377"
 
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-*11 Cereals
+local title "Cereals"
+local code  = 11
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 quietly {
-  local var "Cereals"
-  local code = 11
-  local vlist "" //clear vlist
-  local vlist "`vlist' SGM_CommonWheat"
-  local vlist "`vlist' SGM_Durum"
-  local vlist "`vlist' SGM_Rye"
-  local vlist "`vlist' SGM_Barley"
-  local vlist "`vlist' SGM_Oats"
-  local vlist "`vlist' SGM_GrainMaize"
-  local vlist "`vlist' SGM_Rice"
-  local vlist "`vlist' SGM_OtherCereals"
-  egen double SGMe_`var' = rowtotal(`vlist')
-  
   * Relevant threshold(s) 
   replace Threshold = (2/3) * SGM_Farm
   
   * Update farm type variable
-  replace PrincipalType = `code' ///
-    if SGMe_`var' > Threshold
+  replace PrincipalType = `code'           ///
+    if  P`code'             >  Threshold & ///
+        GeneralType == real(substr("`code'", 1, 1))
 
-  label define PrincipalType `code' "`var'", modify
+
+  label define PrincipalType `code' "`title'", modify
   label values PrincipalType PrincipalType
 }
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
+tab PrincipalType YE_AR, missing
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-
-
-
-
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-*12 Field Crops, other
+local title "Gen. field cropping"
+local code  = 12
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 quietly {
-  local var "FieldCrops"
-  local code = 12
-  local vlist "" //clear vlist
-  local vlist "`vlist' SGM_CommonWheat"
-  local vlist "`vlist' SGM_Durum"
-  local vlist "`vlist' SGM_Rye"
-  local vlist "`vlist' SGM_Barley"
-  local vlist "`vlist' SGM_Oats"
-  local vlist "`vlist' SGM_GrainMaize"
-  local vlist "`vlist' SGM_Rice"
-  local vlist "`vlist' SGM_OtherCereals"
-  local vlist "`vlist' SGM_DriedVeg"
-  local vlist "`vlist' SGM_Potatoes"
-  local vlist "`vlist' SGM_SugarBeet"
-  local vlist "`vlist' SGM_FodderRoots"
-  local vlist "`vlist' SGM_Industrial"
-  local vlist "`vlist' SGM_VegOpenField"
-  local vlist "`vlist' SGM_ForagePlants"
-  local vlist "`vlist' SGM_Seeds"
-  local vlist "`vlist' SGM_OtherCrops"
-  egen double SGMe_`var' = rowtotal(`vlist')
-  
   * Relevant threshold(s) 
   replace Threshold = (2/3) * SGM_Farm
   
   * Update farm type variable
-  replace PrincipalType = `code' ///
-    if SGMe_`var' > Threshold & ///
-       SGMe_Cereals <= Threshold
+  replace PrincipalType = `code'           ///
+    if  P11                 <= Threshold & ///
+        GeneralType == real(substr("`code'", 1, 1))
 
-  label define PrincipalType `code' "`var'", modify
+
+  label define PrincipalType `code' "`title'", modify
   label values PrincipalType PrincipalType
 }
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
+tab PrincipalType YE_AR, missing
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-
-
-
-
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-*21 Horticulture
+local title "Spec. Horticulture"
+local code  = 20
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 quietly {
-  local var "Horticulture"
-  local code = 21
-  local vlist "" // clear vlist
-  local vlist "`vlist' SGM_VegMarket"
-  local vlist "`vlist' SGM_VegUnderGlass"
-  local vlist "`vlist' SGM_FlowersOutdoor"
-  local vlist "`vlist' SGM_FlowersGlass"
-  egen double SGMe_`var' = rowtotal(`vlist')
+  * Relevant threshold(s) - None
+  
+  * Update farm type variable
+  replace PrincipalType = `code'                          ///
+    if  GeneralType == real(substr("`code'", 1, 1))
+        
 
+
+  label define PrincipalType `code' "`title'", modify
+  label values PrincipalType PrincipalType
+}
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+tab PrincipalType YE_AR, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+local title "Spec. Vineyards"
+local code  = 31
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+quietly {
   * Relevant threshold(s) 
   replace Threshold = (2/3) * SGM_Farm
   
   * Update farm type variable
-  replace PrincipalType = `code' ///
-    if SGMe_`var' > Threshold
+  replace PrincipalType = `code'                          ///
+    if  SGM_Vineyards                      >  Threshold & ///
+        GeneralType == real(substr("`code'", 1, 1))
+        
 
-  label define PrincipalType `code' "`var'", modify
+
+  label define PrincipalType `code' "`title'", modify
   label values PrincipalType PrincipalType
 }
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+tab PrincipalType YE_AR, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-
-
-
-
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-*31 Vineyards (there are none of these in IE)
+local title "Spec. Fruit"
+local code  = 32
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 quietly {
-  local var "Vineyards"
-  local code = 31
-  local vlist "" //clear vlist
-  local vlist "`vlist' SGM_Olive"
-  egen double SGMe_`var' = rowtotal(`vlist')
-  
   * Relevant threshold(s) 
   replace Threshold = (2/3) * SGM_Farm
   
   * Update farm type variable
-  replace PrincipalType = `code' ///
-    if SGMe_`var' > Threshold
+  replace PrincipalType = `code'                          ///
+    if  (SGM_FruitBerry + SGM_Citrus)      >  Threshold & ///
+        GeneralType == real(substr("`code'", 1, 1))
+        
 
-  label define PrincipalType `code' "`var'", modify
+
+  label define PrincipalType `code' "`title'", modify
   label values PrincipalType PrincipalType
 }
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+tab PrincipalType YE_AR, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-
-
-
-
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-*32 Fruit/permanent crops, other 
-* (there are none of these in IE)
+local title "Spec. Olives"
+local code  = 33
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 quietly {
-  local var "FruitPerm"
-  local code = 32
-  local vlist "" //clear vlist
-  local vlist "`vlist' SGM_FruitBerry"
-  local vlist "`vlist' SGM_Citrus"
-  local vlist "`vlist' SGM_Olive"
-  local vlist "`vlist' SGM_Vineyards"
-  local vlist "`vlist' SGM_Nurseries"
-  local vlist "`vlist' SGM_OtherPerm"
-  local vlist "`vlist' SGM_PermGlass"
-  egen double SGMe_`var' = rowtotal(`vlist')
-  
   * Relevant threshold(s) 
   replace Threshold = (2/3) * SGM_Farm
   
   * Update farm type variable
-  replace PrincipalType = `code' ///
-    if SGMe_`var' > Threshold       & ///
-       SGMe_Vineyards <= Threshold
+  replace PrincipalType = `code'                          ///
+    if  SGM_Olive                          >  Threshold & ///
+        GeneralType == real(substr("`code'", 1, 1))
+        
 
-  label define PrincipalType `code' "`var'", modify
+
+  label define PrincipalType `code' "`title'", modify
   label values PrincipalType PrincipalType
 }
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+tab PrincipalType YE_AR, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-
-
-
-
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-*41 Cattle, dairying 
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-quietly {
-  local var "Dairying"
-  local code = 41
-  
-  local vlist "" //clear vlist
-  local vlist "`vlist' SGM_BovineLT1"
-  local vlist "`vlist' SGM_Bovine1_2F"
-  local vlist "`vlist' SGM_BovineGT2F"
-  local vlist "`vlist' SGM_DairyCows"
-  egen double SGMe_`var' = rowtotal(`vlist')
-  
-  * Relevant threshold(s) 
-  replace Threshold = (2/3) * SGM_Farm
-  replace Threshold2= (2/3) * SGMe_`var'
-  
-  * Update farm type variable
-  replace PrincipalType = `code' ///
-    if SGMe_`var'    > Threshold    & ///
-       SGM_DairyCows > Threshold2 
-
-  label define PrincipalType `code' "`var'", modify
-  label values PrincipalType PrincipalType
-}
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-
-
-
-
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-*42 Cattle, rearing/fattening
+local title "Various permanent crops"
+local code  = 34
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 quietly {
-  local var "CattleRearing"
-  local code = 42
-  *----------
-  local vlist "" //clear vlist
-  local vlist "`vlist' SGM_BovineLT1"
-  local vlist "`vlist' SGM_Bovine1_2M"
-  local vlist "`vlist' SGM_Bovine1_2F"
-  local vlist "`vlist' SGM_BovineGT2M"
-  local vlist "`vlist' SGM_BovineGT2F"
-  local vlist "`vlist' SGM_DairyCows"
-  local vlist "`vlist' SGM_OtherCows"
-  egen double SGMe_`var' = rowtotal(`vlist')
-  
-  * Relevant threshold(s) 
-  replace Threshold = (2/3)  * SGM_Farm
-  replace Threshold2= (1/10) * SGM_Farm
-  
-  * Update farm type variable
-  replace PrincipalType = `code'     ///
-    if SGMe_`var'    >  Threshold       & ///
-       SGM_DairyCows <= Threshold2 
-
-  label define PrincipalType `code' "`var'", modify
-  label values PrincipalType PrincipalType
-}
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-
-
-
-
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-*43 Cattle, mixed
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-quietly {
-  local var "CattleMixed"
-  local code = 43
-  local vlist "" //clear vlist
-  local vlist "`vlist' SGM_BovineLT1"
-  local vlist "`vlist' SGM_Bovine1_2M"
-  local vlist "`vlist' SGM_Bovine1_2F"
-  local vlist "`vlist' SGM_BovineGT2M"
-  local vlist "`vlist' SGM_BovineGT2F"
-  local vlist "`vlist' SGM_DairyCows"
-  local vlist "`vlist' SGM_OtherCows "
-  egen double SGMe_`var' = rowtotal(`vlist')
-  
-  * Relevant threshold(s) 
-  replace Threshold = (2/3)  * SGM_Farm
-  replace Threshold2= (1/10) * SGM_Farm
-  
-  * Update farm type variable
-  replace PrincipalType = `code' ///
-    if SGMe_`var' > Threshold       & ///
-       SGM_DairyCows > Threshold2   & ///
-       PrincipalType != 41
-
-  label define PrincipalType `code' "`var'", modify
-  label values PrincipalType PrincipalType
-}
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-
-
-
-
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-*44 Grazing livestock, other
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-quietly {
-  local var "Grazing"
-  local code = 44
-  local vlist "" //clear vlist
-  local vlist "`vlist' SGM_PastureMeadow"
-  local vlist "`vlist' SGM_Equidae"
-  local vlist "`vlist' SGM_BovineLT1"
-  local vlist "`vlist' SGM_Bovine1_2M"
-  local vlist "`vlist' SGM_Bovine1_2F"
-  local vlist "`vlist' SGM_BovineGT2M"
-  local vlist "`vlist' SGM_BovineGT2F"
-  local vlist "`vlist' SGM_DairyCows"
-  local vlist "`vlist' SGM_OtherCows"
-  local vlist "`vlist' SGM_Sheep"
-  local vlist "`vlist' SGM_Goats"
-  egen double SGMe_`var' = rowtotal(`vlist')
-  
   * Relevant threshold(s) 
   replace Threshold = (2/3) * SGM_Farm
   
   * Update farm type variable
-  replace PrincipalType = `code'    ///
-    if SGMe_`var'       >  Threshold   & ///
-       SGMe_CattleMixed <= Threshold
+  replace PrincipalType = `code'                          ///
+    if  missing(PrincipalType)             >  Threshold & ///
+        GeneralType == real(substr("`code'", 1, 1))
+        
 
-  label define PrincipalType `code' "`var'", modify
+
+  label define PrincipalType `code' "`title'", modify
   label values PrincipalType PrincipalType
 }
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+tab PrincipalType YE_AR, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-
-
-
-
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-*51 Pigs
+local title "Dairying"
+local code  = 41
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 quietly {
-  local var "Pigs"
-  local code = 51
-  local vlist "" //clear vlist
-  local vlist "`vlist' SGM_PigsLT20kg"
-  local vlist "`vlist' SGM_PigsGT50kg"
-  local vlist "`vlist' SGM_PigsOther"
-  egen double SGMe_`var' = rowtotal(`vlist')
+  * Relevant threshold(s) 
+  replace Threshold  =  (2/3) * SGM_Farm
+  replace Threshold2 =  (2/3) * P41
   
+  * Update farm type variable
+  replace PrincipalType = `code'                        ///
+    if  P41                                >  Threshold  & ///
+        SGM_DairyCows                      >  Threshold2 & ///
+        GeneralType == real(substr("`code'", 1, 1))
+        
+
+
+  label define PrincipalType `code' "`title'", modify
+  label values PrincipalType PrincipalType
+}
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+tab PrincipalType YE_AR, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+local title "Cattle Rearing"
+local code  = 42
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+quietly {
+  * Relevant threshold(s) 
+  replace Threshold  = (2/3)  * SGM_Farm
+  replace Threshold2 = (1/10) * SGM_Farm
+  
+  * Update farm type variable
+  replace PrincipalType = `code'                          ///
+    if  P42                                >  Threshold  & ///
+        SGM_DairyCows                      <= Threshold2 & ///
+        GeneralType == real(substr("`code'", 1, 1))
+        
+
+
+  label define PrincipalType `code' "`title'", modify
+  label values PrincipalType PrincipalType
+}
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+tab PrincipalType YE_AR, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+local title "Dairy/Cattle"
+local code  = 43 
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+quietly {
+  * Relevant threshold(s) 
+  replace Threshold  = (2/3)  * SGM_Farm
+  replace Threshold2 = (1/10) * SGM_Farm
+  
+  * Update farm type variable
+  replace PrincipalType = `code'                          ///
+    if  P42                                >  Threshold  & ///
+        SGM_DairyCows                      >  Threshold2 & ///
+        PrincipalType                      != 41         & ///
+        GeneralType == real(substr("`code'", 1, 1))
+        
+
+
+  label define PrincipalType `code' "`title'", modify
+  label values PrincipalType PrincipalType
+}
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+tab PrincipalType YE_AR, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+local title "Sheep, goats, other"
+local code  = 44
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+quietly {
   * Relevant threshold(s) 
   replace Threshold = (2/3) * SGM_Farm
   
   * Update farm type variable
-  replace PrincipalType = `code' ///
-    if SGMe_`var' > Threshold
+  replace PrincipalType = `code'                          ///
+    if  P42                               <=  Threshold & ///
+        GeneralType == real(substr("`code'", 1, 1))
+        
 
-  label define PrincipalType `code' "`var'", modify
+
+  label define PrincipalType `code' "`title'", modify
   label values PrincipalType PrincipalType
 }
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+tab PrincipalType YE_AR, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-
-
-
-
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-*52 Pigs and poultry, other
+local title "Spec. granivores"
+local code  = 50
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 quietly {
-  local var "PigsPoultryOther"
-  local code = 52
-  local vlist "" //clear vlist
-  local vlist "`vlist' SGM_PigsLT20kg"
-  local vlist "`vlist' SGM_PigsGT50kg"
-  local vlist "`vlist' SGM_PigsOther"
-  local vlist "`vlist' SGM_PoultryBroil"
-  local vlist "`vlist' SGM_PoultryHens"
-  local vlist "`vlist' SGM_PoultryOther"
-  egen double SGMe_`var' = rowtotal(`vlist')
-  
   * Relevant threshold(s) 
   replace Threshold = (2/3) * SGM_Farm
   
   * Update farm type variable
-  replace PrincipalType = `code' ///
-    if SGMe_`var' >  Threshold      & ///
-       SGMe_Pigs  <= Threshold
+  replace PrincipalType = `code'                          ///
+    if GeneralType == real(substr("`code'", 1, 1))
+        
+        
 
-  label define PrincipalType `code' "`var'", modify
+
+  label define PrincipalType `code' "`title'", modify
   label values PrincipalType PrincipalType
 }
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+tab PrincipalType YE_AR, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-
-
-
-
-
+/*
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-*61 Horticulture and permanent crops
-*  (there are none of these in IE)
+local title "Mixed cropping"
+local code  = 60 
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 quietly {
-  local var "HortAndPerm"
-  local code = 61
-  local vlist "" //clear vlist
-  local vlist "`vlist' SGMe_FruitPerm"
-  local vlist "`vlist' SGMe_Horticulture"
-  egen double SGMe_`var' = rowtotal(`vlist')
-  
   * Relevant threshold(s) 
-  replace Threshold = (1/3) * SGM_Farm
-  replace Threshold2= (2/3) * SGM_Farm
+  replace Threshold = (2/3) * SGM_Farm
   
   * Update farm type variable
-  replace PrincipalType = `code'     ///
-    if SGMe_FruitPerm    >  Threshold   & ///
-       SGMe_FruitPerm    <= Threshold2  & ///
-       SGMe_Horticulture >  Threshold   & ///
-       SGMe_Horticulture <= Threshold2
+  replace PrincipalType = `code'                          ///
+    if  missing(PrincipalType)             >  Threshold & ///
+        GeneralType == real(substr("`code'", 1, 1))
+        
 
-  label define PrincipalType `code' "`var'", modify
+
+  label define PrincipalType `code' "`title'", modify
   label values PrincipalType PrincipalType
 }
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
+tab PrincipalType YE_AR, missing
+* - - - - - - - - - - - - - - - - - - - - - - - - - -
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-
-
-
-
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-*62 Mixed cropping, other
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-quietly {
-  local var "MixedCropOther"
-  local code = 62
-  local vlist "" //clear vlist
-  local vlist "SGMe_FieldCrops"
-  local vlist "SGMe_Horticulture"
-  local vlist "SGMe_FruitPerm"
-  egen double SGMe_`var' = rowtotal(`vlist')
-  
-  
-  * Relevant thresholds are 1/3 and 2/3 of SGM_Farm
-  replace Threshold = (1/3) * SGM_Farm
-  replace Threshold2= (2/3) * SGM_Farm
-  
-  
-
-  *  --  --  --  --  --*
-  * Define conditions  *
-  *  --  --  --  --  --*
-  
-  *  --  --  --  --*
-  * For bipolars   *
-  *  --  --  --  --* 
-  * condition1 must be met, but only one of 2a and 2b need be true. 
-
-  * Pole 1 - Field crops are between 1/3 and 2/3 SGM
-  gen int cond_FieldCrops =        ///
-    missing(PrincipalType)        & ///
-    SGMe_FieldCrops   >  Threshold  & ///
-    SGMe_FieldCrops   <= Threshold2  
-  
-  * Pole 2 - Horticulture is between 1/3 and 2/3 SGM
-  gen int cond_Horticulture =      ///
-    missing(PrincipalType)        & ///
-    SGMe_Horticulture >  Threshold  & ///
-    SGMe_Horticulture <= Threshold2 
-  
-  * Pole 3 - Fruit and Permanent is between 1/3 and 2/3 SGM
-  gen int cond_FruitPerm =           ///
-    missing(PrincipalType)          & ///
-    SGMe_FruitPerm      >  Threshold  & ///
-    SGMe_FruitPerm      <= Threshold2 
-  
-  
-  *  --  --  --  --*
-  * For partially  * 
-  *  dominant      *
-  *  --  --  --  --*
-  * For "partially dominant" only one condition must be met, 
-  *  but then the other two poles must be < 1/3.
-  gen int cond_dom_FieldCrops =   ///
-    missing(PrincipalType)       & ///
-    cond_FieldCrops   == 1         & ///
-    SGMe_Horticulture < Threshold  & ///
-    SGMe_FruitPerm    < Threshold
-  
-  gen int cond_dom_Horticulture = ///
-    missing(PrincipalType)       & ///
-    SGMe_FieldCrops   < Threshold  & ///
-    cond_Horticulture == 1         & /// 
-    SGMe_FruitPerm    < Threshold
-  
-  gen int cond_dom_FruitPerm =    ///
-    missing(PrincipalType)       & ///
-    SGMe_FieldCrops   < Threshold  & ///
-    SGMe_Horticulture < Threshold  & ///
-    cond_FruitPerm    == 1 
-  
-  *  --  --  --  --  --*
-  * Conditions defined.*
-  *  --  --  --  --  --*
-  
-  
-
-  * Update farm type variable
-  * Bipolars first... 
-  replace PrincipalType = `code'         ///
-    if  cond_FieldCrops == 1                & ///
-       [cond_Horticulture == 1 | cond_FruitPerm == 1]
-  
-  * ...then partially dominant enterprises
-  replace PrincipalType = `code'         ///
-    if  cond_dom_FieldCrops                 | ///
-        cond_dom_Horticulture               | /// 
-        cond_dom_FruitPerm
-  
-  label define PrincipalType `code' "`var'", modify
-  label values PrincipalType PrincipalType
-}
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
-drop cond_*
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-
-
-
-
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-*71 Partially dominant grazing livestock
+local title ""
+local code  = 
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
 quietly {
-  local var "DominantGrazing"
-  local code = 71
-  local vlist "" //clear vlist
-  local vlist "`vlist' SGMe_Grazing"
-  egen double SGMe_`var' = rowtotal(`vlist')
-  
   * Relevant threshold(s) 
-  replace Threshold = (1/3) * SGM_Farm
-  replace Threshold2= (2/3) * SGM_Farm
- 
-  * Update farm type variable (drawing from remaining missings)
-  replace PrincipalType = `code' ///
-    if SGMe_`var' >  Threshold       & ///
-       SGMe_`var' <= Threshold2      & ///
-       SGMe_CattleMixed <= Threshold & ///
-       SGMe_CattleMixed <= Threshold & ///
-       missing(PrincipalType)
-
-  
-  label define PrincipalType `code' "`var'", modify
-  label values PrincipalType PrincipalType
-}
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-
-
-
-
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-*72 Mixed livestock, other
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-quietly {
-  local var "MixedLiveOther"
-  local code = 72
-  local vlist "" //clear vlist
-  local vlist "`vlist' SGMe_Grazing"
-  local vlist "`vlist' SGMe_PigsPoultryOther"
-  egen double SGMe_`var' = rowtotal(`vlist')
-  
-  * Relevant threshold(s) 
-  replace Threshold = (1/3) * SGM_Farm
-  replace Threshold2= (2/3) * SGM_Farm
+  replace Threshold = (2/3) * SGM_Farm
   
   * Update farm type variable
-  ** Bipolar first ...
-  replace PrincipalType = `code'         ///
-    if SGMe_Grazing          >  Threshold   & ///
-       SGMe_Grazing          <= Threshold2  & ///
-       SGMe_PigsPoultryOther >  Threshold   & ///
-       SGMe_PigsPoultryOther <= Threshold2  & ///
-       missing(PrincipalType)
-  
-  ** ... then partially dominant enterprises
-  replace PrincipalType = `code'         ///
-    if SGMe_PigsPoultryOther >  Threshold   & ///
-       SGMe_PigsPoultryOther <= Threshold2  & ///
-       SGMe_Grazing          <= Threshold   & ///
-       missing(PrincipalType)
-  
-  label define PrincipalType `code' "`var'", modify
+  replace PrincipalType = `code'                          ///
+    if  missing(PrincipalType)             >  Threshold & ///
+        GeneralType == real(substr("`code'", 1, 1))
+        
+
+
+  label define PrincipalType `code' "`title'", modify
   label values PrincipalType PrincipalType
 }
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-
-
-
-
+tab PrincipalType YE_AR, missing
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-*81 Field crops and grazing livestock
 * - - - - - - - - - - - - - - - - - - - - - - - - - -
-quietly {
-  local var "FieldAndGrazing"
-  local code = 81
-  local vlist "" //clear vlist
-  local vlist "`vlist' SGMe_FieldCrops"
-  local vlist "`vlist' SGMe_Grazing"
-  egen double SGMe_`var' = rowtotal(`vlist')
-  
-  
-  * Relevant threshold(s) 
-  replace Threshold = (1/3) * SGM_Farm
-  replace Threshold2= (2/3) * SGM_Farm
-  
-  * Update farm type variable
-  replace PrincipalType = `code'  ///
-    if SGMe_FieldCrops >  Threshold  & ///
-       SGMe_FieldCrops <= Threshold2 & ///
-       SGMe_Grazing    >  Threshold  & ///
-       SGMe_Grazing    <= Threshold2 
+*/
 
-       *TODO: Check with Brian that 81 can take from other types, if
-       *        not, then the replace above should end with
-       *SGMe_Grazing    <= Threshold2 & ///
-       *missing(PrincipalType)
-
-  label define PrincipalType `code' "`var'", modify
-  label values PrincipalType PrincipalType
-}
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-
-
-
-
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-*82 Crops --- livestock, other
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-quietly {
-  local var "CropLiveOther"
-  local code = 82
-  gen double SGMe_`var' = SGM_Farm
-  
-  * No relevant threshold(s) -- can drop them now
-  drop Threshol*
-
-  * Update farm type variable - catch-all group... must be last
-  replace PrincipalType = `code' ///
-    if missing(PrincipalType)
-  
-  label define PrincipalType `code' "`var'", modify
-  label values PrincipalType PrincipalType
-}
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
-tab PrincipalType year, missing
-* - - - - - - - - - - - - - - - - - - - - - - - - - -
+drop Threshol*
