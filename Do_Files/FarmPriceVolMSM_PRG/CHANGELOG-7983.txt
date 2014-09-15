@@ -1,0 +1,56 @@
+Cr_OP_INV_VAL_EU.do|79 col 3| * CHANGE-7983: rename Stata derived var (no sys. var to test against)
+Cr_bulkfeed_fed_livestock_eu_1.do|73 col 3| * CHANGE-7983: leave ALLOC_DEER_EU = 0 (no replace)
+Cr_bulkfeed_fed_livestock_eu_1.do|77 col 3| * CHANGE-7983: leave ALLOC_GOATS_EU = 0 (no replace)
+Cr_bulkfeed_fed_livestock_eu_1.do|85 col 3| * CHANGE-7983: don't create s_b_`var' for DEER & GOATS
+Cr_bulkfeed_fed_livestock_eu_1.do|95 col 3| * CHANGE-7983: no DEER & GOAT vars in drop
+Cr_bulkfeed_fed_livestock_eu_2.do|10 col 3| * CHANGE-7983: comment out s_bulkfeed_*_eu for deer & goats
+Cr_bulkyfeed_fedto_livestock_eu.do|14 col 3| * CHANGE-7983: comment out s_bulkfeed_*_eu for deer & goats
+Cr_car_electricity_telephone.do|7 col 3| * CHANGE-7983: keep - Swapped TOTAL with TOTAL_MISC_EXPENSES_EU 
+Cr_car_electricity_telephone.do|15 col 3| * CHANGE-7983: replace - Swapped TOTAL with TOTAL_MISC_EXPENSES_EU 
+Cr_d_conc_fed_cattle_eu.do|8 col 3| * CHANGE-7983: Hard coded filepath
+Cr_d_conc_fed_dairy_eu.do|9 col 3| * CHANGE-7983: Hard coded filepath
+Cr_d_milk_and_milk_subs_no.do|6 col 3| * CHANGE-7983: Hard coded filepath
+Cr_i_concentrates.do|32 col 3| * CHANGE-7983: rename Stata derived var (no sys. var to test against)
+Cr_i_concentrates.do|46 col 3| * CHANGE-7983: rename Stata derived var (no sys. var to test against)
+Cr_i_concentrates.do|60 col 3| * CHANGE-7983: rename Stata derived var (no sys. var to test against)
+Cr_i_concentrates.do|74 col 3| * CHANGE-7983: rename Stata derived var (no sys. var to test against)
+Cr_i_concentrates.do|88 col 3| * CHANGE-7983: rename Stata derived var (no sys. var to test against)
+Cr_merged_crop_tables_2.do|16 col 3| * CHANGE-7983: rename Stata derived var (no sys. var to test against)
+Cr_merged_crop_tables_2.do|33 col 3| * CHANGE-7983: rename Stata derived var (no sys. var to test against)
+Cr_merged_crop_tables_2.do|47 col 3| * CHANGE-7983: rename Stata derived var (no sys. var to test against)
+Cr_merged_crop_tables_2.do|61 col 3| * CHANGE-7983: rename Stata derived var (no sys. var to test against)
+Cr_merged_crop_tables_2.do|75 col 3| * CHANGE-7983: rename Stata derived var (no sys. var to test against)
+Cr_merged_crop_tables_2.do|89 col 3| * CHANGE-7983: rename Stata derived var (no sys. var to test against)
+Cr_merged_crop_tables_2.do|232 col 3| * CHANGE-7983: rename Stata derived var (no sys. var to test against)
+Cr_svy_cattle_0.do|7 col 3| * CHANGE-7983: create 0 variables
+Cr_svy_dairy_produce_1.do|5 col 3| * CHANGE-7983: create 0 variables
+Cr_svy_dairy_produce_1.do|33 col 3| * CHANGE-7983: leave d_milk_fed_to_livestock_eu = 0 (no vars)
+Cr_svy_livestock_expenses_1.do|4 col 3| * CHANGE-7983: create 0 variables
+Cr_svy_pigs_1.do|7 col 3| * CHANGE-7983: + CULL_SOWS_BOARS_SALES_EU removed from formula
+Cr_svy_pigs_1.do|17 col 3| * CHANGE-7983: Corrected formula for Pigs (received from B. Moran)
+Cr_svy_poultry_1.do|5 col 3| * CHANGE-7983: don't have D_SALES_LIVESTOCK_PROD_EGGS_EU (no rename)
+Cr_svy_sheep_0.do|13 col 3| * CHANGE-7983: no D_SLS_SHEP_ONLY_INCL_HSE_CONS_EU (no rename)
+PS_Milk - Copy.do|109 col 3| * CHANGE-7983: added capture to following two tabstats
+PS_Milk.do|104 col 3| * CHANGE-7983: added capture to following two tabstats
+PS_Milk.do|114 col 3| * CHANGE-7983: added capture to following two tabstats
+PS_Milk.do|124 col 3| * CHANGE-7983: added capture to following two tabstats
+PS_Milk.do|133 col 3| * CHANGE-7983: added capture to following two tabstats
+PS_Milk.do|150 col 3| * CHANGE-7983: added capture to following two tabstats
+PS_Milk.do|161 col 3| * CHANGE-7983: added capture to following two tabstats
+PS_Milk.do|172 col 3| * CHANGE-7983: added capture to following two tabstats
+PS_PriceOnly - Copy.do|86 col 11| * CHANGE-7983: added capture to following two tabstats
+PS_PriceOnly.do|92 col 11| * CHANGE-7983: added capture to following two tabstats
+PS_PriceOnly.do|113 col 3| * CHANGE-7983: added capture to following two tabstats
+PS_PriceOnly.do|158 col 3| * CHANGE-7983: added capture to following two tabstats
+PriceSimulation.do|376 col 3| * CHANGE-7983: don't replace s_b_ALLOC_*_test2 for DEER & GOATS
+PriceSimulation.do|380 col 3| * CHANGE-7983: remove s_b_ALLOC_DEER_EU s_b_ALLOC_GOATS_EU from keep
+mainPRG.do|475 col 3| * CHANGE-7983: removed from svy_deer_1 vlist3a 
+mainPRG.do|480 col 3| * CHANGE-7983: svy_subsidies_grants_1 removed from vlist6 (don't have it)
+mainPRG.do|604 col 3| * CHANGE-7983: svy_horses_other_1_md was OrigData now OutData 
+mainPRG.do|719 col 3| * CHANGE-7983: removed s_b_ALLOC_DEER s_b_ALLOC_GOATS from prvlist4
+mainPRG.do|915 col 3| * CHANGE-7983: removed d_deer_livestock_units from keep and gen
+mainPRG.do|1975 col 3| * CHANGE-7983: don't merge fed_deer_tonnes or fed_goat_tonnes
+mainPRG.do|1983 col 3| * CHANGE-7983: leave d_deer_winter_forage = 0
+mainPRG.do|1987 col 3| * CHANGE-7983: leave d_goats_winter_forage = 0
+mainPRG.do|2317 col 3| * CHANGE-7983: don't use svy_deer, just set d_other_ GO to 0 and leave it
+mainPRG.do|2325 col 3| * CHANGE-7983: keep only d_other_gross_output_eu and identifiers in d_other_gross_output_eu.dta   
