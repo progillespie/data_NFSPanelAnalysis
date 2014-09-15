@@ -2,7 +2,7 @@
 *   and QUANTITY_ALLOCATED_50KGBAGS instead of 4 separate vars each
 
 
-
+capture drop CROP_CODE
 
 * Each row is currently a particular mix of fertilizer. Create a var
 * numbering each mix (it's not a code, just a sequential numbering, so

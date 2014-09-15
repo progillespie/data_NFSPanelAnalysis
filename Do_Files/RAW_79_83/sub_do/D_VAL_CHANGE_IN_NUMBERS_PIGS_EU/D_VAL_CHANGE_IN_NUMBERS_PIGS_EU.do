@@ -1,8 +1,24 @@
 * Create whatever derived variables are needed for this variable and 
 *  calculate the variable itself.
 
+STOP!!! THIS FORMULA IS WRONG!!! USES SHEEP INSTEAD OF PIGS. 
+GOT CORRECTED FORMULA FROM BRIAN MORAN
 
-local startdir: pwd // Save current working directory location
+(
+ ((sows_in_pig_clos_inv_no    - sows_in_pig_op_inv_no)    * sows_in_pig_clos_inv_perhead_eu)    + ///
+ ((gilts_in_pig_clos_inv_no   - gilts_in_pig_op_inv_no)   * gilts_in_pig_clos_inv_perhead_eu)   + ///
+ ((sows_suckling_clos_inv_no  - sows_suckling_op_inv_no)  * sows_suckling_clos_inv_perhead_eu)  + ///
+ ((bonhams_clos_inv_no        - bonhams_op_inv_no)        * bonhams_clos_inv_perhead_eu)        + ///
+ ((weaners_clos_inv_no        - weaners_op_inv_no)        * weaners_clos_inv_perhead_eu)        + ///
+ ((fatteners1_clos_inv_no     - fatteners1_op_inv_no)     * fatteners1_clos_inv_perhead_eu)     + ///
+ ((fatteners2_clos_inv_no     - fatteners2_op_inv_no)     * fatteners2_clos_inv_perhead_eu)     + ///
+ ((fatteners3_clos_inv_no     - fatteners3_op_inv_no)     * fatteners3_clos_inv_perhead_eu)     + ///
+ ((fattening_sows_clos_inv_no - fattening_sows_op_inv_no) * fattening_sows_clos_inv_perhead_eu) + ///
+ ((stock_boars_clos_inv_no    - stock_boars_op_inv_no)    * stock_boars_clos_inv_perhead_eu)
+)
+
+
+Local startdir: pwd // Save current working directory location
 
 
 * Move into the root of the variable's directory
