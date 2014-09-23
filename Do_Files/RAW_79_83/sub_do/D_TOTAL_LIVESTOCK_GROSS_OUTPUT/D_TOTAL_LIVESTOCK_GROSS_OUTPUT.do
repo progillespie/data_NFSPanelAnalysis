@@ -67,6 +67,7 @@ capture drop `this_file_calculates'
 gen  `this_file_calculates' =        ///
  D_DAIRY_GROSS_OUTPUT_EU          +  ///
  D_GROSS_OUTPUT_CATTLE_EU         +  ///
+ D_GROSS_OUTPUT_SHEEP_AND_WOOL_EU +  ///
  D_GROSS_OUTPUT_PIGS_EU           +  ///
  D_POULTRY_GROSS_OUTPUT_EU        +  ///
  D_GROSS_OUTPUT_HORSES_EU         +  ///
@@ -88,6 +89,15 @@ global required_vars: list uniq global(required_vars)
 
 log using `this_file_calculates'.log, text replace
 
+tabstat `this_file_calculates'      ///
+ D_DAIRY_GROSS_OUTPUT_EU            ///
+ D_GROSS_OUTPUT_CATTLE_EU           ///
+ D_GROSS_OUTPUT_SHEEP_AND_WOOL_EU   ///
+ D_GROSS_OUTPUT_PIGS_EU             ///
+ D_POULTRY_GROSS_OUTPUT_EU          ///
+ D_GROSS_OUTPUT_HORSES_EU           ///
+ D_OTHER_GROSS_OUTPUT_EU            ///
+, by(year)
 
 
 

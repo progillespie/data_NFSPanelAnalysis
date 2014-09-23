@@ -89,6 +89,11 @@ global required_vars: list uniq global(required_vars)
 log using `this_file_calculates'.log, text replace
 
 
+tabstat `this_file_calculates'          ///
+ CATTLE_TOTAL_SALES_EU                  ///
+ CATTLE_USED_IN_HOUSE_EU                ///
+ CATTLE_RCPT_BULL_SERVICES_EU           ///
+, by(year)
 
 
 

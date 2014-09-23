@@ -101,6 +101,15 @@ global required_vars: list uniq global(required_vars)
 
 log using `this_file_calculates'.log, text replace
 
+tabstat `this_file_calculates'        ///
+ DY_COWS_SH_BULLS_SALES_BREED_EU      ///
+ DY_COWS_SH_BULLS_SALES_CULL_EU       ///
+ DY_COWS_SH_BULLS_TRANSFER_OUT_EU     ///
+ DY_COWS_SH_BULLS_PURCHASES_EU        ///
+ DY_COWS_SH_BULLS_TRANSFER_IN_EU      ///
+ D_DAIRY_HERD_VALUE_CHANGE_EU         ///
+, by(year)
+
 
 
 

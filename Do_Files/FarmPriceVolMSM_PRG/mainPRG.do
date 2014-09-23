@@ -2419,7 +2419,7 @@ drop _merge
 keep FARM_CODE YE_AR d_dairy_gross_output_eu d_gross_output_cattle_eu d_gross_output_sheep_and_wool_eu d_gross_output_pigs_eu d_poultry_gross_output_eu d_gross_output_horses_eu d_other_gross_output_eu
 mvencode *, mv(0) override
 gen d_total_livestock_gross_output = 0
-replace d_total_livestock_gross_output = d_dairy_gross_output_eu + d_gross_output_cattle_eu + d_gross_output_sheep_and_wool_eu + d_gross_output_pigs_eu + d_poultry_gross_output_eu + d_gross_output_horses_eu + d_other_gross_output_eu
+eplace d_total_livestock_gross_output = d_dairy_gross_output_eu + d_gross_output_cattle_eu + d_gross_output_sheep_and_wool_eu + d_gross_output_pigs_eu + d_poultry_gross_output_eu + d_gross_output_horses_eu + d_other_gross_output_eu
 sort FARM_CODE YE_AR
 save "`OutData'\d_total_livestock_gross_output.dta", replace
  

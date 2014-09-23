@@ -174,7 +174,6 @@ while `j' > 0 {
   *save `outdata'/svy_tables_7983/`table', replace
   save `outdata'/svy_tables_7983/`table'`YYYY'_`i', replace
 
-  *if "`table'" == "svy_power_machinery_totals" STOP!!!
 
   restore
 

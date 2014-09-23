@@ -54,9 +54,28 @@ qui blank
 
 
 capture mkdir `outdata'/svy_tables_7983
+
+* Erase any .dta in the destination directory (because this file will
+*   recreate them. We check that delfiles was actually created first
+*   (in case the directory is already empty)
+local delfiles: dir "`outdata'/svy_tables_7983/" files "*.dta"
+capture macro list _delfiles
+
+if _rc == 0 {
+
+  foreach file of local delfiles {
+
+    erase `outdata'/svy_tables_7983/`file'
+
+  }
+
+}
+
+
+* Now save our blank data tables.
 foreach table of local svy_tables {
 
-  save `outdata'/svy_tables_7983/`table', replace
+  qui save `outdata'/svy_tables_7983/`table', replace
 
 }
 
@@ -266,7 +285,7 @@ foreach table of local svy_tables {
   * Get a list of files in this folder which begin with the name
   *   of the table and have the year and sheet number on the end
   local files: dir "." files "`table'????.dta"
-  *local files: dir "." files "`table'????_*.dta"
+  
   foreach filename of local files {
 
     macro list _filename
@@ -274,7 +293,7 @@ foreach table of local svy_tables {
     else append using `filename' 
 
 
-    *erase `filename'
+    erase `filename'
 
   }
   

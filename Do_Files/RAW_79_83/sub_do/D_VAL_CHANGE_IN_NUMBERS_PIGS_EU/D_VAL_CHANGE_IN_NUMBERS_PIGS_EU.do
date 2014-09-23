@@ -1,24 +1,10 @@
 * Create whatever derived variables are needed for this variable and 
 *  calculate the variable itself.
 
-STOP!!! THIS FORMULA IS WRONG!!! USES SHEEP INSTEAD OF PIGS. 
-GOT CORRECTED FORMULA FROM BRIAN MORAN
-
-(
- ((sows_in_pig_clos_inv_no    - sows_in_pig_op_inv_no)    * sows_in_pig_clos_inv_perhead_eu)    + ///
- ((gilts_in_pig_clos_inv_no   - gilts_in_pig_op_inv_no)   * gilts_in_pig_clos_inv_perhead_eu)   + ///
- ((sows_suckling_clos_inv_no  - sows_suckling_op_inv_no)  * sows_suckling_clos_inv_perhead_eu)  + ///
- ((bonhams_clos_inv_no        - bonhams_op_inv_no)        * bonhams_clos_inv_perhead_eu)        + ///
- ((weaners_clos_inv_no        - weaners_op_inv_no)        * weaners_clos_inv_perhead_eu)        + ///
- ((fatteners1_clos_inv_no     - fatteners1_op_inv_no)     * fatteners1_clos_inv_perhead_eu)     + ///
- ((fatteners2_clos_inv_no     - fatteners2_op_inv_no)     * fatteners2_clos_inv_perhead_eu)     + ///
- ((fatteners3_clos_inv_no     - fatteners3_op_inv_no)     * fatteners3_clos_inv_perhead_eu)     + ///
- ((fattening_sows_clos_inv_no - fattening_sows_op_inv_no) * fattening_sows_clos_inv_perhead_eu) + ///
- ((stock_boars_clos_inv_no    - stock_boars_op_inv_no)    * stock_boars_clos_inv_perhead_eu)
-)
 
 
-Local startdir: pwd // Save current working directory location
+
+local startdir: pwd // Save current working directory location
 
 
 * Move into the root of the variable's directory
@@ -74,45 +60,43 @@ foreach var of local nonexist_vlist {
 }
 
 
+* NOTE: Some of the PERHEAD vars have PERHEAD removed to make the 
+*        varname < 32 characters long (Stata limit)
 
 capture drop `this_file_calculates'
 gen  `this_file_calculates' =    ///
-( ///
-  (                                     ///
-    (EWES_CLOS_INV_NO - EWES_OP_INV_NO ) * ///
-     EWES_CLOS_INV_EU                      ///
-  )                                     ///
-                   +                    ///
-                                        ///
-  (                                     ///
-    (LAMBS_PRE_WEANING_CLOS_INV_NO - LAMBS_PRE_WEANING_OP_INV_NO)  * ///
-     LAMBS_PRE_WEANING_CLOS_INV_EU                                   ///
-  )                                     ///
-                   +                    ///
-                                        ///
-  (                                     ///
-    (LAMBS_LT1YR_CLOS_INV_NO - LAMBS_LT1YR_OP_INV_NO) * ///
-     LAMBS_LT1YR_CLOS_INV_EU                            ///
-  )                                     ///
-                   +                    ///
-                                        ///
-  (                                     ///
-    (SHEEP_1_2YRS_CLOS_INV_NO - SHEEP_1_2YRS_OP_INV_NO) * ///
-     SHEEP_1_2YRS_CLOS_INV_EU                             ///
-  )                                     ///
-                   +                    ///
-                                        ///
-  ( ///
-    (SHEEP_GT2YRS_CLOS_INV_NO - SHEEP_GT2YRS_OP_INV_NO)  * ///
-    SHEEP_GT2YRS_CLOS_INV_EU                               ///
-  )                                     ///
-                   +                    ///
-                                        ///
-  (                                     ///
-  (RAMS_CLOS_INV_NO - RAMS_OP_INV_NO) *    ///
-  RAMS_CLOS_INV_EU                         ///
-  )                                     ///
-)
+(                                                           ///
+ ((SOWS_IN_PIG_CLOS_INV_NO    - SOWS_IN_PIG_OP_INV_NO)    * ///
+     SOWS_IN_PIG_CLOS_INV_PERHEAD_EU)                       ///
+                             +                              ///
+ ((GILTS_IN_PIG_CLOS_INV_NO   - GILTS_IN_PIG_OP_INV_NO)   * ///
+     GILTS_IN_PIG_CLOS_INV_PERHEAD_EU)                      ///
+                             +                              ///
+ ((SOWS_SUCKLING_CLOS_INV_NO  - SOWS_SUCKLING_OP_INV_NO)  * ///
+     SOWS_SUCKLING_CLOS_INV_EU)                             ///
+                             +                              ///
+ ((BONHAMS_CLOS_INV_NO        - BONHAMS_OP_INV_NO)        * ///
+     BONHAMS_CLOS_INV_PERHEAD_EU)                           ///
+                             +                              ///
+ ((WEANERS_CLOS_INV_NO        - WEANERS_OP_INV_NO)        * ///
+     WEANERS_CLOS_INV_PERHEAD_EU)                           ///
+                             +                              ///
+ ((FATTENERS1_CLOS_INV_NO     - FATTENERS1_OP_INV_NO)     * ///
+     FATTENERS1_CLOS_INV_PERHEAD_EU)                        ///
+                             +                              ///
+ ((FATTENERS2_CLOS_INV_NO     - FATTENERS2_OP_INV_NO)     * ///
+     FATTENERS2_CLOS_INV_PERHEAD_EU)                        ///
+                             +                              ///
+ ((FATTENERS3_CLOS_INV_NO     - FATTENERS3_OP_INV_NO)     * /// 
+     FATTENERS3_CLOS_INV_PERHEAD_EU)                        ///
+                             +                              ///
+ ((FATTENING_SOWS_CLOS_INV_NO - FATTENING_SOWS_OP_INV_NO) * ///
+     FATTENING_SOWS_CLOS_INV_EU)                            ///
+                             +                              ///
+ ((STOCK_BOARS_CLOS_INV_NO    - STOCK_BOARS_OP_INV_NO)    * ///
+     STOCK_BOARS_CLOS_INV_PERHEAD_EU)                       ///
+)                                            // end of equation
+
 
 
 
@@ -122,24 +106,7 @@ replace `this_file_calculates' = 0 ///
 
 
 * Add required variables to global list of required vars
-global required_vars "$required_vars EWES_CLOS_INV_NO"
-global required_vars "$required_vars EWES_OP_INV_NO"
-global required_vars "$required_vars EWES_CLOS_INV_EU"
-global required_vars "$required_vars LAMBS_PRE_WEANING_CLOS_INV_NO"
-global required_vars "$required_vars LAMBS_PRE_WEANING_OP_INV_NO"
-global required_vars "$required_vars LAMBS_PRE_WEANING_CLOS_INV_EU"
-global required_vars "$required_vars LAMBS_LT1YR_CLOS_INV_NO"
-global required_vars "$required_vars LAMBS_LT1YR_OP_INV_NO"
-global required_vars "$required_vars LAMBS_LT1YR_CLOS_INV_EU"
-global required_vars "$required_vars SHEEP_1_2YRS_CLOS_INV_NO"
-global required_vars "$required_vars SHEEP_1_2YRS_OP_INV_NO"
-global required_vars "$required_vars SHEEP_1_2YRS_CLOS_INV_EU"
-global required_vars "$required_vars SHEEP_GT2YRS_CLOS_INV_NO"
-global required_vars "$required_vars SHEEP_GT2YRS_OP_INV_NO"
-global required_vars "$required_vars SHEEP_GT2YRS_CLOS_INV_EU"
-global required_vars "$required_vars RAMS_CLOS_INV_NO"
-global required_vars "$required_vars RAMS_OP_INV_NO"
-global required_vars "$required_vars RAMS_CLOS_INV_EU"
+global required_vars "$required_vars "
 
 
 
