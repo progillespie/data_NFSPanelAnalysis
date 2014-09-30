@@ -1,11 +1,16 @@
 capture log close
 
-use "D:/Data/data_NFSPanelAnalysis/OrigData/nfs_all/dataallyears_out1.dta", clear
-replace year = YE_AR
+
+use ../../../OrigData/FarmPriceVolMSM/svy_farm, clear
+merge 1:1 FARM_CODE YE_AR using ../../../OutData/FarmPriceVolMSM/d_dairy_gross_output.dta
+
+*use "D:/Data/data_NFSPanelAnalysis/OrigData/nfs_all/dataallyears_out1.dta", clear
+capture gen int year = . 
+capture replace year = YE_AR
 *--------------------------------------------------------------------
 * Directories
 *--------------------------------------------------------------------
-local weight_dodir  "./_createWeights"
+local weight_dodir  "_createWeights"
 local estat_outdatadir "D:/Data/data_EUROSTAT/OutData/RAW_79_83"
 local outdatadir "D:/Data/data_NFSPanelAnalysis/OutData/MakeWeights"
 *--------------------------------------------------------------------
@@ -229,6 +234,11 @@ view `outdatadir'/Logs/sgm_5to7.txt
    comparison with published results. This will be carried out 
    elsewhere.
 */ 
+
+capture gen int FARM_SYSTEM_HISTORIC = .
+capture replace FARM_SYSTEM_HISTORIC = FARM_SYSTEM
+do Cr_d_sample_cell.do
+
 
 capture mkdir `outdatadir'/Logs
 capture erase `outdatadir'/Logs/sgm_8_assignWeights.txt
