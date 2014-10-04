@@ -497,12 +497,14 @@ save `OrigData'\svy_other_machinery_totals.dta, replace
 
 * ------------------------------------------------------------------- 
 
+*CHANGE-7983: Added investment variables as vlist7a, & _in, _ind, _m, _md, _s macros
 
 * Next set of imputations after Price Simulation2
 local vlist4 = "svy_livestock_expenses_1" 
 local vlist5 = "svy_dairy_produce_1"
 local vlist6 = "svy_pigs_1 svy_poultry_1 svy_subsidies_grants_1 " 
 local vlist7 = "car_electricity_telephone paid_labour hired_labour_casual_excl interest_payments machinery_op_expenses depreciation_of_machinery depreciation_of_buildings depreciation_of_land_imps misc_overhead_costs power_machinery_totals"
+local vlist7a = "investment_in_machinery investment_in_buildings investment_in_land_imps"
 
 * Input file for relevant Output File
 local hay_sil_fed_unit_cost_in       = "merged_crop_tables_3"
@@ -538,6 +540,9 @@ local machinery_op_expenses_in       = "svy_misc_receipts_expenses"
 local depreciation_of_machinery_in   = "svy_asset"
 local depreciation_of_buildings_in   = "svy_asset"
 local depreciation_of_land_imps_in   = "svy_asset"
+local investment_in_machinery_in     = "svy_asset"
+local investment_in_buildings_in     = "svy_asset"
+local investment_in_land_imps_in     = "svy_asset"
 local misc_overhead_costs_in         = "svy_fertilizer_lime_other"
 local power_machinery_totals_in      = "svy_other_machinery_totals"
 
@@ -575,6 +580,9 @@ local machinery_op_expenses_ind       = "OrigData"
 local depreciation_of_machinery_ind   = "OrigData"
 local depreciation_of_buildings_ind   = "OrigData"
 local depreciation_of_land_imps_ind   = "OrigData"
+local investment_in_machinery_ind     = "OrigData" 
+local investment_in_buildings_ind     = "OrigData"
+local investment_in_land_imps_ind     = "OrigData"
 local misc_overhead_costs_ind         = "OrigData"
 local power_machinery_totals_ind      = "OrigData"
 
@@ -612,6 +620,9 @@ local machinery_op_expenses_m       = ""
 local depreciation_of_machinery_m   = ""
 local depreciation_of_buildings_m   = ""
 local depreciation_of_land_imps_m   = ""
+local investment_in_machinery_m     = ""
+local investment_in_buildings_m     = ""
+local investment_in_land_imps_m     = ""
 local misc_overhead_costs_m         = "svy_misc_receipts_expenses"
 local power_machinery_totals_m      = ""
 
@@ -649,6 +660,9 @@ local machinery_op_expenses_md       = ""
 local depreciation_of_machinery_md   = ""
 local depreciation_of_buildings_md   = ""
 local depreciation_of_land_imps_md   = ""
+local investment_in_machinery_md     = ""
+local investment_in_buildings_md     = ""
+local investment_in_land_imps_md     = ""
 local misc_overhead_costs_md         = "OrigData"
 local power_machinery_totals_md      = ""
 
@@ -686,6 +700,9 @@ local machinery_op_expenses_s       = "FARM_CODE YE_AR"
 local depreciation_of_machinery_s   = "FARM_CODE YE_AR"
 local depreciation_of_buildings_s   = "FARM_CODE YE_AR"
 local depreciation_of_land_imps_s   = "FARM_CODE YE_AR"
+local investment_in_machinery_s     = "FARM_CODE YE_AR"
+local investment_in_buildings_s     = "FARM_CODE YE_AR"
+local investment_in_land_imps_s     = "FARM_CODE YE_AR"
 local misc_overhead_costs_s         = "FARM_CODE YE_AR"
 local power_machinery_totals_s      = "FARM_CODE YE_AR"
 
@@ -1214,7 +1231,8 @@ while `i' <= 10 {
 * Next Set of Simulations
 *************************************
 
-foreach var in `vlist6' `vlist7' {
+* CHANGE-7983: Added vlist7a for deriving investment vars
+foreach var in `vlist6' `vlist7' `vlist7a'{
 
 	*Directory
 	di "1"
@@ -2795,6 +2813,65 @@ if  sc_runanalysis == 1 {
 	rename var224 D_DY_VAL_DROPD_CLVS_SLD_TRANS_EU
 	tabstat D_TOTAL_MILK_PRODUCTION_EU D_DY_VAL_DROPD_CLVS_SLD_TRANS_EU D_DAIRY_HERD_REPLACE_COST_EU DAIRY_COWS_SH_BULLS_SUBSIDIES_EU SLAUGHTER_PREMIUM_DAIRY_PAYMENT_ DAIRY_EFF_PROG_TOTAL_PAYMENT_EU DAIRY_COMP_FUND_TOTAL_PAYMENT_EU, by(YE_AR)
 	
+/*
+	******************************************************
+	* Investment in livestock
+	******************************************************
+        clear
+
+        local svy_tables "`svy_tables' cattle"
+        local svy_tables "`svy_tables' sheep"
+        local svy_tables "`svy_tables' pigs"
+        local svy_tables "`svy_tables' poultry"
+        *local svy_tables "`svy_tables' horses" // off for 79-83
+
+        foreach table of local svy_tables {
+
+          qui count
+          if `r(N)' == 0  use "`OrigData'\svy_`table'.dta", clear
+	  else merge 1:1 FARM_CODE YE_AR using ///
+                 `OrigData'/svy_`table', nogen    
+
+        }
+
+        gen double d_investment_in_livestock = 0
+        replace d_investment_in_livestock =  ///
+          (D_OP_INV_DAIRY_HERD_EU             + /// 
+           D_CLOS_INV_DAIRY_HERD_EU           + /// 
+           D_OPENING_INVENTORY_CATTLE_HERD_EU + /// 
+           D_CLOSING_INVENTORY_CATTLE_HERD_EU + /// 
+           D_OPENING_INVENTORY_SHEEP_FLOCK_EU + /// 
+           D_CLOSING_INVENTORY_SHEEP_FLOCK_EU + /// 
+           D_OPENING_INVENTORY_PIGS_EU        + /// 
+           D_CLOSING_INVENTORY_PIGS_EU        + /// 
+           D_OPENING_INVENTORY_POULTRY_EU     + /// 
+           D_CLOSING_INVENTORY_POULTRY_EU     + /// 
+           D_OPENING_INVENTORY_HORSES_EU      + /// 
+           D_CLOSING_INVENTORY_HORSES_EU      + /// 
+           D_DEER_OP_INV_EU                   + /// 
+           D_DEER_CLOS_INV_EU) / 2
+
+
+        tabstat                             /// 
+           d_investment_in_livestock           ///
+           d_op_inv_dairy_herd_eu              /// 
+           d_clos_inv_dairy_herd_eu            /// 
+           d_opening_inventory_cattle_herd_eu  /// 
+           d_closing_inventory_cattle_herd_eu  /// 
+           d_opening_inventory_sheep_flock_eu  /// 
+           d_closing_inventory_sheep_flock_eu  /// 
+           d_opening_inventory_pigs_eu         /// 
+           d_closing_inventory_pigs_eu         /// 
+           d_opening_inventory_poultry_eu      /// 
+           d_closing_inventory_poultry_eu      /// 
+           d_opening_inventory_horses_eu       /// 
+           d_closing_inventory_horses_eu       /// 
+           d_deer_op_inv_eu                    /// 
+           d_deer_clos_inv_eu 
+
+*/
+
+
 	log close
 }
 

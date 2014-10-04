@@ -1,3 +1,8 @@
+/*-----------TURNED OFF---------------------------------------------
+*TODO: the temoporarily off lines
+*TODO: the TEMPORARY FIXES -- off until var fixed
+
+
 * Set directory macros
 local startdir: pwd // save current location
 
@@ -11,8 +16,6 @@ local sub_do ///
    "D:\Data\data_NFSPanelAnalysis\Do_Files\RAW_79_83\sub_do"
 
 
-/*-----------TURNED OFF---------------------------------------------
------------BACK ON ---------------------------------------------*/
 
 * Load data
 cd `outdatadir'
@@ -78,11 +81,14 @@ gen double MILK_QUOTA_TOTAL_CY_LT   = 0
 * = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
+-----------BACK ON ---------------------------------------------*/
 
 /* These are the best mappings I could come up with for these vars
      but they are NOT what's defined in the System Guide, hence
      I hardcode them here.                */
-rename LAND_VALUE_EST_BEG_OF_YEAR_EU  fainvfrm
+
+*rename LAND_VALUE_EST_BEG_OF_YEAR_EU  fainvfrm
+rename LAND_VALUE_EST_END_OF_YEAR_EU  fainvfrm
 rename LAND_RENTED_IN_EU              fortfmer
 
 
@@ -93,8 +99,9 @@ rename LAND_RENTED_IN_EU              fortfmer
 * ===================================================================
 *--------------------------------------------
 * fbelclbl 
+gen double fbelclbl = 0
 *--------------------------------------------
-capture gen double CLOSING_BALANCE_EU = 0
+/*capture gen double CLOSING_BALANCE_EU = 0
 replace CLOSING_BALANCE_EU =    ///
   E_CLOSING_BALANCE_EU           + ///
   N_CLOSING_BALANCE_EU             ///
@@ -104,17 +111,17 @@ replace CLOSING_BALANCE_EU =    ///
 capture drop fbelclbl
 gen double fbelclbl = 0
 replace fbelclbl = CLOSING_BALANCE_EU    ///
-                                      ///
   if N_LOAN_AMOUNT_BORROWED_EU ==0     & ///
      CLOSING_BALANCE_EU        > 0
+*/
 *--------------------------------------------
 
 *TODO sort out age variable. Worker code 1 most likely correct one
 *--------------------------------------------
 * ogagehld 
 *--------------------------------------------
-*rename FARM_MD_AGE              ogagehld 
-gen ogagehld = rnormal(55, 15) 
+rename FARM_MD_AGE              ogagehld 
+*gen ogagehld = rnormal(55, 15) 
 *--------------------------------------------
 
 
@@ -176,7 +183,9 @@ cd `dodir'
 
 * Obs with missing farmcodes are useless to us, and I think they were
 *  introduced in merging process anyway
-drop if missing(FC)
+rename FARM_CODE farmcode
+rename YE_AR     year 
+drop if missing(farmcode)
 
 save temporary_data.dta, replace
 describe,short
@@ -736,33 +745,34 @@ replace POthercap        = 105.3727273 if t==11
 /* Convert punts to Euro */
 local punt_to_euro = .787564
 local time_cond    "!missing(t)"
-local monetary_vlist "`monetary_vlist' fainvmch"
-local monetary_vlist "`monetary_vlist' fainvbld"
-local monetary_vlist "`monetary_vlist' fainvlim"
+local monetary_vlist "`monetary_vlist' fainvmch"  // ok  
+local monetary_vlist "`monetary_vlist' fainvbld" // ok 
+local monetary_vlist "`monetary_vlist' fainvlim" // TEMPORARY off
 *local monetary_vlist "`monetary_vlist' fvalflab" // TEMPORARILY off
-local monetary_vlist "`monetary_vlist' fdcaslab"
-local monetary_vlist "`monetary_vlist' fohirlab"
-local monetary_vlist "`monetary_vlist' fointpay"
-local monetary_vlist "`monetary_vlist' fomacopt"
-local monetary_vlist "`monetary_vlist' fobldmnt"
-local monetary_vlist "`monetary_vlist' foupkpld"
-local monetary_vlist "`monetary_vlist' foexlime"
-local monetary_vlist "`monetary_vlist' foannuit"
-local monetary_vlist "`monetary_vlist' forates"
-local monetary_vlist "`monetary_vlist' foinsure"
-local monetary_vlist "`monetary_vlist' fofuellu"
-local monetary_vlist "`monetary_vlist' foelecfs"
-local monetary_vlist "`monetary_vlist' fophonfs"
+local monetary_vlist "`monetary_vlist' fdcaslab" // ok 
+local monetary_vlist "`monetary_vlist' fohirlab" // ok 
+*local monetary_vlist "`monetary_vlist' fointpay"  // TEMPORARY off
+*local monetary_vlist "`monetary_vlist' fomacopt" // TEMPORARY off
+local monetary_vlist "`monetary_vlist' fobldmnt" // ok 
+local monetary_vlist "`monetary_vlist' foupkpld" // ok 
+*local monetary_vlist "`monetary_vlist' foexlime" // TEMPORARY off
+local monetary_vlist "`monetary_vlist' foannuit" // ok 
+local monetary_vlist "`monetary_vlist' forates"  // ok 
+*local monetary_vlist "`monetary_vlist' foinsure" // TEMPORARY off
+*local monetary_vlist "`monetary_vlist' fofuellu" // TEMPORARY off
+*local monetary_vlist "`monetary_vlist' foelecfs" // TEMPORARY off
+*local monetary_vlist "`monetary_vlist' fophonfs" // TEMPORARY off
 local monetary_vlist "`monetary_vlist' fortfmer" // Don't have, alt.
 local monetary_vlist "`monetary_vlist' fortnfer" // Don't have,set =0
-local monetary_vlist "`monetary_vlist' fomiscel"
-local monetary_vlist "`monetary_vlist' fdairygo"
-local monetary_vlist "`monetary_vlist' fcropsgo"
-local monetary_vlist "`monetary_vlist' fcplivgo"
-local monetary_vlist "`monetary_vlist' fgrtsubs"
-local monetary_vlist "`monetary_vlist' iaisfdy"
-local monetary_vlist "`monetary_vlist' iaisfcat"
-local monetary_vlist "`monetary_vlist' iaisfshp"
+local monetary_vlist "`monetary_vlist' fomiscel" // ok 
+local monetary_vlist "`monetary_vlist' fdairygo" // ok 
+local monetary_vlist "`monetary_vlist' fcropsgo" // ok 
+local monetary_vlist "`monetary_vlist' fcplivgo" // ok 
+local monetary_vlist "`monetary_vlist' fgrtsubs" // ok 
+local monetary_vlist "`monetary_vlist' iaisfdy"  // ok
+local monetary_vlist "`monetary_vlist' iaisfcat" // ok
+local monetary_vlist "`monetary_vlist' iaisfshp" // ok
+
 /*
 * Only six subs actually used! (those with comments)
 local monetary_vlist "`monetary_vlist' fbelclbl" // Set=0,can be calc
@@ -852,7 +862,7 @@ local monetary_vlist "`monetary_vlist' ddconval"
 local monetary_vlist "`monetary_vlist' ddpastur"
 local monetary_vlist "`monetary_vlist' ddwinfor"
 local monetary_vlist "`monetary_vlist' ddmiscdc"
-local monetary_vlist "`monetary_vlist' foadvfee"
+local monetary_vlist "`monetary_vlist' foadvfee" 
 */
 set trace on
 foreach var of local monetary_vlist {
@@ -862,9 +872,8 @@ foreach var of local monetary_vlist {
 set trace off
 
 
-/* Sample selection, drop all non dairy 
-       TEMPORARY FIX -- keep all until we establish farm types */
-drop if ffszsyst!=1
+* Sample selection, drop all non dairy 
+drop if FARM_SYSTEM!=1
 
 
 
@@ -895,7 +904,7 @@ gen L1 = (alloc  *     ///   TEMPORARY FIXES -- off until var fixed
               ) / CPI * 100        
 */
 *gen L2 = alloc * flabtotl   TEMPORARY FIXES -- off until var fixed
-gen L3 = alloc * flabsmds
+*gen L3 = alloc * flabsmds   TEMPORARY FIXES -- off until var fixed
 
 
 
@@ -926,10 +935,11 @@ gen Y2=(dotomkvl/PMilk)*100
 gen DC=  ///
   (ddconval       / PCattleFeed  *100) + ///
   (ddpastur       / PTotalFert   *100) + /// 
-  (ddwinfor       / PTotalFert   *100) + ///
-  (alloc*fomacopt / PTotalInputs *100) + ///
-  (alloc*foexlime / PTotalFert   *100) + ///
-  (alloc*fofuellu / PMotorFuels  *100)
+  (ddwinfor       / PTotalFert   *100) 
+  *(ddwinfor       / PTotalFert   *100) + ///
+  *(alloc*fomacopt / PTotalInputs *100) + ///
+  *(alloc*foexlime / PTotalFert   *100) + ///
+  *(alloc*fofuellu / PMotorFuels  *100)
 
 
 
@@ -989,9 +999,9 @@ replace SOIL3 = 0 if ffsolcod<500
 
 
 /* create AI dummy (equal to 1 if farm spends any amount) */
-replace iaisfdy = iaisfdy/PVetExp*100
+*replace iaisfdy = iaisfdy/PVetExp*100
 gen     AID = 0
-replace AID = 1 if iaisfdy>0
+*replace AID = 1 if iaisfdy>0 // Temporarily off 
 
 
 
@@ -1094,7 +1104,7 @@ rename farmcode FC
 rename oojobhld JOBTYPE
 rename ffsolcod SCLASS
 rename ogsexhld SEX
-rename iaisfdy  AI
+*rename iaisfdy  AI
 rename fsizunad FSIZE
 rename fainvfrm  FVALUE
 rename oanolt5y CHILD5
@@ -1105,8 +1115,8 @@ rename dqownqty QTOWN
 rename dqrentgl QTLEASE
 rename dqletgal QTLET
 rename dqcuryer QT
-rename dabotfat FAT
-rename daproten PROTEIN
+*rename dabotfat FAT //  D_BUTTER_FAT_MILK_KGS
+*rename daproten PROTEIN //  D_PROTEIN_MILK_KGS
 rename daforare LANDFAGE
 rename dafedare LANDFEED
 
@@ -1189,7 +1199,7 @@ count if PS==11
 * partial productivity indicators
 gen PH = Y2/H
 gen PD = Y2/DC
-gen PL = Y2/L3
+*gen PL = Y2/L3  // Temporarily off
 gen PA = Y2/LANDFAGE
 gen PC = Y2/C
 
@@ -1226,6 +1236,9 @@ gen MEDOFF = OFFFARM * MEDIUM
 gen LRGOFF = OFFFARM * LARGE
 
 
+     *AI       // Temporarily off
+     *FAT      // Temporarily off
+     *PROTEIN  // Temporarily off
 
 preserve
 * Subset of vars to go to NLogit
@@ -1233,7 +1246,6 @@ keep ///
      year     ///
      INTENSE  ///
      DECOUP   ///
-     AI       ///
      SYS      ///
      T        ///
      W        ///
@@ -1256,8 +1268,6 @@ keep ///
      QTLEASE  ///
      QTLET    ///
      QT       ///
-     FAT      ///
-     PROTEIN  ///
      LANDFAGE ///
      LANDFEED ///
      ALLOC-   ///

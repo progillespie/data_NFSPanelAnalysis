@@ -457,12 +457,14 @@ local vlist3a = "cattle_dairy_boarding_com svy_cattle_2 svy_deer_1 svy_grazing_1
 local vlist3b = "sum_grazing_total_dc_eu svy_grazing_2 wint_forg_fed_unit_cost bulkfeed_fed_livestock_eu_1 bulkfeed_fed_livestock_eu_2"
 
 
+*CHANGE-8412: Added investment variables as vlist7a, & _in, _ind, _m, _md, _s macros
 
 * Next set of imputations after Price Simulation2
 local vlist4 = "svy_livestock_expenses_1" 
 local vlist5 = "svy_dairy_produce_1"
 local vlist6 = "svy_subsidies_grants_1 svy_pigs_1 svy_poultry_1" 
 local vlist7 = "car_electricity_telephone paid_labour hired_labour_casual_excl interest_payments machinery_op_expenses depreciation_of_machinery depreciation_of_buildings depreciation_of_land_imps misc_overhead_costs power_machinery_totals"
+local vlist7a = "investment_in_machinery investment_in_buildings investment_in_land_imps"
 
 * Input file for relevant Output File
 local hay_sil_fed_unit_cost_in = "merged_crop_tables_3"
@@ -498,6 +500,9 @@ local machinery_op_expenses_in = "svy_misc_receipts_expenses"
 local depreciation_of_machinery_in = "svy_asset"
 local depreciation_of_buildings_in = "svy_asset"
 local depreciation_of_land_imps_in = "svy_asset"
+local investment_in_machinery_in     = "svy_asset"
+local investment_in_buildings_in     = "svy_asset"
+local investment_in_land_imps_in     = "svy_asset"
 local misc_overhead_costs_in = "svy_fertilizer_lime_other"
 local power_machinery_totals_in = "svy_other_machinery_totals"
 
@@ -535,6 +540,9 @@ local machinery_op_expenses_ind = "OrigData"
 local depreciation_of_machinery_ind = "OrigData"
 local depreciation_of_buildings_ind = "OrigData"
 local depreciation_of_land_imps_ind = "OrigData"
+local investment_in_machinery_ind     = "OrigData" 
+local investment_in_buildings_ind     = "OrigData"
+local investment_in_land_imps_ind     = "OrigData"
 local misc_overhead_costs_ind = "OrigData"
 local power_machinery_totals_ind = "OrigData"
 
@@ -572,6 +580,9 @@ local machinery_op_expenses_m = ""
 local depreciation_of_machinery_m = ""
 local depreciation_of_buildings_m = ""
 local depreciation_of_land_imps_m = ""
+local investment_in_machinery_m     = ""
+local investment_in_buildings_m     = ""
+local investment_in_land_imps_m     = ""
 local misc_overhead_costs_m = "svy_misc_receipts_expenses"
 local power_machinery_totals_m = ""
 
@@ -608,6 +619,9 @@ local machinery_op_expenses_md = ""
 local depreciation_of_machinery_md = ""
 local depreciation_of_buildings_md = ""
 local depreciation_of_land_imps_md = ""
+local investment_in_machinery_md     = ""
+local investment_in_buildings_md     = ""
+local investment_in_land_imps_md     = ""
 local misc_overhead_costs_md = "OrigData"
 local power_machinery_totals_md = ""
 
@@ -645,6 +659,9 @@ local machinery_op_expenses_s = "FARM_CODE YE_AR"
 local depreciation_of_machinery_s = "FARM_CODE YE_AR"
 local depreciation_of_buildings_s = "FARM_CODE YE_AR"
 local depreciation_of_land_imps_s = "FARM_CODE YE_AR"
+local investment_in_machinery_s     = "FARM_CODE YE_AR"
+local investment_in_buildings_s     = "FARM_CODE YE_AR"
+local investment_in_land_imps_s     = "FARM_CODE YE_AR"
 local misc_overhead_costs_s = "FARM_CODE YE_AR"
 local power_machinery_totals_s = "FARM_CODE YE_AR"
 
@@ -1172,7 +1189,7 @@ while `i' <= 10 {
 * Next Set of Simulations
 *************************************
 
-foreach var in `vlist6' `vlist7' {
+foreach var in `vlist6' `vlist7' `vlist7a' {
 
 	*Directory
 	di "1"
