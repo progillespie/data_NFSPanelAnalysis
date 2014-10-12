@@ -504,7 +504,7 @@ local vlist4 = "svy_livestock_expenses_1"
 local vlist5 = "svy_dairy_produce_1"
 local vlist6 = "svy_pigs_1 svy_poultry_1 svy_subsidies_grants_1 " 
 local vlist7 = "car_electricity_telephone paid_labour hired_labour_casual_excl interest_payments machinery_op_expenses depreciation_of_machinery depreciation_of_buildings depreciation_of_land_imps misc_overhead_costs power_machinery_totals"
-local vlist7a = "investment_in_machinery investment_in_buildings investment_in_land_imps"
+local vlist7a = "investment_in_machinery investment_in_buildings investment_in_land_imps unpaid_labour"
 
 * Input file for relevant Output File
 local hay_sil_fed_unit_cost_in       = "merged_crop_tables_3"
@@ -534,6 +534,7 @@ local svy_pigs_1_in                  = "svy_pigs"
 local svy_poultry_1_in               = "svy_poultry"
 local car_electricity_telephone_in   = "svy_misc_receipts_expenses"
 local paid_labour_in                 = "svy_paid_labour"
+local unpaid_labour_in               = "svy_unpaid_labour"
 local hired_labour_casual_excl_in    = "svy_farm"
 local interest_payments_in           = "svy_loans"
 local machinery_op_expenses_in       = "svy_misc_receipts_expenses"
@@ -574,6 +575,7 @@ local svy_pigs_1_ind                  = "OrigData"
 local svy_poultry_1_ind               = "OrigData"
 local car_electricity_telephone_ind   = "OrigData"
 local paid_labour_ind                 = "OrigData"
+local unpaid_labour_ind               = "OrigData"
 local hired_labour_casual_excl_ind    = "OrigData"
 local interest_payments_ind           = "OrigData"
 local machinery_op_expenses_ind       = "OrigData"
@@ -614,6 +616,7 @@ local svy_pigs_1_m                  = ""
 local svy_poultry_1_m               = ""
 local car_electricity_telephone_m   = "svy_car_expenses"
 local paid_labour_m                 = ""
+local unpaid_labour_m               = ""
 local hired_labour_casual_excl_m    = "paid_labour"
 local interest_payments_m           = ""
 local machinery_op_expenses_m       = ""
@@ -654,6 +657,7 @@ local svy_pigs_1_md                  = ""
 local svy_poultry_1_md               = ""
 local car_electricity_telephone_md   = "OrigData"
 local paid_labour_md                 = ""
+local unpaid_labour_md               = ""
 local hired_labour_casual_excl_md    = "OutData"
 local interest_payments_md           = ""
 local machinery_op_expenses_md       = ""
@@ -694,6 +698,7 @@ local svy_pigs_1_s                  = "FARM_CODE YE_AR"
 local svy_poultry_1_s               = "FARM_CODE YE_AR"
 local car_electricity_telephone_s   = "FARM_CODE YE_AR"
 local paid_labour_s                 = "FARM_CODE YE_AR"
+local unpaid_labour_s               = "FARM_CODE YE_AR"
 local hired_labour_casual_excl_s    = "FARM_CODE YE_AR"
 local interest_payments_s           = "FARM_CODE YE_AR"
 local machinery_op_expenses_s       = "FARM_CODE YE_AR"
@@ -2481,6 +2486,10 @@ replace d_farm_gross_output = d_total_livestock_gross_output + d_total_crops_gro
 replace d_farm_gross_output = d_total_livestock_gross_output + d_total_crops_gross_output_eu + HIRED_MACHINERY_IN_CASH_EU + HIRED_MACHINERY_IN_KIND_EU + OTHER_RECEIPTS_IN_CASH_EU + OTHER_RECEIPTS_IN_KIND_EU + SALE_OF_TURF_VALUE_EU + USED_IN_HOUSE_OTHER_EU + MISC_GRANTS_SUBSIDIES_EU + PROTEIN_PAYMENTS_TOTAL_EU + OTHER_SUBS_PAYMENTS_TOTAL_EU + LAND_LET_OUT_EU + MILK_QUOTA_LET_EU + super_levy_refund_cond + SINGLE_FARM_PAYMENT_NET_VALUE_EU - d_inter_enterpise_transfers_eu if YE_AR > 2009
 *** NOTE - THE REASON FOR THE ABOVE IS THAT PREVIOUS TO 2010 THE "SHEEP_WELFARE_SCHEME_TOTAL_EU" WAS INCLUCED IN THE "D_FARM_GROSS_OUTPUT" VARIABLE, AND FROM 2010 IT IS INCLUDED IN THE "D_GROSS_OUTPUT_SHEEP_AND_WOOL_EU" VARIABLE IN THE SHEEP TABLE
 sort FARM_CODE YE_AR
+
+drop if FARM_CODE == 0
+drop if missing(FARM_CODE)
+
 save "`OutDataO'\farm_gross_output.dta", replace
 
 
@@ -2813,7 +2822,7 @@ if  sc_runanalysis == 1 {
 	rename var224 D_DY_VAL_DROPD_CLVS_SLD_TRANS_EU
 	tabstat D_TOTAL_MILK_PRODUCTION_EU D_DY_VAL_DROPD_CLVS_SLD_TRANS_EU D_DAIRY_HERD_REPLACE_COST_EU DAIRY_COWS_SH_BULLS_SUBSIDIES_EU SLAUGHTER_PREMIUM_DAIRY_PAYMENT_ DAIRY_EFF_PROG_TOTAL_PAYMENT_EU DAIRY_COMP_FUND_TOTAL_PAYMENT_EU, by(YE_AR)
 	
-/*
+/* NOT WORKING YET
 	******************************************************
 	* Investment in livestock
 	******************************************************
@@ -2870,7 +2879,6 @@ if  sc_runanalysis == 1 {
            d_deer_clos_inv_eu 
 
 */
-
 
 	log close
 }

@@ -25,6 +25,6 @@ keep  FARM_CODE YE_AR m_pma_REPLACE_NET_VALUE m_oma_REPLACE_NET_VALUE
 
 mvencode *, mv(0) override
 
-gen d_investment_in_machinery_eu = 0
-replace d_investment_in_machinery_eu = m_pma_REPLACE_NET_VALUE + m_oma_REPLACE_NET_VALUE
+gen d_investment_in_machinery = 0
+replace d_investment_in_machinery = m_pma_REPLACE_NET_VALUE + m_oma_REPLACE_NET_VALUE
 

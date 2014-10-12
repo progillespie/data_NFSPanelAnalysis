@@ -189,7 +189,7 @@ foreach spreadsheet of local files {
       local YY   = substr("`shortfilename'", 4,2)
       local YYYY = 1900 + `YY' 
 
-      do sub_do/Sheet2Tables.do `i' `YYYY' `outdata' 
+      do sub_do/Sheet2Tables.do `i' `YYYY' "`outdata'"
 
 
       cd `origdata'
@@ -219,11 +219,14 @@ foreach spreadsheet of local files {
             local OtherSortVar "CROP_CODE"
 
 
+    if "`table'" == "svy_paid_labour"           | ///
+       "`table'" == "svy_unpaid_labour"           ///
+            local OtherSortVar "Row WORKER_CODE"
+
+
     if "`table'" == "svy_crop_fertilizer"       | ///
        "`table'" == "svy_purchased_bulkyfeed"   | ///
-       "`table'" == "svy_unpaid_labour"         | ///
        "`table'" == "svy_paid_casual_labour"    | ///
-       "`table'" == "svy_paid_labour"           | ///
        "`table'" == "svy_loans"                   ///
             local OtherSortVar "Row"
 
@@ -298,6 +301,11 @@ foreach table of local svy_tables {
   }
   
   capture drop Row
+  capture drop card
+
+  drop if FARM_CODE == 0
+  drop if missing(FARM_CODE)
+
   sort FARM_CODE YE_AR
   save `table'.dta, replace
 
@@ -315,7 +323,7 @@ foreach table of local svy_tables {
 use svy_crop_fertilizer, clear
 qui do `dodir'\sub_do\wide2long.do
 
-* John's 8 - 9 thousand range
+* John's is in the 8 - 9 thousand range
 tab YE_AR
 
 
@@ -331,6 +339,13 @@ tab YE_AR
 *  UPDATE: Changed YY to YYYY for 4 digit year, and added _`i' to
 *          because intermediate datasets need to be year AND sheet
 *          specific.
+capture drop Row
+capture drop card
+capture drop WORKER_CODE
+capture drop ASSET_CLASS
+
+drop if FARM_CODE == 0
+drop if missing(FARM_CODE)
 
 save svy_crop_fertilizer, replace
 *--------------------------------------------------------------------
@@ -363,6 +378,8 @@ gen exit_nfs  = YE_AR != `max_yr'
 
 keep FARM_CODE YE_AR enter_nfs exit_nfs
 
+drop if FARM_CODE == 0
+drop if missing(FARM_CODE)
 
 save enter_exit_nfs.dta, replace
 *--------------------------------------------------------------------
@@ -383,6 +400,15 @@ save enter_exit_nfs.dta, replace
 *   a copy of this as car expenses as well. 
 
 use svy_misc_receipts_expenses, clear
+
+capture drop Row
+capture drop card
+capture drop CROP_CODE
+capture drop WORKER_CODE
+capture drop ASSET_CLASS
+
+drop if FARM_CODE == 0
+drop if missing(FARM_CODE)
 
 save svy_car_expenses, replace 
 *--------------------------------------------------------------------
@@ -407,6 +433,14 @@ replace ASSET_CLASS = "PMA" if ASSET_CLASS == "63"
 replace ASSET_CLASS = "OMA" if ASSET_CLASS == "64"
 replace ASSET_CLASS = "BLD" if ASSET_CLASS == "65"
 replace ASSET_CLASS = "LAN" if ASSET_CLASS == "66"
+
+capture drop Row
+capture drop card
+capture drop CROP_CODE
+capture drop WORKER_CODE
+
+drop if FARM_CODE == 0
+drop if missing(FARM_CODE)
 
 save svy_asset, replace 
 tab ASSET_CLASS YE_AR

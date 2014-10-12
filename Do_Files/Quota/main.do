@@ -51,15 +51,19 @@ qui count
 if `r(N)' == 0 {
 
   local firstdata: word 1 of `files2get'
+  use `firstdata', clear
+
   macro list _files2get _firstdata
   local file2get: list files2get - firstdata
-  use `firstdata', clear
 
 }
 
 
 * Now loop over file list to merge all desired datasets
 foreach file of local files2get {
+
+  pwd
+  macro list _file
 
   merge 1:1 FARM_CODE YE_AR using `file', nogen update
 
@@ -82,39 +86,102 @@ end
 * ------------------------------------------------------------------
 
 *--- Early years (based on my version) --- *
-cd "`outdata79'\1\"       // first directory
+cd "`outdata79'" // Main output directory
+build "*dairy*.dta"
+build "*labour.dta"
+build "misc_overhead_costs.dta"
+build "invest*.dta"
+build "svy_cattle*.dta"
+build "svy_shee*.dta"
+build "svy_pig*.dta"
+build "svy_poultr*.dta"
+build "svy_horse*.dta"
+*build "total_crops_gross_output*"
+build "svy_hay_silage_?.dta"
+
+
+cd "1"       // Parameter subdirectory
 build "*farm*.dta"
 build "DAIRY*.dta"
 build "*DAIRY*.dta"
 build "*DAIRY*.dta"
 
-cd ..                     // second directory
-build "*dairy*.dta"
-build "invest*.dta"
-build "svy_cattle*.dta"
 
 cd "`origdata79'"         // raw data directory 
 build "svy_farm.dta"
+build "svy_misc_receipts_expenses.dta"
 build "svy_livestock_expenses.dta"
+build "svy_std_man_days.dta"
 
 
 
 *--- Later years (based on COD version) --- *
-cd "`outdata84'\1\"       // first directory
+cd "`outdata84'\1\"       // Parameter subdirectory
 build "*farm*.dta"
 build "DAIRY*.dta"
 build "*DAIRY*.dta"
 
-cd ..                     // second directory
+cd ..                    // Main output directory
 build "*dairy*.dta"
+build "*labour.dta"
+build "misc_overhead_costs.dta"
 build "invest*.dta"
 build "svy_cattle*.dta"
+build "svy_shee*.dta"
+build "svy_pig*.dta"
+build "svy_poultr*.dta"
+build "svy_horse*.dta"
+*build "total_crops_gross_output*"
+build "svy_hay_silage_?.dta"
 build "svy_weights_84.dta"
 
 cd "`origdata84'"         // raw data directory 
 build "svy_farm.dta"
+build "svy_misc_receipts_expenses.dta"
 build "svy_livestock_expenses.dta"
+build "svy_std_man_days.dta"
   
+
+
+
+* Go back to the merged crop tables to create the HA vars you need
+*   for SMDS calculation, save, and merge into main dataset. Necessary
+*   because these tables are multi-card, and we also have to reshape
+*   that data to match the main data's panel structure.
+
+preserve  // put main data in background
+
+use `outdata79'/merged_crop_tables_3, clear
+append using `outdata84'/merged_crop_tables_3
+
+cd `dodir'
+do Cr_HA_for_smds
+save `outdatadir'/HA_for_smds.dta, replace
+
+restore  // back to main data now
+
+merge 1:1 FARM_CODE YE_AR using `outdatadir'/HA_for_smds.dta, nogen
+
+
+
+
+* TEMPORARY - use my original code to recalculate D_FORAGE_AREA_HA
+*   and D_FEED_AREA_EQUIV_HA. TODO: do this the FarmPriceVolMSM way. 
+preserve
+
+use "D:\Data\data_NFSPanelAnalysis\OutData\nfs_7983", clear
+cd "D:\Data\data_NFSPanelAnalysis\Do_Files\RAW_79_83\sub_do" 
+qui do D_FORAGE_AREA_HA/D_FORAGE_AREA_HA
+qui do D_FEED_AREA_EQUIV_HA/D_FEED_AREA_EQUIV_HA
+rename farmcode FARM_CODE
+rename year YE_AR
+keep FARM_CODE YE_AR D_FEED_AREA_EQUIV_HA D_FORAGE_AREA_HA
+save `outdatadir'/feed_forage_ha, replace
+cd `dodir'
+restore
+
+merge 1:1 FARM_CODE YE_AR using `outdatadir'/feed_forage_ha.dta, nogen update
+
 * ------------------------------------------------------------------
 
 
@@ -199,7 +266,42 @@ replace UAA_SIZE =     ///
   if YE_AR < 1984
 
 
+* update age variable with sys. generated one > 84 (I made a guess at 
+*   a formula for farm_md_age and added it to Cr_unpaid_labour for the 
+*   FarmPriceVolMSM_7983 folder, but not the post 84 folder, where we 
+*   have a collected variable). 
+replace farm_md_age = FARM_MD_AGE if YE_AR > 1986
 
+gen double d_fuel_lubs_eu = 0
+replace d_fuel_lubs_eu =            ///
+  MACHINERY_FUEL_LUBS_OP_INV_EU      + ///
+  MACHINERY_FUEL_LUBS_PURCHASES_EU   - ///
+  MACHINERY_FUEL_LUBS_CLOS_INV_EU   
+  
+
+gen double d_insurance_eu = 0
+replace d_insurance_eu  =  ///
+  BUILDINGS_FIRE_INSURANCE_EU + MACHINERY_INSURANCE_EU
+* TEMPORARY FIX
+* Formula doesn't seem to work well for > 84. Prob. difference in 
+*   input table in two time periods. 
+replace d_insurance_eu = D_INSURANCE_EU if YE_AR > 1983
+
+
+gen double d_total_labour_units = 0
+replace d_total_labour_units  =   ///
+  d_labour_units_paid              + ///
+  d_labour_units_unpaid              
+
+
+gen double d_crop_livestock_gross_output_eu = 0
+replace d_crop_livestock_gross_output_eu = ///
+  d_total_livestock_gross_output            + ///
+  d_total_crops_gross_output_eu
+  
+
+
+do smds
 
 quietly {
 
@@ -403,7 +505,16 @@ tabstat                        ///
 
 
 
+* D_INVESTMENT_IN_LAND_IMPROVEMENTS too long, given "var145". Fix that.
+rename var145  D_INVESTMENT_IN_LAND_IMPROVEMENT 
 
+* Update the calculated vars with values from IB where we have them
+foreach var of varlist *invest* {
+
+  local uppercase = upper("`var'")
+  replace `var' = `uppercase' if YE_AR > 1983
+
+}
 
 
 * -------------------
@@ -424,7 +535,19 @@ xtsum                            ///
 
 * ------------------------------------------------------------------
 
-STOP!!
+
+* Graph of investment variables
+preserve
+collapse *invest* if FARM_SYSTEM == 1 & D_SOIL_GROUP < 3 [weight = UAA_WEIGHT ], by(YE_AR )
+tw (line d_investment_in_buildings YE_AR)  ///
+   (line d_investment_in_machinery YE_AR ) ///
+   (line d_investment_in_land_improvement YE_AR ) ///
+   , legend(label(1 "Buildings") ///
+            label(2 "Machinery") ///
+            label(3 "Land Imp."))
+restore
+
+
 
 * ------------------------------------------------------------------
 * Switching to SAS varnames
@@ -449,6 +572,7 @@ foreach var of local vlist {
 
 }
 
+save `outdatadir'/data_for_dairydofile, replace
 
 do dairydofile.do
 

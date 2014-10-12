@@ -97,7 +97,9 @@ gen nm_labu1             = (fdairygm - fdairyoh)/flabunpd
 gen nm_labu1_land        = (fdairygm - fdairyoh-ownlandval)/flabunpd
 
 * Adjusted Net Margin
-local yr_list = "1995 1996 1997 1998 1999 2000 2001 2002 2003 2004 2005 2006 2007 2008 2009"
+levelsof year, local(yr_list)
+*local yr_list = "1995 1996 1997 1998 1999 2000 2001 2002 2003 2004 2005 2006 2007 2008 2009"
+STOP!!
 local cntry_list = "1"
 
 

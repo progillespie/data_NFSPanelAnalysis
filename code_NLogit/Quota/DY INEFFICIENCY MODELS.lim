@@ -1,24 +1,30 @@
 RESET$ 
-
 READ;FILE="D:\R E S E A R C H\DATA\Data\THESIS\DAIRY\DAIRY XLS.xls"$
 
-RENAME	;DC=D$
+
+
+RENAME	        ;DC=D$
+
+
 
 ? CREATE LAND
-
 CREATE		;A=LANDFAGE$
-
 DSTAT		;RHS=Y2,H,C,D,L3,A$
 
-? CREATE PANEL INDICATOR 
 
+
+? CREATE PANEL INDICATOR 
 SORT		;LHS=FC;RHS=*$
 CREATE	 	;IND=NDX(FC,0)$
-REGRESS	;LHS=ONE;RHS=ONE;STR=fc;PANEL$
+REGRESS	        ;LHS=ONE;RHS=ONE;STR=fc;PANEL$
 CREATE		;GRPSIZE=_GROUPTI$
 CALC		;LIST;G=MAX(GRPSIZE)$
 
+
+
+?----------------- 
 ? CALCULATE MEANS		
+?----------------- 
 CALC		;MEANY1=XBR(Y1)$
 CALC		;MEANY2=XBR(Y2)$ 
 CALC		;MEANH=XBR(H)$
@@ -26,36 +32,74 @@ CALC		;MEANC=XBR(C)$
 CALC		;MEAND=XBR(D)$
 CALC		;MEANL=XBR(L3)$
 CALC		;MEANA=XBR(A)$
+?----------------- 
 
 
 
-? MEAN ADJUST
+?----------------- 
+? MEAN ADJUSTMENT
+?----------------- 
+CREATE		;MY1=Y1/MEANY1 9
+                ;MY2=Y2/MEANY2 
+                ;MH=H/MEANH  
+                ;MC=C/MEANC 
+                ;MD=D/MEAND  
+                ;ML=L3/MEANL 
+                ;MA=A/MEANA
+                $  
+?----------------- 
 
-CREATE		;MY1=Y1/MEANY1 ;MY2=Y2/MEANY2 ;MH=H/MEANH ;MC=C/MEANC ; MD=D/MEAND  ;ML=L3/MEANL ;MA=A/MEANA$  
-
-? CONvERT TO LOGS
-
-CREATE		;LNY1=LOG(MY1);LNY2=LOG(MY2);LNH=LOG(MH);LND=LOG(MD);LNC=LOG(MC);LNL=LOG(ML) ;LNA=LOG(MA)$
 
 
+?----------------- 
+? CONVERT TO LOGS
+?----------------- 
+CREATE	;LNY1=LOG(MY1)
+        ;LNY2=LOG(MY2)
+        ;LNH=LOG(MH)
+        ;LND=LOG(MD)
+        ;LNC=LOG(MC)
+        ;LNL=LOG(ML)
+        ;LNA=LOG(MA)
+        $
+?----------------- 
+
+
+
+?----------------- 
 ? CREATE INTERACTION VARIABLES FOR TRANSLOG
+?----------------- 
+CREATE ; TT=T*T       ; LNHH=LNH*LNH ; LNHD=LNH*LND ; LNHC=LNH*LNC 
+       ; LNHL=LNH*LNL ; LNDD=LND*LND ; LNDC=LND*LNC ; LNDL=LND*LNL
+       ; LNCC=LNC*LNC ; LNCL=LNC*LNL ; LNLL=LNL*LNL ; LNHA=LNH*LNA 
+       ; LNDA=LND*LNA ; LNCA=LNC*LNA ; LNLA=LNL*LNA ; LNAA=LNA*LNA
+       ; LNHT=LNH*T   ; LNDT=LND*T   ; LNCT=LNC*T   ; LNLT=LNL*T   
+       ; TTT=TT*T
+       $
+?----------------- 
 
-CREATE		;TT=T*T;LNHH=LNH*LNH; LNHD=LNH*LND; LNHC=LNH*LNC; LNHL=LNH*LNL; LNDD=LND*LND
-		;LNDC=LND*LNC; LNDL=LND*LNL; LNCC=LNC*LNC ;LNCL=LNC*LNL; LNLL=LNL*LNL
-		;LNHA=LNH*LNA; LNDA=LND*LNA; LNCA=LNC*LNA; LNLA=LNL*LNA; LNAA=LNA*LNA
-		;LNHT=LNH*T; LNDT=LND*T; LNCT=LNC*T; LNLT=LNL*T ;TTT=TT*T$
 
-
+?----------------- 
 ? CREATE NAMELISTS
+?----------------- 
+NAMELIST ; CD  = ONE  , LNH  , LND  , LNC  , LNL  , LNA $
 
-NAMELIST	;CD=ONE,LNH,LND,LNC,LNL,LNA$
-NAMELIST	;TL=LNHH,LNHD,LNHC,LNHL,LNHA,LNDD,LNDC,LNDL,LNDA,LNCC,LNCL,LNCA,LNLL,LNLA,LNAA$
-NAMELIST	;TCD=T,TT$
-NAMELIST	;TTL=T,TT,LNHT,LNDT,LNCT,LNLT$
-NAMELIST	;TDV=T2,T3,T4,T5,T6,T7,T8,T9,T10,T11$
+NAMELIST ; TL  = LNHH , LNHD , LNHC , LNHL , LNHA , LNDD  , LNDC , 
+                 LNDL , LNDA , LNCC  , LNCL , LNCA , LNLL , LNLA , 
+                 LNAA $
 
-NAMELIST	;CD2=ONE,LNH,LND,LNC,LNL$
-NAMELIST	;TL2=LNHH,LNHD,LNHC,LNHL,LNDD,LNDC,LNDL,LNCC,LNCL,LNLL$
+NAMELIST ; TCD = T    , TT $
+
+NAMELIST ; TTL = T    , TT   , LNHT , LNDT , LNCT , LNLT$
+
+NAMELIST ; TDV = T2   , T3   , T4   , T5   , T6   , T7    , T8   , 
+                 T9   , T10  , T11$
+
+NAMELIST ; CD2 = ONE  , LNH  , LND  , LNC  , LNL$
+
+NAMELIST ; TL2 = LNHH , LNHD , LNHC , LNHL , LNDD , LNDC  , LNDL , 
+                 LNCC , LNCL , LNLL $
+?----------------- 
 
 
 

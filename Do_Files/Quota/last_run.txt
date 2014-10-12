@@ -1,0 +1,113 @@
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  D:\Data\data_NFSPanelAnalysis\Do_Files\Quota\last_run.txt
+  log type:  text
+ opened on:  12 Oct 2014, 18:18:33
+
+. 
+. /*
+> * PIT AND LEE, 1981
+> qui xtreg LNY2 `CD'  `TL' `TDV', fe
+> matrix B = e(b)
+> sfpanel LNY2 `CD'  `TL' `TDV', model(pl81) svfrontier(B) 
+> predict UPL, u
+> */
+. 
+. bacon `CD', gen(outliers)
+
+Total number of observations:       10050
+   BACON outliers (p = 0.15):           4
+      Non-outliers remaining:       10046
+
+. 
+. set more on
+
+. qui reg LNY2 `CD'  `TL' `TDV'
+
+. predict xb, xb
+
+. predict res, res
+
+. tw sc res xb , ml(outliers)
+
+. summ res, detail
+
+                          Residuals
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%    -.5659269      -5.761406
+ 5%    -.3135447      -4.637232
+10%    -.2253115      -4.615278       Obs               10050
+25%    -.1009365      -4.556969       Sum of Wgt.       10050
+
+50%     .0157551                      Mean           1.40e-10
+                        Largest       Std. Dev.      .2307007
+75%     .1269335       .7089089
+90%      .220431       .7282834       Variance       .0532228
+95%     .2792151       .9129533       Skewness      -6.770088
+99%     .4057234        .948683       Kurtosis       130.8176
+
+. count if outliers > 0
+    4
+
+. drop  if outliers > 0
+(4 observations deleted)
+
+. 
+. 
+. * Battese and Coelli, 1992 
+. qui reg LNY2 `CD'  `TL' `TDV'
+
+. matrix B = e(b)
+
+. sfpanel LNY2 `CD'  `TL'  `TDV', model(bc92) tech(bhhh) svfrontier(B) 
+
+
+initial:       Log likelihood = -24683.757
+Iteration 0:   Log likelihood = -24683.757  
+Iteration 1:   Log likelihood = -24667.815  
+Iteration 2:   Log likelihood = -24634.114  
+Iteration 3:   Log likelihood = -24549.738  
+Iteration 4:   Log likelihood = -24524.442  
+Iteration 5:   Log likelihood = -24482.465  
+Iteration 6:   Log likelihood = -24470.545  
+Iteration 7:   Log likelihood = -24454.774  
+Iteration 8:   Log likelihood = -24403.891  
+Iteration 9:   Log likelihood = -24339.744  
+Iteration 10:  Log likelihood =  -24311.02  (backed up)
+Iteration 11:  Log likelihood = -24293.775  (backed up)
+Iteration 12:  Log likelihood = -24275.901  (backed up)
+Iteration 13:  Log likelihood = -24265.048  (backed up)
+Iteration 14:  Log likelihood =  -24247.11  (backed up)
+Iteration 15:  Log likelihood = -24227.565  (backed up)
+Iteration 16:  Log likelihood = -24218.724  (backed up)
+Iteration 17:  Log likelihood = -24194.544  (backed up)
+Iteration 18:  Log likelihood = -24181.902  (backed up)
+Iteration 19:  Log likelihood = -24168.733  (backed up)
+Iteration 20:  Log likelihood = -24151.794  (backed up)
+Iteration 21:  Log likelihood = -24139.758  (backed up)
+Iteration 22:  Log likelihood =  -24122.71  (backed up)
+Iteration 23:  Log likelihood = -24109.448  (backed up)
+Iteration 24:  Log likelihood = -24087.501  (backed up)
+Iteration 25:  Log likelihood = -24082.163  (backed up)
+Iteration 26:  Log likelihood = -24055.315  (backed up)
+Iteration 27:  Log likelihood = -24054.633  (backed up)
+Iteration 28:  Log likelihood =  -24025.13  (backed up)
+Iteration 29:  Log likelihood = -24015.145  (backed up)
+Iteration 30:  Log likelihood = -23996.665  (backed up)
+Iteration 31:  Log likelihood = -23987.127  (backed up)
+Iteration 32:  Log likelihood = -23966.864  (backed up)
+Iteration 33:  Log likelihood = -23956.318  (backed up)
+Iteration 34:  Log likelihood = -23933.287  (backed up)
+Iteration 35:  Log likelihood = -23923.762  (backed up)
+Iteration 36:  Log likelihood = -23903.161  (backed up)
+Iteration 37:  Log likelihood = -23890.283  (backed up)
+--Break--
+r(1);
+
+end of do-file
+
+--Break--
+r(1);
+
+. exit, clear

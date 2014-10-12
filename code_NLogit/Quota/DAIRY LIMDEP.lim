@@ -34,16 +34,24 @@ READ;FILE="D:\Data\data_NFSPanelAnalysis\code_NLogit\Quota\DAIRY.xls"
 
 
 
+? Check that all the years came in, and see how many cases there are 
+?   before any more sample selection takes place (already only 
+?   specialist dairy)
+DSTAT;Rhs=YEAR$
+
+
 
 
 ? ******************************************************************
 ? ------------ Prepare sample for modelling ------------------------
 ? ******************************************************************
 
+
+
 ? Rename Direct Costs
 RENAME	;DC=D$
 
-
+ 
 
 ? CREATE LAND
 CREATE	;A=LANDFAGE$
@@ -51,24 +59,44 @@ CREATE	;A=LANDFAGE$
 
 SAMPLE;ALL$
 ? Summary stats
-DSTAT	;RHS=Y2,H,C,D,L3,A$
+DSTAT	;RHS=Y2,H,C,D,L3,A,YEAR$
 
 
-
+DSTAT;Rhs=YEAR$
 ? Sample selection
-REJECT	;Y2<=0$
-DSTAT	;RHS=Y2,H,C,D,L3,A$
-REJECT	;H<=0$
-DSTAT	;RHS=Y2,H,C,D,L3,A$
-REJECT	;C<=0$
-DSTAT	;RHS=Y2,H,C,D,L3,A$
-REJECT	;L3<=0$
-DSTAT	;RHS=Y2,H,C,D,L3,A$
-REJECT	;D<=0$
-DSTAT	;RHS=Y2,H,C,D,L3,A$
-REJECT	;A<=0$
-DSTAT	;RHS=Y2,H,C,D,L3,A$
 
+REJECT      ;W < 1$
+
+?REJECT	;Y1<=0$
+?DSTAT;Rhs=YEAR$
+
+REJECT	;Y2<=0$
+DSTAT;Rhs=YEAR$
+
+REJECT	;H<=0$
+DSTAT;Rhs=YEAR$
+
+REJECT	;C<=0$
+DSTAT;Rhs=YEAR$
+
+REJECT	;L3<=0$
+DSTAT;Rhs=YEAR$
+
+REJECT	;D<=0$
+DSTAT;Rhs=YEAR$
+
+REJECT	;A<=0$
+DSTAT;Rhs=YEAR$
+
+REJECT	;D<=0$
+DSTAT;Rhs=YEAR$
+
+REJECT	;A<=0$
+DSTAT;Rhs=YEAR$
+
+
+
+? Check that Min and Max years are correct
 
 
 ? More summary for comparison with full sample
@@ -76,10 +104,6 @@ DSTAT	;RHS=Y2,H,C,D,L3,A$
 
 
 
-?BROKEN !!!!!!
-?REJECT	;D<=0$
-?REJECT	;A<=0$
-?!!!!!!!!!!!!!
 
 
 
@@ -122,8 +146,9 @@ CREATE	;MY1=Y1/MEANY1
 ?                      linear in parameters, hence they no longer 
 ?                      violate assumptions of OLS (which are the same
 ?                      that we must adhere to for these SFA models).
-CREATE	;LNY1=LOG(MY1)
-	;LNY2=LOG(MY2)
+
+?;LNY1=LOG(MY1) (neg values to fix... not using for now)
+CREATE	;LNY2=LOG(MY2)
 	;LNH=LOG(MH)
 	;LND=LOG(MD)
 	;LNC=LOG(MC)
@@ -132,7 +157,7 @@ CREATE	;LNY1=LOG(MY1)
 
 
 ? CREATE INTERACTION VARIABLES FOR TRANSLOG
-CREATE	;TT=T*T
+ CREATE	;TT=T*T
 	;LNHH=LNH*LNH
 	;LNHD=LNH*LND
 	;LNHC=LNH*LNC
@@ -152,6 +177,7 @@ CREATE	;TT=T*T
 	;LNDT=LND*T
 	;LNCT=LNC*T
 	;LNLT=LNL*T
+	;LNAT=LNA*T
 	;TTT=TT*T$
 
 
@@ -159,52 +185,48 @@ CREATE	;TT=T*T
 ?                      to give lists of variables. You cannot
 ?                      store other info this way however (e.g.
 ?                      conditions states, filepaths, etc.)
-NAMELIST;CD=ONE,LNH,LND,LNC,LNL,LNA$
-NAMELIST;TL=LNHH,LNHD,LNHC,LNHL,LNHA,LNDD,LNDC,LNDL,LNDA,
+ NAMELIST;CD=ONE,LNH,LND,LNC,LNL,LNA$
+
+ NAMELIST;TL=LNHH,LNHD,LNHC,LNHL,LNHA,LNDD,LNDC,LNDL,LNDA,
             LNCC,LNCL,LNCA,LNLL,LNLA,LNAA$
 
+ NAMELIST;TCD=T,TT$
 
+ NAMELIST;TTL=T,TT,LNHT,LNDT,LNCT,LNLT,LNAT$
 
-???????????????????????????????????????????????????????????
-? TESTING A is a 0 vector for now, so remove those terms
-?
-? Also some of the T vars are always 0 (don't know why) 
-???????????????????????????????????????????????????????????
+ NAMELIST;TDV= T2, T3, T4, T5, T6, T7, T8, T9,T10,T11,
+              T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,
+              T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,
+              T32,T33,T34 $
 
-
-NAMELIST;TCD=T,TT$
-NAMELIST;TTL=T,TT,LNHT,LNDT,LNCT,LNLT$
-NAMELIST;TDV=T2,T3,T4,T5$
-DSTAT	;RHS=TDV$
-
-
-
+DSTAT	;RHS=TDV $
 
 
 ? ******************************************************************
-? --------------------- Models Begin Here --------------------------
+? Procedures for repetitive tasks
 ? ******************************************************************
 
-?===================================================================
-?PIT AND LEE 
-?===================================================================
+? -----------------------
+? Yearly summary stats
+? ----------------------- 
+PROC = YSTATS(namelist) $
 
-DSTAT	;RHS=CD,TL,TDV$
-
-FRONTIER
-	;LHS=LNY2
-	;RHS=CD,TL,TDV
-	;PDS=GRPSIZE
-	;EFF=UPL$
-
-CREATE	;EPL=EXP(-UPL)$
-
-SAMPLE	;ALL$
+  CALC ; List; i$
+  INCLUDE	;New;T = i $
+  DSTAT	;RHS=namelist;WTS=W$
 
 
+ENDPROCEDURE
 
-? Save parameter estimates. Note that b(1) is the constant.
-CREATE	
+
+? ---------------------------
+?  Saving parameter estimates 
+?  and elasticities
+? ---------------------------
+
+PROC = MKRTS $
+
+  CREATE	
 	;B1  = b(2)
 	;B2  = b(3)
 	;B3  = b(4)
@@ -226,59 +248,63 @@ CREATE
 	;B45 = b(20)
 	;B55 = b(21)$
 
-DSTAT	;RHS =  B1 , B2 , B3 , B4 , B5 , B11, B12, B13, B14, B15,
+  DSTAT	;RHS =  B1 , B2 , B3 , B4 , B5 , B11, B12, B13, B14, B15,
 	        B22, B23, B24, B25, B33, B34, B35, B44, B45, B55$
 
+  ?Using parameter estimates to calc. elasticities 
+  CREATE	;EH=B1+(2*LNH*B11)+(LND*B12)+(LNC*B13)+(LNL*B14)+(LNA*B15)$
+  CREATE	;ED=B2+(LNH*B12)+(2*LND*B22)+(LNC*B23)+(LNL*B24)+(LNA*B25)$
+  CREATE	;EC=B3+(LNH*B13)+(LND*B23)+(2*LNC*B33)+(LNL*B34)+(LNA*B35)$
+  CREATE	;EL=B4+(LNH*B14)+(LND*B24)+(LNC*B34)+(2*LNL*B44)+(LNA*B45)$
+  CREATE	;EA=B5+(LNH*B15)+(LND*B25)+(LNC*B35)+(LNL*B45)+(2*LNA*B55)$
+
+  ? Using the elasticities to calculate Returns to Scale
+  CREATE	;RTS=EH+ED+EC+EL+EA$
 
 
-? TODO -- isn't this unnecessary with the mean adjustment above?
-?Using parameter estimates to calc. elasticities 
-CREATE	;EH=B1+(2*LNH*B11)+(LND*B12)+(LNC*B13)+(LNL*B14)+(LNA*B15)$
-CREATE	;ED=B2+(LNH*B12)+(2*LND*B22)+(LNC*B23)+(LNL*B24)+(LNA*B25)$
-CREATE	;EC=B3+(LNH*B13)+(LND*B23)+(2*LNC*B33)+(LNL*B34)+(LNA*B35)$
-CREATE	;EL=B4+(LNH*B14)+(LND*B24)+(LNC*B34)+(2*LNL*B44)+(LNA*B45)$
-CREATE	;EA=B5+(LNH*B15)+(LND*B25)+(LNC*B35)+(LNL*B45)+(2*LNA*B55)$
+  ? Summarise elasticities and RTS overall, and year by year
+  DSTAT	;RHS=EH,ED,EC,EL,EA,RTS;WTS=W$
 
 
-? Using the elasticities to calculate Returns to Scale
-CREATE	;RTS=EH+ED+EC+EL+EA$
+ENDPROCEDURE
 
 
-? Summarise elasticities and RTS overall, and year by year
-DSTAT	;RHS=EH,ED,EC,EL,EA,RTS;WTS=W$
 
-INCLUDE	;New;t=1$
-DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+? ******************************************************************
 
-INCLUDE	;New;t=2$
-DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
 
-INCLUDE	;New;t=3$
-DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
 
-INCLUDE	;New;t=4$
-DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
 
-INCLUDE	;New;t=5$
-DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
 
-INCLUDE	;New;t=6$
-DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
 
-INCLUDE	;New;t=7$
-DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
 
-INCLUDE	;New;t=8$
-DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+? ******************************************************************
+? --------------------- Models Begin Here --------------------------
+? ******************************************************************
 
-INCLUDE	;New;t=9$
-DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+?===================================================================
+? PIT AND LEE 
+?===================================================================
 
-INCLUDE	;New;t=10$
-DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+DSTAT	;RHS=CD,TL,TDV$
 
-INCLUDE	;New;t=11$
-DSTAT	;RHS=EPL,EH,ED,EC,EL,EA,LNH,LND,LNC,LNL,LNA;WTS=W$
+FRONTIER
+	;LHS=LNY2
+      ;RHS=CD,TL,TDV
+	;PDS=GRPSIZE
+	;EFF=UPL$
+
+CREATE	;EPL=EXP(-UPL)$
+SAMPLE	;ALL$
+
+
+? Use procedure to make elasticities and returns to scale
+EXEC  ;PROC = MKRTS $
+
+
+? Use procedure to get summaries of elasticities for each year
+NAMELIST  ; elist = EPL,EH,ED,EC,EL,EA $
+EXEC ;PROC = YSTATS(elist) ;i=1,34$
 
 SAMPLE	;ALL$
 
@@ -300,76 +326,19 @@ FRONTIER
 
 CREATE	;EBC=EXP(-UBC)$
 
-
-? TODO -- Parameter estimates are hard-coded, and will be wrong.
-?         See if there's a way to access estimates dynamically [DONE] 
-? TODO -- there is almost certainly a better way to calc. these using
-?           matrix operations. See if you can pull that off.
 SAMPLE	;ALL$
-CREATE;B1  = b(2)
-	;B2  = b(3)
-	;B3  = b(4)
-	;B4  = b(5)
-	;B5  = b(6)
-	;B11 = b(7)
-	;B12 = b(8)
-	;B13 = b(9)
-	;B14 = b(10)
-	;B15 = b(11)
-	;B22 = b(12)
-	;B23 = b(13)
-	;B24 = b(14)
-	;B25 = b(15)
-	;B33 = b(16)
-	;B34 = b(17)
-	;B35 = b(18)
-	;B44 = b(19)
-	;B45 = b(20)
-	;B55 = b(21)$
 
-		
-CREATE;	EH=B1+(2*LNH*B11)+(LND*B12)+(LNC*B13)+(LNL*B14)+(LNA*B15)$
-CREATE;	ED=B2+(LNH*B12)+(2*LND*B22)+(LNC*B23)+(LNL*B24)+(LNA*B25)$
-CREATE;	EC=B3+(LNH*B13)+(LND*B23)+(2*LNC*B33)+(LNL*B34)+(LNA*B35)$
-CREATE;	EL=B4+(LNH*B14)+(LND*B24)+(LNC*B34)+(2*LNL*B44)+(LNA*B45)$
-CREATE;	EA=B5+(LNH*B15)+(LND*B25)+(LNC*B35)+(LNL*B45)+(2*LNA*B55)$
 
-CREATE;	RTS=EH+ED+EC+EL+EA$
+? Use procedure to make elasticities and returns to scale
+EXEC  ;PROC = MKRTS $
 
-DSTAT	;RHS=EH,ED,EC,EL,EA,RTS;WTS=W$
 
-INCLUDE	;New;t=1$
-DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
+? Use procedure to get summaries of elasticities for each year
+NAMELIST  ; elist = EBC,EH,ED,EC,EL,EA $
+EXEC ;PROC = YSTATS(elist) ;i=1,34$
 
-INCLUDE	;New;t=2$
-DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
+SAMPLE	;ALL$
 
-INCLUDE	;New;t=3$
-DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=4$
-DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=5$
-DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=6$
-DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=7$
-DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=8$
-DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=9$
-DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=10$
-DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=11$
-DSTAT	;RHS=EBC,EH,ED,EC,EL,EA;WTS=W$
 
 
 
@@ -398,72 +367,15 @@ FRONTIER
 CREATE	;ETRE=EXP(-UTRE)$
 ?,TDV
 
+? Use procedure to make elasticities and returns to scale
+EXEC  ;PROC = MKRTS $
+
+
+? Use procedure to get summaries of elasticities for each year
+NAMELIST  ; elist = EBC,EH,ED,EC,EL,EA $
+EXEC ;PROC = YSTATS(elist) ;i=1,34$
+
 SAMPLE	;ALL$
-CREATE;B1  = b(2)
-	;B2  = b(3)
-	;B3  = b(4)
-	;B4  = b(5)
-	;B5  = b(6)
-	;B11 = b(7)
-	;B12 = b(8)
-	;B13 = b(9)
-	;B14 = b(10)
-	;B15 = b(11)
-	;B22 = b(12)
-	;B23 = b(13)
-	;B24 = b(14)
-	;B25 = b(15)
-	;B33 = b(16)
-	;B34 = b(17)
-	;B35 = b(18)
-	;B44 = b(19)
-	;B45 = b(20)
-	;B55 = b(21)$
-
-		
-CREATE;	EH=B1+(2*LNH*B11)+(LND*B12)+(LNC*B13)+(LNL*B14)+(LNA*B15)$
-CREATE;	ED=B2+(LNH*B12)+(2*LND*B22)+(LNC*B23)+(LNL*B24)+(LNA*B25)$
-CREATE;	EC=B3+(LNH*B13)+(LND*B23)+(2*LNC*B33)+(LNL*B34)+(LNA*B35)$
-CREATE;	EL=B4+(LNH*B14)+(LND*B24)+(LNC*B34)+(2*LNL*B44)+(LNA*B45)$
-CREATE;	EA=B5+(LNH*B15)+(LND*B25)+(LNC*B35)+(LNL*B45)+(2*LNA*B55)$
-
-CREATE;	RTS=EH+ED+EC+EL+EA$
-
-DSTAT	;RHS=EH,ED,EC,EL,EA,RTS;WTS=W$
-
-INCLUDE	;New;t=1$
-DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=2$
-DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=3$
-DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=4$
-DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=5$
-DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=6$
-DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=7$
-DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=8$
-DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=9$
-DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=10$
-DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=11$
-DSTAT	;RHS=ETRE,EH,ED,EC,EL,EA;WTS=W$
-
 
 
 
@@ -484,71 +396,16 @@ FRONTIER
 
 CREATE;ETFE=EXP(-UTFE)$
 
-SAMPLE;ALL$
-CREATE;B1  = b(2)
-	;B2  = b(3)
-	;B3  = b(4)
-	;B4  = b(5)
-	;B5  = b(6)
-	;B11 = b(7)
-	;B12 = b(8)
-	;B13 = b(9)
-	;B14 = b(10)
-	;B15 = b(11)
-	;B22 = b(12)
-	;B23 = b(13)
-	;B24 = b(14)
-	;B25 = b(15)
-	;B33 = b(16)
-	;B34 = b(17)
-	;B35 = b(18)
-	;B44 = b(19)
-	;B45 = b(20)
-	;B55 = b(21)$
 
-CREATE;	EH=B1+(2*LNH*B11)+(LND*B12)+(LNC*B13)+(LNL*B14)+(LNA*B15)$
-CREATE;	ED=B2+(LNH*B12)+(2*LND*B22)+(LNC*B23)+(LNL*B24)+(LNA*B25)$
-CREATE;	EC=B3+(LNH*B13)+(LND*B23)+(2*LNC*B33)+(LNL*B34)+(LNA*B35)$
-CREATE;	EL=B4+(LNH*B14)+(LND*B24)+(LNC*B34)+(2*LNL*B44)+(LNA*B45)$
-CREATE;	EA=B5+(LNH*B15)+(LND*B25)+(LNC*B35)+(LNL*B45)+(2*LNA*B55)$
+? Use procedure to make elasticities and returns to scale
+EXEC  ;PROC = MKRTS $
 
-CREATE;	RTS=EH+ED+EC+EL+EA$
 
-DSTAT	;RHS=EH,ED,EC,EL,EA,RTS;WTS=W$
+? Use procedure to get summaries of elasticities for each year
+NAMELIST  ; elist = EBC,EH,ED,EC,EL,EA $
+EXEC ;PROC = YSTATS(elist) ;i=1,34$
 
-INCLUDE	;New;t=1$
-DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=2$
-DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=3$
-DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=4$
-DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=5$
-DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=6$
-DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=7$
-DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=8$
-DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=9$
-DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=10$
-DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
-
-INCLUDE	;New;t=11$
-DSTAT	;RHS=ETFE,EH,ED,EC,EL,EA;WTS=W$
-
+SAMPLE	;ALL$
 
 
 
@@ -637,7 +494,7 @@ plot	;rhs=rktre2;lhs=rktfe2$
 
 
 ?===================================================================
-Latent Class Model
+? Latent Class Model
 ?===================================================================
 
 SAMPLE	;ALL$
@@ -660,7 +517,7 @@ DSTAT	;RHS=ELCM;WTS=W$
 ?-------------------------
 ? CORRELATION MATRIX
 ?-------------------------
-DSTAT;Rhs=UPL,UCS,UBC,UKO,UTRE,UTFE;Wts=W;Output=2$
+DSTAT;Rhs=UPL,UBC,UTRE,UTFE;Wts=W;Output=2$
 
 
 
@@ -668,12 +525,10 @@ DSTAT;Rhs=UPL,UCS,UBC,UKO,UTRE,UTFE;Wts=W;Output=2$
 ? CREATE RANKS AND COMPARE CORRELATIONS
 ?-------------------------
 CREATE	;RKPL=RNK(UPL)$
-CREATE	;RKCS=RNK(UCS)$
 CREATE	;RKBC=RNK(UBC)$
-CREATE	;RKKO=RNK(UKO)$
 CREATE	;RKTRE=RNK(UTRE)$
 CREATE	;RKTFE=RNK(UTFE)$
-DSTAT;Rhs=RKPL,RKCS,RKBC,RKKO,RKTRE,RKTFE;Wts=W;Output=2$
+DSTAT;Rhs=RKPL,RKBC,RKTRE,RKTFE;Wts=W;Output=2$
 
 
 
@@ -750,7 +605,7 @@ CREATE	;RKTFE2=RNK(UTFE)$
 
 
 REJECT	;NEW;T<5$
-DSTAT   ;Rhs=RKPL2,RKCS2,RKBC2,RKKO2,RKTRE2,RKTFE2;Wts=W;Output=2$
+DSTAT   ;Rhs=RKPL2,RKBC2,RKTRE2,RKTFE2;Wts=W;Output=2$
 
 
 

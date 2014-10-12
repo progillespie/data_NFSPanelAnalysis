@@ -157,8 +157,8 @@ capture rename   VET_MED_ALLOC_PIGS_EU             ivmallpg
 capture rename   AI_SERVICE_FEES_ALLOC_PIGS_EU     iaisfpig   
 capture rename   VET_MED_ETC_ALLOC_POULTRY_EU      ivmallpy   
 capture rename   VET_MED_ALLOC_DAIRY_HERD_EU       ivmalldy   
-*capture rename   AI_FEES_ALLOC_DAIRY_HERD_EU       iaisfdy    
-capture rename   AI_SR_FEES_ALOC_DAIRY_HRD_EU      iaisfdy    
+capture rename   AI_FEES_ALLOC_DAIRY_HERD_EU       iaisfdy   // slight name difference    
+capture rename   AI_SR_FEES_ALOC_DAIRY_HRD_EU      iaisfdy   // slight name difference
 capture rename   VET_MED_ALLOC_CATTLE_EU           ivmallc    
 capture rename   AI_SERVICE_FEES_ALLOC_CATTLE_EU   iaisfcat   
 capture rename   VET_MED_ALLOC_SHEEP_EU            ivmallsp   
@@ -224,7 +224,7 @@ capture rename   LAND_VALUE_PURCHASES_EU           faprldvl
 capture rename   LAND_VALUE_SALES_HA               faslldac   
 capture rename   LAND_VALUE_SALES_EU               faslldvl   
 capture rename   TEAGASC_ADVISORY_FEES_EU          foadvfee   
-capture rename   :                                 ffszsyst   
+*capture rename   :                                 ffszsyst   
 capture rename   D_LABOUR_UNITS_TOTAL              flabtotl   
 capture rename   D_STANDARD_MAN_DAYS               flabsmds   
 capture rename   LAND_VALUE_EST_END_OF_YEAR_EU     fainvfrm   
@@ -234,8 +234,10 @@ capture rename   D_INV_IN_LIMPROVEMENTS            fainvlim
 capture rename   D_VALUE_OF_FAMILY_LABOUR_EU       fvalflab   
 capture rename   D_TOTAL_CASUAL_LABOUR_EU          fdcaslab   
 capture rename   D_HIRED_LABOUR_CASUAL_EXCL_EU     fohirlab   
-capture rename   D_INT_PAY_INCL_HP_INT_EU          fointpay   
-capture rename   D_MACHINERY_OPERATING_EXP_EU      fomacopt   
+capture rename   D_INTRST_PAY_INCL_HP_INTEREST_EU  fointpay   // slight name difference
+capture rename   D_INT_PAY_INCL_HP_INT_EU          fointpay   // slight name difference  
+capture rename   D_MACHINE_OPERATING_EXPENSES_EU   fomacopt   // slight name difference   
+capture rename   D_MACHINERY_OPERATING_EXP_EU      fomacopt   // slight name difference   
 capture rename   BUILDINGS_REPAIRS_UPKEEP_EU       fobldmnt   
 capture rename   LAND_GENERAL_UPKEEP_EU            foupkpld   
 capture rename   D_INSURANCE_EU                    foinsure   

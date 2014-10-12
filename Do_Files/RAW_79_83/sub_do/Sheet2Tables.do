@@ -1,5 +1,14 @@
 args i YYYY outdata 
 
+* _i
+*    the Sheet number being prepared in each workbook (1 per year)
+* _YYYY 
+*    the 4 digit year extracted from the workbook's name
+* _outdata 
+*    the filepath to the folder where you'll save the data
+
+macro list _outdata
+
 *qui destring, replace force
 
 capture rename farm FARM_CODE
@@ -14,8 +23,6 @@ capture gen int Row   = _n
 *   varnamemappings.xlsx here
 *====================================================================
 qui do sub_do/_renameSheet/renameSheetLennon`i'.do
-*outsheet using ///
-  *`origdata'/csv/`shortfilename'/Sheet`i'.csv, replace comma
 *====================================================================
 
 
@@ -126,7 +133,8 @@ while `j' > 0 {
   * 1:1 with table, use Row (in effect, just loading data)
   if `i' == 12             local OtherSortVar "Row"
   if `i' == 52             local OtherSortVar "Row"
-  if `i' >= 57 & `i' <= 59 local OtherSortVar "Row"
+  if `i' >= 57 & `i' <= 58 local OtherSortVar "Row WORKER_CODE"
+  if `i' == 59             local OtherSortVar "Row"
 
 
   * svy_loans is fundamentally different. There are no accnt numbers
@@ -134,7 +142,7 @@ while `j' > 0 {
   *   variables. Best way to handle this is to "merge" by Row and 
   *   card (just gives the sheet number). This is really just 
   *   appending the two sheets (which I assume John's code is going
-  *   to collapse later anyway)
+  *   to collapse again later anyway)
   if `i' >= 61 & `i' <= 62 local OtherSortVar "Row card"
 
 
@@ -182,6 +190,12 @@ while `j' > 0 {
 
 }
 
+
+* Save a csv version (can be turned on or off, useful for debugging)
+capture mkdir `outdata'/csv
+capture mkdir `outdata'/csv/raw`YYYY'
+outsheet using ///
+  `outdata'/csv/raw`YYYY'/Sheet`i'.csv, replace comma
 *DONE:
 * PROBLEM: svy_hay_silage only has silage (file overwriting itself)
 * FIX: Save to same file within Jloop (build on each merge). When out
@@ -196,3 +210,5 @@ while `j' > 0 {
 blank
 
 save `outdata'/svy_tables_7983/`table', replace
+
+
