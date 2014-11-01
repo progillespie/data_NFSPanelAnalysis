@@ -144,17 +144,20 @@ capture log close
 log using last_run.txt, replace text
 
 /*
-* PIT AND LEE, 1981
-qui xtreg LNY2 `CD'  `TL' `TDV', fe
-matrix B = e(b)
-sfpanel LNY2 `CD'  `TL' `TDV', model(pl81) svfrontier(B) 
-predict	UPL, u
 */
+
+bysort FC: egen WI = mean(W)
+
+* PIT AND LEE, 1981
+qui xtreg LNY2 `CD'  `TL' `TDV'  [pweight=WI], fe
+matrix B = e(b)
+sfpanel LNY2 `CD'  `TL' `TDV'  [pweight=WI], model(pl81) svfrontier(B) 
+predict	UPL, u
 
 bacon `CD', gen(outliers)
 
 set more on
-qui reg LNY2 `CD'  `TL' `TDV'
+qui reg LNY2 `CD'  `TL' `TDV' [pweight=WI]
 predict xb, xb
 predict res, res
 tw sc res xb , ml(outliers)
@@ -164,23 +167,23 @@ drop  if outliers > 0
 
 
 * Battese and Coelli, 1992 
-qui reg LNY2 `CD'  `TL' `TDV'
+qui reg LNY2 `CD'  `TL' `TDV' [pweight=WI]
 matrix B = e(b)
-sfpanel LNY2 `CD'  `TL'  `TDV', model(bc92) tech(bhhh) svfrontier(B) 
+sfpanel LNY2 `CD'  `TL'  `TDV' [pweight=WI], model(bc92) tech(bhhh) svfrontier(B) 
 predict	UBC, bc
 exit
 
 * 'True' Random Effects
-qui xtreg LNY2 `CD'  `TL' , fe
+qui xtreg LNY2 `CD'  `TL' `TDV' [pweight=WI] , fe
 matrix B = e(b)
-sfpanel LNY2 `CD'  `TL'  , model(tre) svfrontier(B) nsim(10) simtype(halton)
+sfpanel LNY2 `CD'  `TL' `TDV' [pweight=WI]  , model(tre) svfrontier(B) nsim(10) simtype(halton)
 predict	UTRE, u
 
 
 * 'True' Fixed Effects
-qui xtreg LNY2 `CD'  `TL' `TDV', fe
+qui xtreg LNY2 `CD'  `TL' `TDV'  [pweight=WI], fe
 matrix B = e(b)
-sfpanel LNY2 `CD'  `TL' `TDV' , model(tre) svfrontier(B) nsim(10) simtype(halton)
+sfpanel LNY2 `CD'  `TL' `TDV' [pweight=WI], model(tre) svfrontier(B) nsim(10) simtype(halton)
 predict	UTFE, u
 
 log close

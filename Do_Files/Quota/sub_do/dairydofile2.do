@@ -1830,7 +1830,7 @@ gen LRGOFF = OFFFARM * LARGE
 * Each row must count as at least 1 farm! Couple of 0's to remove
 drop if W     <  1 
 
-preserve
+*preserve
 * Subset of vars to go to NLogit
 keep ///
      year     ///
@@ -1879,6 +1879,176 @@ drop if ALLOC < .6
 
 
 
+
+
+tabstat Y2 H C L3 DC LANDFAGE LANDFEED FSIZE ALLOC INTENSE AGE AI [weight = W] , by(year)
+
+
+* Rename so as to accomodate generic code
+rename Y2       y
+rename H        x1
+rename DC       x2
+rename C        x3
+rename L3       x4
+rename LANDFAGE x5
+
+
+* Which functional form? Cobb-Douglas = 1,  Translog = 2
+local func_form = 2
+
+* Input list
+local x "x1 x2 x3 x4 x5"
+
+* Output list
+local y "y"
+
+
+* Homogeneity restriction for distance functions
+* Numeraire input (for IO distance function)
+local x_0 "x1"
+
+* Numeraire output (for OO distance function)
+local y_0 "y"
+* The choice of numeraire is arbitrary
+
+local norm   = 1
+local xhomog = 0
+local yhomog = 0
+  
+
+* Frontier type?
+* Production      = 1
+* Cost            = 2
+* Distance (OO)   = 3
+* Distance (IO)   = 4
+local front_type = 1
+
+if `norm' ==1 {
+  if `front_type' == 1 local lhs "y"
+  if `front_type' == 2 local lhs "c"
+  if `front_type' == 3 local lhs "`y_0'"
+  if `front_type' == 4 local lhs "`x_0'"
+  qui summ `lhs'
+  gen `lhs'_norm = `lhs'/`r(mean)'
+  gen  ln`lhs' = ln(`lhs')
+} 
+
+* Set cost option if fitting cost frontier
+if `front_type' == 2 local cost_on_or_off "cost"
+
+
+* Run program definition for fform 
+qui do sub_do/fform.do
+
+
+* --------------------------------------------------------------------
+* Frontier type 1 - (single output) Production frontier
+* --------------------------------------------------------------------
+* CD and TL terms for 
+fform "x" "`x'" "" `norm' `xhomog'
+local cdpd     "`r(cd)'" 
+local tlpd     "`r(tl)'"
+local suffix1 "`r(suffix)'"
+* --------------------------------------------------------------------
+
+
+
+* --------------------------------------------------------------------
+* Frontier type 2 - Cost frontier
+* --------------------------------------------------------------------
+/* XXXXXXXXXXXXXXXXXXXXXXXXXXXX 
+Not yet operational
+* CD and TL terms for Cost Functions
+fform "w" "`w'" "`w_0'" `norm' `yhomog'
+local cdct     "`r(cd)'"
+local tlct     "`r(tl)'"
+   XXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+* --------------------------------------------------------------------
+
+
+
+* --------------------------------------------------------------------
+* Frontier type 3 - Distance Functions (OO) approach
+* --------------------------------------------------------------------
+local homog = 1 //need to homogenise outputs
+fform "y" "`y'" "`y_0'" `norm' `homog'
+local cddo     "`r(cd)'"
+local tldo     "`r(tl)'"
+* --------------------------------------------------------------------
+
+
+
+* --------------------------------------------------------------------
+* Frontier type 4 - Distance Functions (IO) approach
+* --------------------------------------------------------------------
+local homog = 1 //need to homogenise inputs
+fform "x" "`x'" "`x_0'" `norm' `homog'
+local cddi     "`r(cd)'"
+local tldi     "`r(tl)'"
+
+local homog = 0 //no need to homogenise outputs
+fform "y" "`y'" "" `norm' `homog'
+local cdo     "`r(cd)'"
+local tlo     "`r(tl)'"
+* --------------------------------------------------------------------
+
+
+
+* --------------------------------------------------------------------
+* Define the correct list of RHS vars based on 
+* front_type = first  number after "spec"
+* func_form  = second number after "spec"
+* --------------------------------------------------------------------
+
+* For (single output) production frontiers 
+local spec11 "ln`y_0' `cdpd'        `time'"
+local spec12 "ln`y_0' `cdpd' `tlpd' `time'"
+
+
+* For cost frontiers
+local spec21 "ln`c' `cdct'        `time'"
+local spec22 "ln`c' `cdct' `tlct' `time'"
+
+
+* For (output orientated) distance functions
+local spec31 "ln`y_0' `cdpd' `cddo'               `time'"
+local spec32 "ln`y_0' `cdpd' `cddo' `tlpd' `tldo' `time'"
+
+
+* For (input orientated) distance functions
+local spec41 "ln`x_0' `cddi' `cdo'              `time'"
+local spec42 "ln`x_0' `cddi' `cdo' `tldi' `tlo' `time'"
+
+* Now use front_type and func_form to give correct spec to model
+local spec "`spec`front_type'`func_form''"
+* --------------------------------------------------------------------
+
+
+
+
+* --------------------------------------------------------------------
+* Model commands (use spec macro from last section)
+* --------------------------------------------------------------------
+* Model commands are really slow for this data, 
+*   so do the modelling in NLogit (list macros to paste in NLogit
+*   code)
+
+
+
+if        `front_type' == 1 local front_type "Production Function"
+else if   `front_type' == 2 local front_type "Cost Function"
+else if   `front_type' == 3 local front_type "Distance Function (OO)"
+else if   `front_type' == 4 local front_type "Distance Function (IO)"
+else                        local front_type "Unknown Function"
+
+if        `func_form' == 1 local func_form  "Cobb-Douglas"
+else if   `func_form' == 2 local func_form  "Translog"
+else                       local func_form  "Unknown"
+
+
+macro list
+
+
 * Save csv file for NLogit
 outsheet using ../../code_NLogit/Quota/DAIRY.csv, comma replace noq
 
@@ -1887,12 +2057,12 @@ export excel using ../../code_NLogit/Quota/DAIRY.xls ///
   , firstrow(var) replace nolabel missing(0)
 
 * Bring back full data
-restore
+*restore
 * NOTE that you will have more vars here than you are sending to 
 *  NLogit. Add to the "keep" command above if you want more for 
 *  NLogit.
 
 
-tabstat Y2 H C L3 DC LANDFAGE LANDFEED FSIZE ALLOC INTENSE AGE AI [weight = W] , by(year)
+return local spec "`spec'"
 
 cd `startdir' // return Stata to start location

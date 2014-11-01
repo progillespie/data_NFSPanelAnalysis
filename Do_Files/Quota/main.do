@@ -193,6 +193,9 @@ merge 1:1 FARM_CODE YE_AR using `outdatadir'/feed_forage_ha.dta, nogen update
 * Minor data manipulation
 * ------------------------------------------------------------------
 
+label var YE_AR "Year"
+
+
 * NFS only started using weights in 1984. Prior to this, each row
 *  of the data counted equally. Implicitly, this is equivalent to 
 *  each farm having the same weight (we'll use 1 as our constant). 
@@ -300,8 +303,31 @@ replace d_crop_livestock_gross_output_eu = ///
   d_total_crops_gross_output_eu
   
 
+* Standard Man days
+do sub_do/smds
 
-do smds
+
+* Fix total milk production
+do Cr_d_total_milk_production_lt
+replace D_TOTAL_MILK_PRODUCTION_LT = d_total_milk_production_lt if YE_AR < 1984
+
+* Stocking rate, Milk yield
+gen double d_dairy_stocking_rate = d_dairy_livstk_units_inc_bulls / D_FORAGE_AREA_HA
+gen double d_milk_yield          = d_total_milk_production_eu / d_dairy_livstk_units_inc_bulls 
+gen double d_milk_price          = d_total_milk_production_eu / D_TOTAL_MILK_PRODUCTION_LT
+gen double d_labour_intensity_ha = d_total_labour_units / D_FORAGE_AREA_HA
+gen double d_labour_intensity_lu = d_total_labour_units / d_dairy_livstk_units_inc_bulls 
+
+
+* D_INVESTMENT_IN_LAND_IMPROVEMENTS too long, given "var145". Fix that.
+rename var145  D_INVESTMENT_IN_LAND_IMPROVEMENT 
+
+
+* Extend D_UAA_PUB_SIZE_CODE back to 1979
+do Cr_d_uaa_pub_size_code.do
+
+
+
 
 quietly {
 
@@ -340,173 +366,27 @@ foreach YYYY in 1979 1980 1981 1982 1983 {
 
 }
 
+drop if d_dairy_livstk_units_inc_bulls <= 10
+
 * ------------------------------------------------------------------
 
 
 
+* ------------------------------------------------------------------
+* Save an intermediate dataset
+* ------------------------------------------------------------------
+save `outdatadir'/built_panel, replace
 
 
 
 * ------------------------------------------------------------------
 * Descriptives
 * ------------------------------------------------------------------
-describe
-
-* -------------------
-* Financial Summary 
-* -------------------
-rename d_farm_gross_output            FarmGO
-rename d_farm_direct_costs            FarmDC
-rename d_farm_gross_margin            FarmGM
-rename d_farm_total_overhead_costs_eu FarmOH
-rename d_farm_family_income           FarmFFI
-tabstat                 ///
-    FarmGO                 ///
-    FarmDC                 ///
-    FarmGM                 ///
-    FarmOH                 ///
-    FarmFFI                ///
-  if FARM_SYSTEM == 1 & ///
-  D_SOIL_GROUP < 3      ///
-  [weight=UAA_WEIGHT]   ///
-  , by(YE_AR)
-rename FarmGO  d_farm_gross_output
-rename FarmDC  d_farm_direct_costs
-rename FarmGM  d_farm_gross_margin
-rename FarmOH  d_farm_total_overhead_costs_eu
-rename FarmFFI d_farm_family_income
+use  `outdatadir'/built_panel, clear
+do sub_do/descriptives.do "`outdatadir'"
 
 
 
-* -------------------
-* GO decomposition
-* -------------------
-tabstat                           /// 
-    d_farm_gross_output              /// 
-    SINGLE_FARM_PAYMENT_NET_VALUE_EU /// 
-    SUPER_LEVY_CHARGE_EU             /// 
-    SHEEP_WELFARE_SCHEME_TOTAL_EU    /// 
-    d_inter_enterpise_transfers_eu   /// 
-    d_total_livestock_gross_output   /// 
-    OTHER_RECEIPTS_IN_CASH_EU        /// 
-    OTHER_SUBS_PAYMENTS_TOTAL_EU     /// 
-    PROTEIN_PAYMENTS_TOTAL_EU        /// 
-    OTHER_RECEIPTS_IN_KIND_EU        /// 
-    LAND_LET_OUT_EU                  /// 
-    d_total_crops_gross_output_eu    /// 
-    SALE_OF_TURF_VALUE_EU            /// 
-    MILK_QUOTA_LET_EU                /// 
-    MISC_GRANTS_SUBSIDIES_EU         /// 
-    USED_IN_HOUSE_OTHER_EU           /// 
-    SUPER_LEVY_REFUND_EU             /// 
-  if FARM_SYSTEM ==1              /// 
-  [weight=UAA_WEIGHT]             /// 
-  , by(YE_AR)
-
-
-
-* -------------------
-* DC decomposition
-* -------------------
-tabstat                          /// 
-    d_farm_direct_costs             /// 
-    d_poultry_total_direct_costs_eu /// 
-    dc_fodder_crops_sold_eu         /// 
-    csh_crp_op_inv_fed_eu_1         /// 
-    d_horses_direct_costs_eu        /// 
-    d_dc_inv_misc_csh_crop          /// 
-    csh_crp_cy_fed_eu_1             /// 
-    d_dairy_total_direct_costs_eu   /// 
-    d_other_direct_costs_eu         /// 
-    d_dc_select_crops               /// 
-    s_home_grown_seed_value_eu      /// 
-    d_cattle_total_direct_costs_eu  /// 
-    d_total_livestock_direct_costs  /// 
-    oth_csh_crop_dc                 /// 
-    d_milk_fed_to_livestock_eu      /// 
-    d_sheep_total_direct_costs_eu   /// 
-    waste_hay_dc                    /// 
-    s_setaside_dc                   /// 
-    d_inter_enterpise_transfers_eu  /// 
-    d_pigs_total_direct_costs_eu    /// 
-    waste_sil_dc                    /// 
-    d_total_crops_direct_costs_eu   /// 
-  if FARM_SYSTEM == 1 &          /// 
-  D_SOIL_GROUP < 3               /// 
-  [weight=UAA_WEIGHT]            /// 
-  , by(YE_AR)
-
-
-
-* -------------------
-* OH decomposition
-* -------------------
-tabstat                           /// 
-    d_farm_total_overhead_costs_eu   /// 
-    d_depreciation_of_machinery_eu   /// 
-    BUILDINGS_REPAIRS_UPKEEP_EU      /// 
-    TOTAL_COST_OF_LEASE_EU           /// 
-    LAND_RENTED_IN_EU                /// 
-    LAND_GENERAL_UPKEEP_EU           /// 
-    d_car_electricity_telephone_eu   /// 
-    ANNUITIES_EU                     /// 
-    d_machine_operating_expenses_eu  /// 
-    d_depreciation_of_buildings_eu   /// 
-    d_hired_labour_casual_excl_eu    /// 
-    d_misc_overhead_costs_eu         /// 
-    d_depreciation_of_land_imps_eu   /// 
-    d_intrst_pay_incl_hp_interest_eu /// 
-    pm_TOTAL_COST_OF_LEASE_EU        /// 
-  if FARM_SYSTEM == 1 &           /// 
-  D_SOIL_GROUP < 3                /// 
-  [weight=UAA_WEIGHT]             /// 
-  , by(YE_AR)
-
-
-
-* -------------------
-* Farm structures
-* -------------------
-tabstat                  ///
-    UAA_SIZE                ///
-    LAND_FARMED_HA          ///
-    WOODLAND_HA             ///
-    NON_AGRI_AREA_HA        ///
-    OTHER_LAND_USE_HA       ///
-  if FARM_SYSTEM == 1 &  /// 
-  D_SOIL_GROUP < 3       /// 
-  [weight=UAA_WEIGHT]    /// 
-  , by(YE_AR)
-
-
-gen double sh_owned   = LAND_OWNED        / UAA_SIZE
-gen double sh_rented  = LAND_RENTED_IN_HA / UAA_SIZE
-gen double sh_let     = LAND_LET_OUT_HA   / UAA_SIZE
-gen double sh_pasture = TOTAL_PASTURE_HA  / UAA_SIZE
-
-tabstat                        ///
-    sh_*                          ///
-    COMMONAGE*                    ///
-    MILK_QUOTA*                   ///
-    FARM_MD*                   ///
-    FARM*EDUC*                 ///
-    DEROGATION*                ///
-  if FARM_SYSTEM == 1 &        /// 
-  D_SOIL_GROUP < 3             /// 
-  [weight=UAA_WEIGHT]          /// 
-  , by(YE_AR)
-
-
-tabstat                        ///
-    D_SOIL_GROUP                  ///
-  if FARM_SYSTEM == 1          /// 
-  [weight=UAA_WEIGHT]          /// 
-  , by(YE_AR)
-
-
-
-* D_INVESTMENT_IN_LAND_IMPROVEMENTS too long, given "var145". Fix that.
-rename var145  D_INVESTMENT_IN_LAND_IMPROVEMENT 
 
 * Update the calculated vars with values from IB where we have them
 foreach var of varlist *invest* {
@@ -550,7 +430,7 @@ restore
 
 
 * ------------------------------------------------------------------
-* Switching to SAS varnames
+* Run prep file adapted from James Carroll's code
 * ------------------------------------------------------------------
 
 
@@ -574,10 +454,23 @@ foreach var of local vlist {
 
 save `outdatadir'/data_for_dairydofile, replace
 
-do dairydofile.do
+do sub_do/dairydofile.do
+
+* % early calving
+egen ecalf = rowtotal(dpcfbjan dpcfbfeb  dpcfbmar)
+gen ecalfpct = ecalf/dpcfbtot
+
+* Note the difference in sample composition < 1984
+tab SZCLASS year, column nofreq
+
+* Define a box plot with a few hard-coded options 
+qui do sub_do/yrbox
+
+* Then run file with the various plotting commands
+qui do sub_do/plots `outdatadir'
 
 
 * Change to SAS varnames
-*qui do renameIB2SAS.do
+*qui do sub_do/renameIB2SAS.do
 
 * ------------------------------------------------------------------
