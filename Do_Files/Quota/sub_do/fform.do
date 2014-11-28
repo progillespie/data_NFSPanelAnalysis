@@ -40,8 +40,6 @@ foreach var of local vlist {
   if `homog'==1 gen double ln`var' = ln(`var'_hom)
   else          gen double ln`var' = ln(`var'`suffix')
   
-  capture drop ln`var'
-  gen double ln`var' = ln(`var')
   
   
   * Cobb-Douglas production function (exlcude numerarire from list)
