@@ -1,3 +1,5 @@
+args outdatadir
+
 /*-----------TURNED OFF---------------------------------------------
 *TODO: the temoporarily off lines
 *TODO: the TEMPORARY FIXES -- off until var fixed
@@ -166,7 +168,7 @@ rename SEX SEX_RAW_CODES // another var is called SEX later in code
 /* Use SAS varnames instead of IB varnames where available
      (I'm more confident in these)                    */
 *qui do create_renameIB2SAS_code.do // update renaming file
-qui do renameIB2SAS.do             // do renaming file
+qui do sub_do/renameIB2SAS.do             // do renaming file
 
 
 
@@ -225,6 +227,7 @@ qui summ year
 gen t = year - `r(min)' + 1
 
 
+/* Doing this by insheeting and merging now
 
 * ===================================================================
 * Create Price indices   TODO: 79 and the last couple of years
@@ -1458,6 +1461,11 @@ foreach var of local monetary_vlist {
 }
 
 */
+*/
+
+
+
+merge m:1 year using `outdatadir'/cso_p_indices.dta, nogen
 
 
 * Sample selection, keep only specialist dairy (non-hill farms) 
@@ -1687,6 +1695,7 @@ replace SIZE5 = 1 if fsizunad>175
 
 
 drop   dosubsvl
+rename D_UAA_PUB_SIZE_CODE SZCLASS
 rename alloc    ALLOC
 rename ffszsyst SYS
 rename t        T
@@ -1787,7 +1796,7 @@ count if PS==11
 * partial productivity indicators
 gen PH = Y2/H
 gen PD = Y2/DC
-*gen PL = Y2/L3  // Temporarily off
+gen PL = Y2/L3  // Temporarily off
 gen PA = Y2/LANDFAGE
 gen PC = Y2/C
 
@@ -1831,6 +1840,9 @@ gen LRGOFF = OFFFARM * LARGE
 drop if W     <  1 
 
 preserve
+drop if SZCLASS == 0 | SZCLASS == 7
+tab SZCLASS, gen(SZCLASS)
+
 * Subset of vars to go to NLogit
 keep ///
      year     ///
@@ -1842,6 +1854,7 @@ keep ///
      W        ///
      FC       ///
      SCLASS   ///
+     SZCLAS*  ///
      FSIZE    ///
      FVALUE   ///
      SEX      ///

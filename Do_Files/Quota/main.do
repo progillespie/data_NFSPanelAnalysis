@@ -304,7 +304,30 @@ replace d_crop_livestock_gross_output_eu = ///
   
 
 * Standard Man days
-do smds
+do sub_do/smds
+
+
+* Fix total milk production
+do Cr_d_total_milk_production_lt
+replace D_TOTAL_MILK_PRODUCTION_LT = d_total_milk_production_lt if YE_AR < 1984
+
+* Stocking rate, Milk yield
+gen double d_dairy_stocking_rate = d_dairy_livstk_units_inc_bulls / D_FORAGE_AREA_HA
+gen double d_milk_yield          = d_total_milk_production_eu / d_dairy_livstk_units_inc_bulls 
+gen double d_milk_price          = d_total_milk_production_eu / D_TOTAL_MILK_PRODUCTION_LT
+gen double d_labour_intensity_ha = d_total_labour_units / D_FORAGE_AREA_HA
+gen double d_labour_intensity_lu = d_total_labour_units / d_dairy_livstk_units_inc_bulls 
+
+
+* D_INVESTMENT_IN_LAND_IMPROVEMENTS too long, given "var145". Fix that.
+rename var145  D_INVESTMENT_IN_LAND_IMPROVEMENT 
+
+
+* Extend D_UAA_PUB_SIZE_CODE back to 1979
+do Cr_d_uaa_pub_size_code.do
+
+
+
 
 
 * Fix total milk production
@@ -377,7 +400,8 @@ save `outdatadir'/built_panel, replace
 * Descriptives
 * ------------------------------------------------------------------
 use  `outdatadir'/built_panel, clear
-do descriptives.do "`outdatadir'"
+
+do sub_do/descriptives.do "`outdatadir'"
 
 
 
@@ -448,10 +472,31 @@ foreach var of local vlist {
 
 save `outdatadir'/data_for_dairydofile, replace
 
-do dairydofile.do
+
+*qui do sub_do/indices.do            // farm level price indices (not used yet)
+*qui do create_renameIB2SAS_code.do // to update renaming file
+qui do sub_do/renameIB2SAS.do       // to run renaming file
+do sub_do/dairydofile.do "`outdatadir'"      // prep for NLogit
+
+
+
+* % early calving
+egen ecalf = rowtotal(dpcfbjan dpcfbfeb  dpcfbmar)
+gen ecalfpct = ecalf/dpcfbtot
+
+
+
+
+* Note the difference in sample composition < 1984
+tab SZCLASS year, column nofreq
+
+
+* Draw and save box plots to show differences in sample
+qui do sub_do/yrbox  // program for box plots w/ hard-coded options 
+qui do sub_do/plots `outdatadir'  // actual box plot commands
 
 
 * Change to SAS varnames
-*qui do renameIB2SAS.do
+*qui do sub_do/renameIB2SAS.do
 
 * ------------------------------------------------------------------
