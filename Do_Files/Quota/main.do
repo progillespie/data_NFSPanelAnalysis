@@ -330,22 +330,6 @@ do Cr_d_uaa_pub_size_code.do
 
 
 
-* Fix total milk production
-do Cr_d_total_milk_production_lt
-replace D_TOTAL_MILK_PRODUCTION_LT = d_total_milk_production_lt if YE_AR < 1984
-
-* Stocking rate, Milk yield
-gen double d_dairy_stocking_rate = d_dairy_livstk_units_inc_bulls / D_FORAGE_AREA_HA
-gen double d_milk_yield          = d_total_milk_production_eu / d_dairy_livstk_units_inc_bulls 
-gen double d_milk_price          = d_total_milk_production_eu / D_TOTAL_MILK_PRODUCTION_LT
-gen double d_labour_intensity_ha = d_total_labour_units / D_FORAGE_AREA_HA
-gen double d_labour_intensity_lu = d_total_labour_units / d_dairy_livstk_units_inc_bulls 
-
-
-* D_INVESTMENT_IN_LAND_IMPROVEMENTS too long, given "var145". Fix that.
-rename var145  D_INVESTMENT_IN_LAND_IMPROVEMENT 
-
-
 quietly {
 
   * Unwanted vars. Capture prevents error if var isn't in data.
