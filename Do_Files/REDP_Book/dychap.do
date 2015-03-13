@@ -29,6 +29,13 @@
    * doFarmDerivedVars.do <-- creates Derived vars (see COD)
 
    * education.csv 	  <-- Obtained from Anne Kinsella.
+   
+   * seasonality.csv  <-- pulled from CSO using R script, but
+                           will include a copy so that R need
+						   not be used. R script also included
+						   but is not called anywhere (you can
+						   choose to run it yourself if you have
+						   R.)
 ------------------------------------------------------------*/
 
 clear
@@ -47,7 +54,7 @@ capture cmdlog close
 /* path to data_NFSPanelAnalysis (i.e. the main 
     directory) all subsequent filepath macros 
     depend on this one */
-local paneldir F:/Data/data_NFSPanelAnalysis
+local paneldir D:/Data/data_NFSPanelAnalysis
 
 
 * filepaths of subdirectories of `paneldir'
@@ -175,10 +182,10 @@ tabstat wt region, by(year)
     (and possibly again on the final program 
     run). 
 -----------------------------------------------*/
-*do doFarmDerivedVars.do 
+do doFarmDerivedVars.do 
 
 
-*save `outdatadir'/`intdata', replace * turn off when skipping doFarmDerivedVars.do 
+save `outdatadir'/`intdata', replace // turn off when skipping doFarmDerivedVars.do 
 
 
 /* Closes any logs the previous do-file may have left

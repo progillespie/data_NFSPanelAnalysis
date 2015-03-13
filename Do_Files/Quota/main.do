@@ -12,23 +12,24 @@ local dodir      ///
 
 local outdatadir    ///
    "`dataroot'\OutData\Quota"
+capture mkdir `outdatadir'
 
 
 local origdata79   ///
    "`dataroot'\OutData\RAW_79_83\svy_tables_7983"
 local outdata79   ///
    "`dataroot'\OutData\FarmPriceVolMSM_7983"
-
+capture mkdir `outdata79'
 
 local origdata84   ///
    "`dataroot'\OrigData\FarmPriceVolMSM\"
 local outdata84   ///
    "`dataroot'\OutData\FarmPriceVolMSM\"
+capture mkdir `outdata84'
 
 
 
-
-
+/*
 
 * ============================================================== * 
 * =============== Program for building data ==================== *
@@ -97,7 +98,10 @@ build "svy_pig*.dta"
 build "svy_poultr*.dta"
 build "svy_horse*.dta"
 *build "total_crops_gross_output*"
-build "svy_hay_silage_?.dta"
+build "svy_hay_silage_1.dta"
+build "hay_silage_ha.dta"
+build "pasture_ha.dta"
+build "svy_livestock_expenses_2.dta"
 
 
 cd "1"       // Parameter subdirectory
@@ -132,42 +136,87 @@ build "svy_pig*.dta"
 build "svy_poultr*.dta"
 build "svy_horse*.dta"
 *build "total_crops_gross_output*"
-build "svy_hay_silage_?.dta"
+build "svy_hay_silage_1.dta"
+build "hay_silage_ha.dta"
+build "pasture_ha.dta"
 build "svy_weights_84.dta"
+build "svy_livestock_expenses_2.dta"
 
 cd "`origdata84'"         // raw data directory 
 build "svy_farm.dta"
 build "svy_misc_receipts_expenses.dta"
-build "svy_livestock_expenses.dta"
 build "svy_std_man_days.dta"
   
 
 
 
 * Go back to the merged crop tables to create the HA vars you need
-*   for SMDS calculation, save, and merge into main dataset. Necessary
-*   because these tables are multi-card, and we also have to reshape
-*   that data to match the main data's panel structure.
+*   for SMDS calculation (and forage and feed), save, and merge into 
+*   main dataset. Necessary because these tables are multi-card, and 
+*   we also have to reshape that data to match the main data's panel
+*   structure.
 
 preserve  // put main data in background
 
 use `outdata79'/merged_crop_tables_3, clear
 append using `outdata84'/merged_crop_tables_3
-
 cd `dodir'
 do Cr_HA_for_smds
 save `outdatadir'/HA_for_smds.dta, replace
 
 restore  // back to main data now
-
 merge 1:1 FARM_CODE YE_AR using `outdatadir'/HA_for_smds.dta, nogen
 
 
+/* 
+===================================================================
+Attempt at removing need for deprecated code and nfs_7983 
+It runs, but gives too low an anwer for d_feed_area_equiv_ha, with 
+ too many zero values. When that's sorted out then this part can 
+ be used, or ideally the Cr files can be incorporated into the 
+ FarmPriceVolMSM projects (where they really belong).
+===================================================================
+do Cr_d_forage_area_ha
 
 
+use 
+* Need to dip into the bulkyfeed data
+preserve // put main data in background
+
+
+use          `outdata79'/bulkfeed_fed_livestock_eu_1, clear
+append using `outdata84'/bulkfeed_fed_livestock_eu_1
+merge m:1 FARM_CODE YE_AR using `outdata79'/svy_hay_silage_1, nogen
+merge m:1 FARM_CODE YE_AR using `outdata84'/svy_hay_silage_1, nogen update
+merge m:1 FARM_CODE YE_AR using `outdata79'/hay_silage_ha, nogen 
+merge m:1 FARM_CODE YE_AR using `outdata84'/hay_silage_ha, nogen update
+rename s_b_ALLOC_DAIRY_HERD_QTY ALLOC_DAIRY_HERD_QTY
+drop s_b*
+drop *_cond
+
+do Cr_d_purch_feed_bulk_alloc_dairy_ha
+save `outdatadir'/bulkfeed_merge_data.dta, replace
+
+restore  // back to main data now
+
+
+merge 1:1 FARM_CODE YE_AR using `outdatadir'/bulkfeed_merge_data.dta, nogen
+do Cr_d_feed_area_equiv_ha
+* ===================================================================
+*/
+
+
+
+* ===================================================================
 * TEMPORARY - use my original code to recalculate D_FORAGE_AREA_HA
-*   and D_FEED_AREA_EQUIV_HA. TODO: do this the FarmPriceVolMSM way. 
+*   and D_FEED_AREA_EQUIV_HA. 
+* 
+* TODO: do this the FarmPriceVolMSM way. One attempt made at it (code 
+*  above). Not yet successful (code runs, but var is wrong). Have to 
+*  live with the following for now. 
+* ===================================================================
 preserve
+
 
 use "D:\Data\data_NFSPanelAnalysis\OutData\nfs_7983", clear
 cd "D:\Data\data_NFSPanelAnalysis\Do_Files\RAW_79_83\sub_do" 
@@ -181,6 +230,8 @@ cd `dodir'
 restore
 
 merge 1:1 FARM_CODE YE_AR using `outdatadir'/feed_forage_ha.dta, nogen update
+* ===================================================================
+
 
 * ------------------------------------------------------------------
 
@@ -455,6 +506,9 @@ foreach var of local vlist {
 }
 
 save `outdatadir'/data_for_dairydofile, replace
+*/
+
+use  `outdatadir'/data_for_dairydofile, clear
 
 
 *qui do sub_do/indices.do            // farm level price indices (not used yet)
@@ -462,7 +516,7 @@ save `outdatadir'/data_for_dairydofile, replace
 qui do sub_do/renameIB2SAS.do       // to run renaming file
 do sub_do/dairydofile.do "`outdatadir'"      // prep for NLogit
 
-
+exit
 
 * % early calving
 egen ecalf = rowtotal(dpcfbjan dpcfbfeb  dpcfbmar)

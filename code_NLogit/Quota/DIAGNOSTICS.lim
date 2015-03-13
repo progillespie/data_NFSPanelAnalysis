@@ -1,0 +1,487 @@
+? ******************************************************************
+? *       Patrick R. Gillespie                            
+? *       Walsh Fellow                    
+? *       Teagasc, REDP                           
+? *       patrick.gillespie@teagasc.ie            
+? ******************************************************************
+? *
+? *       Dairy Efficiency Models
+? *         for the purpose of generating 
+? *         Malmquist indices of TFP
+? * 
+? *       Code for PhD Thesis chapter
+? *         based on original specification and code by 
+? * 
+? *          James Carroll, TCD (2008, Thesis)
+? *      
+? *                                                    
+? *       Thesis Supervisors:
+? *       -------------------
+? *       Cathal O'Donoghue
+? *       Stephen Hynes
+? *       Thia Hennessey
+? *       Fiona Thorne
+? *
+? ******************************************************************
+? *  Contributions:
+? *    - Post-estimation tests
+? ******************************************************************
+
+
+
+RESET$ 
+READ;FILE="D:\Data\data_NFSPanelAnalysis\code_NLogit\Quota\DAIRY.xls"
+    ;FORMAT=xls$
+SORT	      ;LHS=FC;RHS=*$
+
+
+?----------------------- 
+? CREATE PANEL INDICATOR
+?  - NDX(IDVAR, #) creates and index starting at 1 counting up.
+?      IDVAR is the name of your ID variable, # is 0 or 1. 
+?      If # is 0, NDX just creates a new ID which starts at 1 
+?      and goes up in steps of 1, which may not be the case for
+?      the IDVAR (e.g. if Farm 965 is the first farm in the data, 
+?      every row for Farm 965 has the index 1). If # is 1, then NDX 
+?      counts each observation of IDVAR, starting at 1 for each new 
+?      IDVAR (e.g. Farm 965 might have 4 rows, which would be numbered 
+?      1,2,3,and 4 in whatever way the data were sorted).Note the 
+?      importance of sorting the data before doing the CALC; NDX().
+?
+?  - REGRESS ONE against ONE, with FC set as stratification (i.e. ID)
+?      variable will NOT actually do a regression, but just create the 
+?      ID index. It leaves behind _GROUPTI.
+?----------------------- 
+SORT	      ;LHS=FC;RHS=*$
+CREATE	;IND=NDX(FC,0)$
+REGRESS	;LHS=ONE;RHS=ONE;STR=FC;PANEL$
+CREATE	;GRPSIZE=_GROUPTI$
+CALC	;LIST ;G=MAX(GRPSIZE)$
+
+SETPANEL ; Group = FC ; Pds = Ti $ ? Declare taht this is a panel
+
+
+? ******************************************************************
+? -------------------- PROCEDURE DEFINITIONS -----------------------
+? ******************************************************************
+
+?-------------------------
+? Sample Selection 
+?-------------------------
+
+? Drop zero's, negatives, and weights less than 1
+
+PROC = ZERODROP $
+
+  REJECT  ;W < 1$
+  ?????REJECT	;Y1<=0$
+  REJECT	;Y2<=0$
+  REJECT	;H<=0$
+  REJECT	;C<=0$
+  REJECT	;L3<=0$
+  REJECT	;D<=0$
+  REJECT	;A<=0$
+ENDPROC $
+
+
+
+?-------------------------
+? Sample Selection 
+?-------------------------
+
+? Procedure to carry out a Chow test of structural change.
+?    Inputs: X = namelist that contains full set of independent variables
+?            y = dependent variable
+?            d = dummy variable used to partition the sample
+?    Outputs F = sample F statistic for the Chow test
+?   F95 = 95th percentile from the appropriate F table.
+ 
+
+PROC = ChowTest(X,y,d) $
+  CALC    ; k = Col(X) ; Nfull = N $
+
+  INCLUDE ; New ; d = 1 $
+  REGRESS ; LHS = y; RHS = X; PANEL; FIXED EFFECTS $
+  CALC    ; ee1 = sumsqdev $
+
+  INCLUDE ; New ; d = 0 $
+  REGRESS ; LHS = y; RHS = X; PANEL; FIXED EFFECTS $
+  CALC    ; ee0 = sumsqdev $
+
+  SAMPLE  ; All $
+  REGRESS ; LHS = y; RHS = X; PANEL; FIXED EFFECTS $
+  CALC    ; ee  = sumsqdev $
+
+  CALC    ; List
+          ; F = ((ee-(ee1+ee0))/K) / (ee/(Nfull-2*K) ) 
+          ; F95 = Ftb(.95,K, (Nfull-2*K)) $
+END PROCEDURE $
+
+
+
+? ******************************************************************
+? -------------- END OF PROCEDURE DEFINITIONS ----------------------
+? ******************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+? ******************************************************************
+? --------------------- DATA MANIPULATION --------------------------
+? ******************************************************************
+
+
+
+
+?---------------------
+? Rename Direct Costs
+?---------------------
+RENAME	;DC=D$
+
+
+?------------ 
+? CREATE LAND
+?------------
+CREATE	;A=LANDFAGE$
+
+
+?------------ 
+? Scale variables (per cow)
+?------------
+CREATE            ;Y20 = Y2     $
+CREATE [IF H > 0] ;Y2  = Y2/H   $
+CREATE [IF H <=0] ;Y2  = 0.0001 $
+
+CREATE            ;C0 = C       $
+CREATE [IF H > 0] ;C  = C/H     $
+CREATE [IF H <=0] ;C  = 0.0001  $
+
+CREATE            ;D0 = D       $
+CREATE [IF H > 0] ;D = D/H      $
+CREATE [IF H <=0] ;D = 0.0001   $
+
+CREATE            ;L0 = L3       $
+CREATE [IF H > 0] ;L  = L3/H     $
+CREATE [IF H <=0] ;L  = 0.0001   $
+
+CREATE            ;A0 = A       $
+CREATE [IF H > 0] ;A = A/H      $
+CREATE [IF H <=0] ;A = 0.0001   $
+
+
+
+?------------ 
+? CREATE Panel Dummies
+?------------
+CREATE	;IF(              YEAR <= 1983) PANEL1=1$
+CREATE	;IF(YEAR > 1983 & YEAR <= 1991) PANEL2=1$
+CREATE	;IF(YEAR > 1991               ) PANEL3=1$
+
+
+?--------------
+? Summary stats
+?--------------
+DSTAT	;RHS=Y2,H,C,D,L3,A,YEAR$
+
+
+EXEC; PROC = ZERODROP $
+
+?----------------
+? CALCULATE MEANS
+?----------------
+CALC	;MEANY1=XBR(Y1)$
+CALC	;LIST;MEANY2=XBR(Y2)$
+CALC	;MEANH=XBR(H)$
+CALC	;MEANC=XBR(C)$
+CALC	;MEAND=XBR(D)$
+CALC	;MEANL=XBR(L3)$
+CALC	;MEANA=XBR(A)$
+
+CREATE; MNY2 = MEANY2 $
+CREATE; MNH  = MEANH  $
+CREATE; MNC  = MEANC  $
+CREATE; MND  = MEAND  $
+CREATE; MNL  = MEANL  $
+CREATE; MNA  = MEANA  $
+
+
+NAMELIST; MUNDLAK = MNH, MNC, MND, MNL, MNA$
+
+
+?--------------------------------------------------------------------
+? MEAN ADJUSTMENT -- Eases interpretation of parameter estimates
+?                      Makes it so B's are elasticities as in 
+?                      Cobb-Douglas, even for the Translog functional
+?                      form. 
+?--------------------------------------------------------------------
+CREATE;MY1=Y1/MEANY1 
+ 	;MY2=Y2/MEANY2 
+	;MH=H/MEANH 
+	;MC=C/MEANC 
+	;MD=D/MEAND  
+	;ML=L3/MEANL 
+      ;MA=A/MEANA$  
+
+
+?--------------------------------------------------------------------
+? CONVERT TO LOGS -- Both CD and TL functions are non-linear, 
+?                      but this transforms them s.t. they are now 
+?                      linear in parameters, hence they no longer 
+?                      violate assumptions of OLS (which are the same
+?                      that we must adhere to for these SFA models).
+?--------------------------------------------------------------------
+?????;LNY1=LOG(MY1) (neg values to fix... not using for now)
+CREATE;LNY2=LOG(MY2)
+	;LNH=LOG(MH)
+	;LND=LOG(MD)
+	;LNC=LOG(MC)
+	;LNL=LOG(ML) 
+	;LNA=LOG(MA)$
+
+
+?-------------------------------------------
+? CREATE INTERACTION VARIABLES FOR TRANSLOG
+?-------------------------------------------
+ CREATE ;TT=T*T
+        ;LNHH=LNH*LNH
+        ;LNHD=LNH*LND
+        ;LNHC=LNH*LNC
+        ;LNHL=LNH*LNL
+        ;LNDD=LND*LND
+        ;LNDC=LND*LNC
+        ;LNDL=LND*LNL
+        ;LNCC=LNC*LNC
+        ;LNCL=LNC*LNL
+        ;LNLL=LNL*LNL
+        ;LNHA=LNH*LNA
+        ;LNDA=LND*LNA
+        ;LNCA=LNC*LNA
+        ;LNLA=LNL*LNA
+        ;LNAA=LNA*LNA
+        ;LNHT=LNH*T
+        ;LNDT=LND*T
+        ;LNCT=LNC*T
+        ;LNLT=LNL*T
+        ;LNAT=LNA*T
+        ;TTT=TT*T$
+
+
+?------------------------------------------------------------
+? CREATE NAMELISTS -- Similar to macros for Stata, allows you
+?                      to give lists of variables. You cannot
+?                      store other info this way however (e.g.
+?                      conditions states, filepaths, etc.)
+?------------------------------------------------------------
+ NAMELIST;CD=ONE,LNH,LND,LNC,LNL,LNA$
+
+ NAMELIST;TL=LNHH,LNHD,LNHC,LNHL,LNHA,LNDD,LNDC,LNDL,LNDA,
+            LNCC,LNCL,LNCA,LNLL,LNLA,LNAA$
+
+ NAMELIST;TCD=T,TT$
+
+ NAMELIST;TTL=T,TT,LNHT,LNDT,LNCT,LNLT,LNAT$
+
+ NAMELIST;TDV=  T2, T3, T4, T5, T6,
+                T7, T8, T9,T10,T11,
+               T12,T13,T14,T15,T16,
+               T17,T18,T19,T20,T21,
+               T22,T23,T24,T25,T26,
+               T27,T28,T29,T30,T31, 
+               T32,T33,T34 $
+
+CREATE; SZC2_PAN = SZCLASS2 * (1-PANEL1)$
+CREATE; SZC3_PAN = SZCLASS3 * (1-PANEL1)$
+CREATE; SZC4_PAN = SZCLASS4 * (1-PANEL1)$
+CREATE; SZC5_PAN = SZCLASS5 * (1-PANEL1)$
+CREATE; SZC6_PAN = SZCLASS6 * (1-PANEL1)$
+
+
+? Cannot fit TFE model with time invariant vars, so must interact
+?   SZCLASS vars with TDV instead of Panel
+? NOTE: there are no farms in SZCLASS6 pre-1984
+CREATE; SZC2T1 = SZCLASS2 * T1
+      ; SZC2T2 = SZCLASS2 * T2
+      ; SZC2T3 = SZCLASS2 * T3
+      ; SZC2T4 = SZCLASS2 * T4
+      ; SZC2T5 = SZCLASS2 * T5
+      ; SZC3T1 = SZCLASS3 * T1
+      ; SZC3T2 = SZCLASS3 * T2
+      ; SZC3T3 = SZCLASS3 * T3
+      ; SZC3T4 = SZCLASS3 * T4
+      ; SZC3T5 = SZCLASS3 * T5
+      ; SZC4T1 = SZCLASS4 * T1
+      ; SZC4T2 = SZCLASS4 * T2
+      ; SZC4T3 = SZCLASS4 * T3
+      ; SZC4T4 = SZCLASS4 * T4
+      ; SZC4T5 = SZCLASS4 * T5
+      ; SZC5T1 = SZCLASS5 * T1
+      ; SZC5T2 = SZCLASS5 * T2
+      ; SZC5T3 = SZCLASS5 * T3
+      ; SZC5T4 = SZCLASS5 * T4
+      ; SZC5T5 = SZCLASS5 * T5
+      ; SZC6T1 = SZCLASS6 * T1
+      ; SZC6T2 = SZCLASS6 * T2
+      ; SZC6T3 = SZCLASS6 * T3
+      ; SZC6T4 = SZCLASS6 * T4
+      ; SZC6T5 = SZCLASS6 * T5 $
+
+
+CREATE; LNQT = LOG(QT + 0.01)$
+CREATE; LNALLOC = LOG(ALLOC + 0.00001)$
+
+
+? Must have SOIL dummies in controls at a minimum.
+NAMELIST; CONTROLS = SZC2_PAN, SZC3_PAN, SZC4_PAN, 
+                     SZC5_PAN, SZC6_PAN,
+                     SOIL1, SOIL2, LNQT$
+
+? Must have SOIL dummies in controls at a minimum.
+? Consider LNQT too (as a control, not a modelled variable)
+NAMELIST; CONTROLT = SZC2T2, SZC2T3, SZC2T4, SZC2T5,
+                     SZC3T2, SZC3T3, SZC3T4, SZC3T5,
+                     SZC4T2, SZC4T3, SZC4T4, SZC4T5,
+                     SZC5T2, SZC5T3, SZC5T4, SZC5T5,
+                     SOIL1, SOIL2, LNQT$
+
+
+
+
+
+
+DSTAT	;RHS=TDV $	
+
+
+
+? ******************************************************************
+? END------------------ DATA MANIPULATION --------------------------
+? ******************************************************************
+
+
+
+
+
+? ******************************************************************
+? --------------------- Testing & Diagnostics ----------------------
+? ******************************************************************
+
+
+PLOT  ; LHS = LNY2; RHS = LNH, LNC, LND, LNL, LNA $
+SPLOT ; RHS = LNC, LND, LNL, LNA$
+
+
+REGRESS; LHS = LNY2; RHS = LNC, LND, LNL, LNA
+       ; PANEL; FIXED EFFECTS 
+       ; RES  = FEe
+       ; KEEP = FExb $
+
+PLOT; LHS = FExb; RHS = FEe $
+KERNEL; RHS = FEe $
+
+
+?Chow Tests - NOT A PREPROGRAMMED COMMAND! Procedure defined above.
+?-----------
+NAMELIST; INDVAR = CD, TL, SZCLASS2, SZCLASS3, SZCLASS4, SZCLASS5 $
+
+
+SAMPLE  ; ALL$
+EXECUTE ; PROC = ChowTest(INDVAR, LNY2, PANEL1); SILENT $
+CALC    ; LIST; F ; F95 $
+
+REJECT  ; YEAR < 1989$
+EXECUTE ; PROC = ChowTest(INDVAR, LNY2, PANEL1); SILENT$
+CALC    ; LIST; F ; F95 $
+
+
+
+
+
+
+
+
+? Test for homoscedastic errors 
+REGRESS  ; LHS = LNY2 ; RHS = CD ;Panel;Fixed Effect            $
+REGRESS  ; Lhs = LNY2 ; RHS = CD ;Panel;Fixed Effects      ; Het $
+
+
+? LR spec. test of Cobb-Douglas vs Translog functional form (TL if significant)
+REGRESS ; LHS = LNY2 ; RHS = CD$
+CALC    ; LR = LogL$
+REGRESS ; LHS = LNY2 ; RHS = CD,TL $
+CALC    ; LU = LogL $
+CALC    ; LRtest = -2*(LR-LU)
+        ; LRcrit = CTB(0.95,15)$ ? 15 is the number of restrictions
+CALC    ; LIST
+        ; TLtest = LRtest
+        ; TLcrit = LRcrit$
+
+
+? LR spec. test of Time Dummy variables (TDV if significant)
+REGRESS ; LHS = LNY2 ; RHS = CD, TL$
+CALC    ; LR = LogL$
+REGRESS ; LHS = LNY2 ; RHS = CD,TL,TDV $
+CALC    ; LU = LogL $
+CALC    ; LRtest = -2*(LR-LU)
+        ; LRcrit = CTB(0.95,15)$ ? 15 is the number of restrictions
+CALC    ; LIST
+        ; TDVtest = LRtest
+        ; TDVcrit = LRcrit$
+
+
+? LR spec. test of Translog terms with trend variable (TTL if significant)
+REGRESS ; LHS = LNY2 ; RHS = CD, TL $
+CALC    ; LR = LogL$
+REGRESS ; LHS = LNY2 ; RHS = CD,TL, TTL $
+CALC    ; LU = LogL $
+CALC    ; LRtest = -2*(LR-LU)
+        ; LRcrit = CTB(0.95,15)$ ? 15 is the number of restrictions
+CALC    ; LIST
+        ; TTLtest = LRtest
+        ; TTLcrit = LRcrit$
+
+
+
+
+? Part 6.  Testing for constant returns to scale.  The test is of the hypothesis
+?          that the four output elasticities sum to one.
+?          The first regression does not impose the restriction.
+?          The second computes the conventional F statistic.  The value is 
+?          55.67. There is one restriction, so the critical value is 3.84 
+?          (square of critical t value with 1477 degrees of freedom which is 
+?           standard normal, or 1.96).
+?
+
+? Test CRS hypothesis for CD form
+REGRESS ; LHS = LNY2 ; RHS = CD, TDV;
+        ; CLS: b(2) + b(3) + b(4) + b(5)+ b(6) = 1$ 
+? RELEVANT LINE FROM OUTPUT
+? Restrictns.  F[  1,  8715] (prob) =    29.1(.0000)
+
+? Test CRS hypothesis for TL form
+REGRESS ; LHS = LNY2 ; RHS = CD, TL, TDV;
+        ; CLS: b( 2) + b( 3) + b( 4) + b( 5) + b( 6) = 1,
+               b( 7) + b( 8) + b( 9) + b(10) + b(11) = 0,
+               b(12) + b( 8) + b(13) + b(14) + b(15) = 0,
+               b( 9) + b(13) + b(16) + b(17) + b(18) = 0,
+               b(10) + b(14) + b(17) + b(19) + b(20) = 0,
+               b(11) + b(15) + b(18) + b(20) + b(21) = 0$
+               
+
+REGRESS ; Lhs = yit ; Rhs = Translog ; 
+CLS: x1+x2+x3+x4 = 1, 
+x11+x12+x13+x14=0, 
+x12+x22+x23+x24=0, 
+x13+x23+x33+x34=0, 
+x14+x24+x34+x44=0 $ 
+? RELEVANT LINE FROM OUTPUT
+
+? ******************************************************************
+? END------------------ Testing & Diagnostics ----------------------
+? ******************************************************************

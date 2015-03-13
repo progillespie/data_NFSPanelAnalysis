@@ -5,7 +5,7 @@ set maxvar 10000
 
   
 local stata_version = 12
-local lennon = 1
+local lennon = 0
 
 
 local startdir: pwd // Save current working directory location

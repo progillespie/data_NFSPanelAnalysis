@@ -1,0 +1,1348 @@
+? ******************************************************************
+? *       Patrick R. Gillespie                            
+? *       Walsh Fellow                    
+? *       Teagasc, REDP                           
+? *       patrick.gillespie@teagasc.ie            
+? ******************************************************************
+? *
+? *       Dairy Efficiency Models
+? *         for the purpose of generating 
+? *         Malmquist indices of TFP
+? * 
+? *       Code for PhD Thesis chapter
+? *         based on original specification and code by 
+? * 
+? *          James Carroll, TCD (2008, Thesis)
+? *      
+? *                                                    
+? *       Thesis Supervisors:
+? *       -------------------
+? *       Cathal O'Donoghue
+? *       Stephen Hynes
+? *       Thia Hennessey
+? *       Fiona Thorne
+? *
+? ******************************************************************
+? *  Contributions:
+? *    - re-estimate and evaluate using vars scaled per cow
+? ******************************************************************
+
+
+
+
+
+
+
+
+
+
+? ******************************************************************
+? ------------------------ DATA IMPORT -----------------------------
+? ******************************************************************
+
+? NOTE ON IMPORTING DATA -------------------------------------------
+?
+? If the file throws an error on import: 
+?  1  : Open and save the file again (without changes, including  
+?         filename) I'm not sure why this is necessary, but it seems 
+?         to work. I suspect it has something to do with 
+?         [compatibility mode] in recent versions of Excel. 
+?         I'm using Excel 2010. 
+?
+?  2  : If the file is .xlsx, save it as .xls
+?
+?  3  : Check and see if the file has blank cells. If so, try using 
+?         the missing() option on export excel in Stata.
+?
+?  I'm using "export excel" in Stata to write the Excel file, and 
+?    I've had to do "1" from above every time to read the file in. 
+?
+?  NLogit/Limdep is supposed to be able to read csv files as well, 
+?    but I've never gotten it to work properly; often it LOOKS 
+?    like it's correctly in memory, but it reads only half the file!
+? ------------------------------------------------------------------
+
+
+RESET$ 
+
+? ROWS makes the default workspace bigger, i.e. 2777 x 900. 
+?   The READ command that follows will reallocate cells between rows 
+?   and columns based on the data (> 8700 rows), but as a result of the
+?   larger workspace, there will be more cells available for columns than
+?   if you had immediately done the READ command.
+ROWS; 2777 $ 
+READ;FILE="D:\Data\data_NFSPanelAnalysis\code_NLogit\Quota\DAIRY.xls"
+    ;FORMAT=xls$
+SETPANEL; Group = FC; Pds = Ti$
+
+
+
+? Check that all the years came in, and see how many cases there are 
+?   before any more sample selection takes place (already only 
+?   specialist dairy)
+DSTAT;Rhs=YEAR$
+
+? ******************************************************************
+? -------------------- END OF DATA IMPORT --------------------------
+? ******************************************************************
+
+
+
+
+
+
+
+
+
+
+? ******************************************************************
+? -------------------- PROCEDURE DEFINITIONS -----------------------
+? ******************************************************************
+
+?-------------------------
+? Sample Selection 
+?-------------------------
+
+
+
+?- -   - -   - -
+? YEARLY OUTLIERS
+?- -   - -   - -
+
+PROC = OUTLIER(var,tindex) $
+
+  INCLUDE; NEW; T = tindex           $
+  CALC; XOB = QNT(var, 0.995)        $
+  CREATE [IF T = tindex]; VXOB = XOB $
+
+ENDPROCEDURE
+  
+
+
+?- -   - -   - -
+? Select groups of years via T index, 
+? Drop zero's, neg.'s, outliers
+?- -   - -   - -
+
+PROC = SAMPSEL(min_t, max_t) $
+
+  SAMPLE;ALL$
+  REJECT  ;T < min_t $
+  REJECT  ;T > max_t $
+
+  ? Non-sense weights
+  REJECT    ; W  < 1$
+
+  ? Zero's and neg.'s
+  REJECT	;Y1 <= 0$
+  REJECT	;Y2 <= 0$
+  REJECT	; H <= 0$
+  REJECT	; D <= 0$
+  REJECT	; C <= 0$
+  REJECT	;L3 <= 0$
+  REJECT	; A <= 0$
+
+  ? Extreme observations
+  REJECT	;Y1 >  Y1XOB $
+  
+
+  ? Tried these as well, but not necessary for removing outliers,
+  ?  so to use them too is probably heavy-handed.
+  ?REJECT	;Y2 >  Y2XOB $
+  ?REJECT	; H >   HXOB $
+  ?REJECT	; D >   DXOB $
+  ?REJECT	; C >   CXOB $
+  ?REJECT	;L3 >  L3XOB $
+  ?REJECT	; A >   AXOB $
+
+ENDPROCEDURE
+
+
+
+? -----------------------
+? Yearly summary stats
+? ----------------------- 
+
+? Get summary stats per year, puts  
+
+PROC = YSTATS(namelist, tindex) $
+
+  SAMPLE  ; ALL $ 
+  EXEC    ; PROC = DROP$
+  REJECT  ;T < tindex $
+  REJECT  ;T > tindex $
+
+  ? Non-sense weights
+  REJECT    ; W  < 1$
+
+  ? Zero's and neg.'s
+  REJECT	;Y1 <= 0$
+  REJECT	;Y2 <= 0$
+  REJECT	; H <= 0$
+  REJECT	; D <= 0$
+  REJECT	; C <= 0$
+  REJECT	;L3 <= 0$
+  REJECT	; A <= 0$
+
+  ? Extreme observations
+  REJECT	;Y1 >  Y1XOB $
+
+  DSTAT	;RHS=namelist;WTS=W $
+  MATRIX; YSTATMAT = [YSTATMAT / LASTDSTA] $
+
+ENDPROCEDURE
+
+
+
+? ---------------------------
+?  Make elasticities, 1st  
+?  and 2nd deriv's and RTS
+? ---------------------------
+
+PROC = MKRTS$
+
+  ?----------------------- 
+  ? INITIALISE ROW SPECIFIC THEORY CHECK VARIABLES
+  ?----------------------- 
+  CREATE; CONCAVE = 0 $ FOR QUASI-CONCAVITY
+  CREATE; MONO    = 0 $ FOR MONOTONICITY
+  CREATE; DMPROD  = 0 $ FOR DIMINSHING MARGINAL PRODUCT
+
+
+
+  ?Calc. input elasticities (EX) at each data point 
+  CREATE ; ED=B_LND+(2*LND*B_LNDD)+(LNC*B_LNDC)+(LNL*B_LNDL)+(LNA*B_LNDA)$
+  CREATE ; EC=B_LNC+(LND*B_LNDC)+(2*LNC*B_LNCC)+(LNL*B_LNCL)+(LNA*B_LNCA)$
+  CREATE ; EL=B_LNL+(LND*B_LNDL)+(LNC*B_LNCL)+(2*LNL*B_LNLL)+(LNA*B_LNLA)$
+  CREATE ; EA=B_LNA+(LND*B_LNDA)+(LNC*B_LNCA)+(LNL*B_LNLA)+(2*LNA*B_LNAA)$
+
+
+  ? Use elasticities and average product to get marginal product
+  CREATE; dYdD = "ST1" / D * ED $
+  CREATE; dYdC = "ST1" / C * EC $
+  CREATE; dYdL = "ST1" / L * EL $
+  CREATE; dYdA = "ST1" / A * EA $
+
+
+  ? Use elasticities to get 2nd derivatives
+  CREATE; d2YdD2= (B_LNDD + ((ED - 1) * ED)) * ("ST1" / (D^2))
+  CREATE; d2YdC2= (B_LNCC + ((EC - 1) * EC)) * ("ST1" / (C^2))
+  CREATE; d2YdL2= (B_LNLL + ((EL - 1) * EL)) * ("ST1" / (L^2))
+  CREATE; d2YdA2= (B_LNAA + ((EA - 1) * EA)) * ("ST1" / (A^2))
+
+
+  ? Record whether they are of expected sign
+  CREATE;  IF (
+               ED > 0 & 
+               EC > 0 & 
+               EL > 0 & 
+               EA > 0       ) MONO = 1 $ Monotonicity fullfilled?
+ 
+
+  CREATE;  IF (
+               d2YdD2  < 0 &
+               d2YdC2  < 0 & 
+               d2YdL2  < 0 &
+               d2YdA2  < 0  ) DMPROD = 1 $ Diminishing Marginal Product fulfilled?
+
+
+  ? Using the elasticities to calculate Returns to Scale (row specific)
+  CREATE	;RTS=ED+EC+EL+EA$
+
+
+  ? Summarise elasticities and (row specific) RTS overall
+  DSTAT	;RHS=ED,EC,EL,EA,RTS;WTS=W$
+
+
+ENDPROCEDURE
+
+
+
+PROC = REGPOINT
+
+  ? Form the Hessian matrix from a handy decomposition. Taken from 
+  ?  Sauer (2006, pg. 148). 
+  ?              HESSIAN = Q - S1 + S2
+  ?  where Q is the symmetric matrix of the quadratic coef's of the 
+  ?  translog function, S1 is a diagonal matrix formed from a row
+  ?  vector of input elasticities (called v below), and S2 = v'v
+  ?  (if v was constructed as a row, NOT a column), which is a 
+  ?  matrix of squared and interacted elasticities. Note that these 
+  ?  should not be confused with the coef.'s of the quadratic terms 
+  ?  of the function itself (e.g. EH^2 is not B_LNHH).
+  ?
+  ? In the special case where the data have been normalised by a point 
+  ?  of approximation, then you can just put the coef.'s of the main 
+  ?  effects of the inputs (e.g. B_LNH, B_LND, etc.) in v instead of 
+  ?  the full elasticity formula (e.g. EH, ED, etc.) because
+  ?  they'll be equivalent. You'll end up multiplying the other
+  ?  terms by ln(1)= 0, so the other terms just drop out.
+  
+  MATRIX; Q = [ B_LNDD, B_LNDC, B_LNDL, B_LNDA /
+                B_LNDC, B_LNCC, B_LNCL, B_LNCA /
+                B_LNDL, B_LNCL, B_LNLL, B_LNLA /
+                B_LNDA, B_LNCA, B_LNLA, B_LNAA ] $
+
+  MATRIX; v = [B_LND, B_LNC, B_LNL, B_LNA] $
+  MATRIX; v0 = v'       $ Column version of v
+  MATRIX; v0 = [0 / v0] $ Transposed v with a 0 appended to the top
+  MATRIX; S1 = diag(v)  $ Matrix with v on diagonal, 0 elsewhere
+  MATRIX; S2 = v'v      $ Should be a square matrix, check dimension of v if scalar
+  MATRIX; HESSIAN = Q - S1 + S2 $
+
+
+  ? Create the bordered Hessian. First append 0 to front of v, then
+  ?   make this the first row of BH, finally making the rest of BH's 
+  ?   rows by appending transpose of to HESSIAN and appending underneath.
+
+  MATRIX; BH = [ v / HESSIAN ] $ Attach border row. BH still needs the border column
+  MATRIX; v0 = v'              $ Column version of v, but missing leading 0 for BH.
+  MATRIX; v0 = [0 / v0]        $ 0 appended to the top, v0 is now the correct length.
+  MATRIX; BH = [v0 ,BH]        $ Bordered Hessian is now complete.    
+
+
+  ? The result should have this form 
+  ?  (f1 = partial derivatives, fij = cross partials and 2nd derivatives)
+  ?   
+  ?      BH = [ 0 , f1 , f2 , f3 , f4  /
+  ?            f1 , f11, f12, f13, f14 /
+  ?            f2 , f21, f22, f23, f24 /
+  ?            f3 , f31, f32, f33, f34 /
+  ?            f4 , f41, f42, f43, f44 ]
+
+  MATRIX; vXX  = [B_LNDD, B_LNCC, B_LNLL, B_LNAA] $
+  MATRIX; v_1  = v - 1        $
+  MATRIX; vt   = v'           $
+  MATRIX; MP   = Dirp(v_1, v) $
+  MATRIX; MP   = vXX + MP     $
+  MATRIX; MP   = MP'          $
+  MATRIX; LIST; MP   = [vt, MP]     $
+
+
+  ? To check curvature, you could check the sign of the principle minors of BH, but that
+  ?  gets impractical as BH gets bigger (i.e. as you add inputs to the function). Sauer
+  ?  suggests using eigenvalues (sometimes called characteristic roots) instead. These
+  ?  must all be negative, which is simpler to check. 
+  ? To get eigenvalues of BH, use matrix function ROOT(). 
+  ?  NOTE: This only gives correct answers for symmetric matrices, 
+  ?  but I'm assuming Bij = Bji, so this will be true by construction
+
+  MATRIX;LIST;  E     = Root(BH) $
+
+
+ENDPROCEDURE
+
+
+
+
+PROC = LRTEST(sig,df)
+
+  ? You must save the following two scalars before running this
+  ?  procedure (copy and paste immediately below the restricted and
+  ?  the unrestricted models for your test.
+  ?CALC    ; LR = LogL $ After estimating restricted model
+  ?CALC    ; LU = LogL $ After estimating restricted model
+
+  CALC    ; LIST
+          ; LRstat = -2*(LR-LU)
+          ; LRcrit = CTB(sig,df)$ df is the number of restrictions
+ 
+ENDPROCEDURE
+
+
+
+PROC = TESTCRS
+
+  ? Test CRS for TL form, Fn1 is the same test for CD form (CD is nested in TL)
+  WALD; Fn1 = B_LND  + B_LNC  + B_LNL  + B_LNA - 1 
+      ; Fn2 = B_LNDD + B_LNDC + B_LNDL + B_LNDA   
+      ; Fn3 = B_LNDC + B_LNCC + B_LNCL + B_LNCA   
+      ; Fn4 = B_LNDL + B_LNCL + B_LNLL + B_LNLA   
+      ; Fn5 = B_LNDA + B_LNCA + B_LNLA + B_LNAA  $
+
+
+ENDPROCEDURE
+
+
+
+? ---------------------------
+? Checking regularity conditions
+?  at each data point (i.e. row of data) 
+? ---------------------------
+
+PROC = REGCHECK$
+
+  SAMPLE; I $ Work with one row at a time.
+
+
+  ? In LIMDEP's matrix notation, 
+  ?     - row entries are comma separated, and 
+  ?     - "/" starts a new row.
+  ? I've written the code assuming v is a row, so separate with commas. 
+
+  MATRIX; v       = [ED, EC, EL, EA] $
+  MATRIX; S1      = diag(v)  $ Matrix with v on diagonal, 0 elsewhere
+  MATRIX; S2      = v'v      $ Should be a square matrix, check dimension of v if scalar
+  MATRIX; HESSIAN = Q - S1 + S2 $ 
+      ? NOTE: Q doesn't change over rows, no need to redefine it 
+
+  ? Create the bordered Hessian. First append 0 to front of v, then
+  ?   make this the first row of BH, finally making the rest of BH's 
+  ?   rows by appending transpose of to HESSIAN and appending underneath.
+
+  MATRIX; BH = [ v / HESSIAN ] $ Attach border row. BH still needs the border column
+  MATRIX; v0 = v'              $ Column version of v, but missing leading 0 for BH.
+  MATRIX; v0 = [0 / v0]        $ 0 appended to the top, v0 is now the correct length.
+  MATRIX; BH = [v0 ,BH]        $ Bordered Hessian is now complete.    
+  MATRIX; E  = Root(BH)        $ Get the eigenvalues to check
+
+  
+  ? ------------------------------------------
+  ? Filling the CONCAVE theory check variable
+  ? ------------------------------------------
+  ?  All values should have the same sign, which should be negative. Therefore, 
+  ?  the sum of the squared eigenvalues should be of the same magnitude (if all 
+  ?  elements have the same sign), and that sum should have the opposite sign 
+  ?  (if the elements are negative). The following checks this by summing the 
+  ?  original vector (post multiplying a row vector ... transpose of E... by a 
+  ?  vector of 1's. This then compared to the sum of the original 
+  ?  vector's elements but with strictly positive signs, regardless of
+  ?  the original signs (by taking the sqrt(e^2) where e is an element of E).    
+
+  CALC  ; m     = row(E)          $ length of row vector E
+  MATRIX; E1    = E'1             $ shortcut to sum of elements of E 
+  MATRIX; E2    = Dirp(E,E)       $ Vector of e^2
+  MATRIX; E2    = Esqr(E2)        $ Vector of sqrt(e^2)
+  MATRIX; E2    = E2'1            $ shortcut to sum of elements of E2  
+  MATRIX; E2    = -1*E2           $ If E has only negative values, then E1 = -E2
+
+
+  ? Update variable which records the result
+  CREATE;  If (E1 = E2) CONCAVE = 1 $ Update this row of CONCAVE if check is passed
+
+
+ENDPROCEDURE
+
+
+
+?-------------------------
+? RANKS (BY YEAR) 
+?-------------------------
+
+PROC = MKRNKS $
+
+  EXEC; PROC = SAMPSEL(i,i) $
+  CREATE	;RKPL2=RNK(UPL)$
+  CREATE	;RKBC2=RNK(UBC)$
+  CREATE	;RKTRE2=RNK(UTRE)$
+  CREATE	;RKTFE2=RNK(UTFE)$
+
+ENDPROCEDURE
+
+
+
+
+
+? ******************************************************************
+? -------------- END OF PROCEDURE DEFINITIONS ----------------------
+? ******************************************************************
+
+
+
+
+
+
+
+
+
+
+? ******************************************************************
+? --------------------- DATA MANIPULATION --------------------------
+? ******************************************************************
+
+?-------------------------------------------------------------------
+? Get boundary values of T for panel. Also get second year for 
+?  situations where we initialise a procedure in the first year, then
+? iterate 
+?  over the rest.
+?-------------------------------------------------------------------
+CALC; MINT  = MIN(T)   $
+CALC; MINT2 = MINT + 1 $
+CALC; MAXT  = MAX(T)   $
+
+
+?---------------------
+? Rename Direct Costs
+?---------------------
+RENAME	;DC = D $
+
+
+?------------ 
+? CREATE LAND and Labour
+?------------
+?CREATE	;A = LANDFAGE $ Forage area
+CREATE	;A = LANDFEED $ Feed adj. area
+CREATE      ;L = L3      $ Labour in SMDS
+
+
+
+?------------ 
+? CREATE Panel Dummies
+?------------
+CREATE	;IF(              YEAR <= 1983) PANEL1=1$
+CREATE	;IF(YEAR > 1983 & YEAR <= 1991) PANEL2=1$
+CREATE	;IF(YEAR > 1991               ) PANEL3=1$
+
+
+?--------------
+? Summary stats
+?--------------
+DSTAT	;RHS=Y1,Y2,H,C,D,L3,A,YEAR$
+
+
+
+?------------ 
+? Scale variables (per cow)
+?------------
+CREATE ;Y10 = Y1     $
+CREATE ;Y1  = Y10/A  $
+
+
+CREATE ;Y20 = Y2     $
+CREATE ;Y2  = Y20/A  $
+
+
+CREATE ;H0 = H       $
+CREATE ;H = H0/A     $
+
+
+CREATE ;C0 = C       $
+CREATE ;C  = C0/A    $
+
+
+CREATE ;D0 = D       $
+CREATE ;D = D0/A     $
+
+
+CREATE ;L0 = L3      $
+CREATE ;L3 = L0/A    $
+
+DSTAT; RHS = Y1, Y2, H, C, D, L3 $
+
+
+?------------------
+? Sample selection (if scaling on, then selection based on scaled vars)
+?------------------
+
+? Get the extreme obs for dropping
+EXEC; PROC = OUTLIER(Y1, i); i=1,MAXT $
+RENAME; VXOB = Y1XOB $
+
+EXEC; PROC = OUTLIER(Y2, i); i=1,MAXT $
+RENAME; VXOB = Y2XOB $
+
+EXEC; PROC = OUTLIER( H, i); i=1,MAXT $
+RENAME; VXOB =  HXOB $
+
+EXEC; PROC = OUTLIER( D, i); i=1,MAXT $
+RENAME; VXOB =  DXOB $
+
+EXEC; PROC = OUTLIER( C, i); i=1,MAXT $
+RENAME; VXOB =  CXOB $
+
+EXEC; PROC = OUTLIER(L3, i); i=1,MAXT $
+RENAME; VXOB = L3XOB $
+
+EXEC; PROC = OUTLIER( A, i); i=1,MAXT $
+RENAME; VXOB =  AXOB $
+
+
+? - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+? Select the sample from the data, dropping zero's, neg. value, and
+?  removing outliers. Procedure also takes min and max year numbers.
+?  Check summary stats (DSTAT's) before and after dropping.
+?  Using the 0.995 percentile drops 66 obs. and removes most 
+?  egregious outliers.
+? - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+SAMPLE; ALL $
+DSTAT; RHS= Y1   , Y2   , H   , D   , C   , L3   , A    $.
+
+? The BEFORE outlier removal plot and summary stats
+PLOT; LHS=T; RHS= Y1   , Y2   , H   , D   , C   , L3   , A    $
+EXEC; PROC = SAMPSEL(MINT,MAXT) $
+
+? The AFTER outlier removal plot and summary stats
+DSTAT; RHS= Y1   , Y2   , H   , D   , C   , L3   , A    $
+PLOT; LHS=T; RHS= Y1   , Y2   , H   , D   , C   , L3   , A    $
+
+
+?----------------------- 
+? CREATE PANEL INDICATOR
+?----------------------- 
+SORT	;LHS=FC;RHS=*$
+CREATE	;IND=NDX(FC,0)$
+REGRESS	;LHS=ONE;RHS=ONE;STR=FC;PANEL$
+CREATE	;GRPSIZE=_GROUPTI$
+CALC	;LIST;G=MAX(GRPSIZE)$
+
+
+?----------------
+? CALCULATE MEANS
+?----------------
+CALC	;MEANY1 = XBR(Y1)$
+CALC	;MEANY2 = XBR(Y2)$
+CALC	;MEANH  = XBR(H) $
+CALC	;MEANC  = XBR(C) $
+CALC	;MEAND  = XBR(D) $
+CALC	;MEANL  = XBR(L3)$
+CALC	;MEANA  = XBR(A) $
+
+
+?--------------------------------------------------------------------
+? MEAN ADJUSTMENT -- Eases interpretation of parameter estimates
+?                      Makes it so B's are elasticities as in 
+?                      Cobb-Douglas, even for the Translog functional
+?                      form. 
+?--------------------------------------------------------------------
+CREATE ; MY1 = Y1 / MEANY1
+       ; MY2 = Y2 / MEANY2
+       ; MH  = H  / MEANH
+       ; MC  = C  / MEANC
+       ; MD  = D  / MEAND
+       ; ML  = L3 / MEANL
+       ; MA  = A  / MEANA    $
+
+
+?--------------------------------------------------------------------
+? CONVERT TO LOGS -- Both CD and TL functions are non-linear, 
+?                      but this transforms them s.t. they are now 
+?                      linear in parameters, hence they no longer 
+?                      violate assumptions of OLS (which are the same
+?                      that we must adhere to for these SFA models).
+?--------------------------------------------------------------------
+CREATE ; LNY1 = LOG(MY1)
+       ; LNY2 = LOG(MY2)
+       ; LNH  = LOG(MH )
+       ; LND  = LOG(MD )
+       ; LNC  = LOG(MC )
+       ; LNL  = LOG(ML )
+       ; LNA  = LOG(MA ) $
+
+
+? Above is log of mean normalised variables (for estimation)For evaluating Hessian
+
+?-------------------------------------------
+? CREATE INTERACTION VARIABLES FOR TRANSLOG
+?-------------------------------------------
+ CREATE ;TT=T*T
+        ;LNHH = LNH*LNH
+        ;LNHD = LNH*LND
+        ;LNHC = LNH*LNC
+        ;LNHL = LNH*LNL
+        ;LNDD = LND*LND
+        ;LNDC = LND*LNC
+        ;LNDL = LND*LNL
+        ;LNCC = LNC*LNC
+        ;LNCL = LNC*LNL
+        ;LNLL = LNL*LNL
+        ;LNHA = LNH*LNA
+        ;LNDA = LND*LNA
+        ;LNCA = LNC*LNA
+        ;LNLA = LNL*LNA
+        ;LNAA = LNA*LNA
+        ;LNHT = LNH*T
+        ;LNDT = LND*T
+        ;LNCT = LNC*T
+        ;LNLT = LNL*T
+        ;LNAT = LNA*T
+        ;TTT  = TT*T    $
+
+
+
+
+
+?------------------------------------------------------------
+? CREATE NAMELISTS -- Similar to macros for Stata, allows you
+?                      to give lists of variables. You cannot
+?                      store other info this way however (e.g.
+?                      conditions states, filepaths, etc.)
+?------------------------------------------------------------
+ NAMELIST;CD=ONE, LND,LNC,LNL,LNA$    Removefor scaled model
+
+
+ NAMELIST;TL = LNDD,LNDC,LNDL,LNDA,
+               LNCC,LNCL,LNCA,
+               LNLL,LNLA, 
+               LNAA $
+
+
+
+ NAMELIST;TCD = T,TT $
+
+ NAMELIST;TTL = LNDT,LNCT,LNLT,LNAT $
+
+ NAMELIST;TDV = T2, T3, T4, T5, T6,
+                T7, T8, T9,T10,T11,
+               T12,T13,T14,T15,T16,
+               T17,T18,T19,T20,T21,
+               T22,T23,T24,T25,T26,
+               T27,T28,T29,T30,T31, 
+               T32,T33,T34 $
+
+CREATE; SZC2_PAN = SZCLASS2 * PANEL1 $
+CREATE; SZC3_PAN = SZCLASS3 * PANEL1 $
+CREATE; SZC4_PAN = SZCLASS4 * PANEL1 $
+CREATE; SZC5_PAN = SZCLASS5 * PANEL1 $
+CREATE; SZC6_PAN = SZCLASS6 * PANEL1 $
+
+
+? Cannot fit TFE model with time invariant vars, so must interact
+?   SZCLASS vars with TDV instead of Panel
+
+? NOTE: There were no farms in SZCLASS6 < 1984
+CREATE; SZC2T1 = SZCLASS2 * T1
+      ; SZC2T2 = SZCLASS2 * T2
+      ; SZC2T3 = SZCLASS2 * T3
+      ; SZC2T4 = SZCLASS2 * T4
+      ; SZC2T5 = SZCLASS2 * T5
+      ; SZC3T1 = SZCLASS3 * T1
+      ; SZC3T2 = SZCLASS3 * T2
+      ; SZC3T3 = SZCLASS3 * T3
+      ; SZC3T4 = SZCLASS3 * T4
+      ; SZC3T5 = SZCLASS3 * T5
+      ; SZC4T1 = SZCLASS4 * T1
+      ; SZC4T2 = SZCLASS4 * T2
+      ; SZC4T3 = SZCLASS4 * T3
+      ; SZC4T4 = SZCLASS4 * T4
+      ; SZC4T5 = SZCLASS4 * T5
+      ; SZC5T1 = SZCLASS5 * T1
+      ; SZC5T2 = SZCLASS5 * T2
+      ; SZC5T3 = SZCLASS5 * T3
+      ; SZC5T4 = SZCLASS5 * T4
+      ; SZC5T5 = SZCLASS5 * T5
+      ; SZC6T1 = SZCLASS6 * T1
+      ; SZC6T2 = SZCLASS6 * T2
+      ; SZC6T3 = SZCLASS6 * T3
+      ; SZC6T4 = SZCLASS6 * T4
+      ; SZC6T5 = SZCLASS6 * T5 $
+
+
+?FIX: ADD SOIL1-2 to controls (hopefully fix neg on EA)
+ ?                    SOIL1 , SOIL2                 $   
+
+
+NAMELIST; CONTROLS = SZC2_PAN, SZC3_PAN, SZC4_PAN, 
+                     SZC5_PAN$   There were no SZC6_PAN before 1984!
+
+
+? NOTE: There were no farms in SZCLASS6 < 1984, class 1 is base
+?       Using T1 as base as well, 
+?        so interactions are SZC2T2 - SZC5T5
+?                     SOIL1 , SOIL2 $ 
+
+
+NAMELIST; CONTROLT = SZC2T2, SZC2T3, SZC2T4, SZC2T5,
+                     SZC3T2, SZC3T3, SZC3T4, SZC3T5,
+                     SZC4T2, SZC4T3, SZC4T4, SZC4T5,
+                     SZC5T2, SZC5T3, SZC5T4, SZC5T5 $
+
+
+
+
+
+
+
+? ******************************************************************
+? --------------------- DATA MANIPULATION --------------------------
+? ******************************************************************
+
+
+
+
+
+
+
+
+
+? ******************************************************************
+? ---------------------- MODEL ESTIMATION --------------------------
+? ******************************************************************
+
+
+? Define list of RHS vars for all subsequent models.
+
+STRING; ST1 = Y1           $ For setting namelist
+NAMELIST; DEPIN  = "ST1"
+        ; DEPVAR = LN"ST1" $  
+
+NAMELIST; DEPVAR = LNY1 $
+NAMELIST; X = CD,TL, TDV,CONTROLS $
+
+/* Parameter numbers for imposing CRS restriction
+     ONE  1
+     LND  2
+     LNC  3
+     LNL  4
+     LNA  5
+     LNDC 6
+     LNDL 7
+     LNDA 8
+     LNCC 9
+     LNCL 10
+     LNCA 11
+     LNLL 12
+     LNLA 13
+     LNAA 14
+*/
+
+
+? NOTE: before each model, make sure you have the correct sample.
+?       LIMDEP/NLOGIT allows you to return previously rejected obs
+?       back into the sample. To avoid accidentally expanding the 
+?       sample, I created the SAMPSEL procedure at the top of this
+?       file to just run all the REJECT commands again. Also takes
+?       a start and end T, so you can specify an individual year or 
+?       a range of years. I do this by creating and passing in 
+?       MINT and MAXT which guarantees that each model is using the 
+?       same years, and MAXT is also used for creating the elasticity
+?       matrices (yearly DSTATS of the elasticity variables). 
+
+
+
+
+?===================================================================
+? PIT AND LEE 
+?===================================================================
+EXEC; PROC = SAMPSEL(MINT,MAXT) $
+
+FRONTIER
+      ;LHS=DEPVAR
+      ;RHS=X
+      ;QUIETLY $
+
+FRONTIER
+      ;LHS=DEPVAR
+      ;RHS=X
+      ;PANEL
+      ;EFF=UPL 
+      ;RES  = resPL
+      ;KEEP = xbPL  $
+
+CREATE; VPL = resPL - UPL$
+
+
+CREATE;EPL=EXP(-UPL)$
+MATRIX;B_PL = B$
+
+
+
+
+?----------------------------------------------------------
+? Procedures 
+?----------------------------------------------------------
+EXEC; PROC = TESTCRS            $ Wald test of hypothesis of CRS technology
+EXEC; PROC = MKRTS              $ Make RTS, EX,dYdX, d2YdX2. Also fills MONO and DMPROD 
+EXEC; PROC = REGPOINT           $ Check regularity conditions at point of approximation (mean)
+EXEC; PROC = REGCHECK; I=1,8752 $ Check regularity conditions at every data point
+SAMPLE; ALL$
+CREATE; MONO_PL = MONO  
+      ; DMPR_PL = DMPROD 
+      ; CONC_PL = CONCAVE  $
+
+EXEC; PROC = SAMPSEL(MINT,MAXT) $
+
+?----------------------------------------------------------
+? Get the average elasticities for each year of the sample
+?----------------------------------------------------------
+
+? First create a list of the varnames (includes time index, 
+?   technical efficiency estimate, and logged primary vars)
+NAMELIST  ; elist = T,EPL,ED,EC,EL,EA,CD $
+
+
+
+? Do the DSTATS for the first year and initialise matrix X
+EXEC  ; PROC = SAMPSEL(i,i); i=MINT $
+DSTAT	; RHS  = elist ; WTS=W$
+MATRIX; YSTATMAT = LASTDSTA $
+
+
+? Use procedure for remaining years
+EXEC ;PROC = YSTATS(elist,i) ;i=MINT2,MAXT $
+
+
+? Copy EM for this model.Delete YSTATMAT in preparation for next model.
+MATRIX; EM_PL = YSTATMAT $
+MATRIX; DELETE YSTATMAT $
+
+
+
+
+?===================================================================
+
+
+
+
+?===================================================================
+? B AND C 1992 
+?===================================================================
+EXEC; PROC = SAMPSEL(MINT,MAXT) $
+
+FRONTIER
+	;LHS=DEPVAR
+	;RHS=X
+        ;QUIETLY $
+
+FRONTIER
+	;LHS=DEPVAR
+	;RHS=X
+	;PANEL
+	;MODEL=BC
+	;EFF=UBC 
+      ;RES  = resBC
+      ;KEEP = xbBC  $
+
+CREATE; VBC = resBC - UBC $
+
+
+CREATE;EBC=EXP(-UBC)$
+MATRIX;B_BC = B$
+
+
+?----------------------------------------------------------
+? Procedures 
+?----------------------------------------------------------
+EXEC; PROC = MKRTS              $ Make RTS, EX,dYdX, d2YdX2. Also fills MONO and DMPROD 
+EXEC; PROC = TESTCRS            $ Wald test of hypothesis of CRS technology
+EXEC; PROC = REGPOINT           $ Check regularity conditions at point of approximation (mean)
+EXEC; PROC = REGCHECK; I=1,8752 $ Check regularity conditions at every data point
+SAMPLE; ALL$
+
+CREATE; MONO_BC = MONO  
+      ; DMPR_BC = DMPROD 
+      ; CONC_BC = CONCAVE  $
+
+EXEC; PROC = SAMPSEL(MINT,MAXT) $
+
+?----------------------------------------------------------
+? Get the average elasticities for each year of the sample
+?----------------------------------------------------------
+
+? First create a list of the varnames (includes time index, 
+?   technical efficiency estimate, and logged primary vars)
+NAMELIST  ; elist = T,EBC,ED,EC,EL,EA,CD $
+
+
+? Do the DSTATS for the first year and initialise matrix X
+EXEC; PROC = SAMPSEL(MINT,MINT) $
+DSTAT	;RHS=elist;WTS=W$
+MATRIX; YSTATMAT = LASTDSTA$
+
+
+? Use procedure for remaining years
+EXEC ;PROC = YSTATS(elist,i) ;i=MINT2,MAXT $
+
+? Copy EM for this model.Delete YSTATMAT in preparation for next model.
+MATRIX; EM_BC = YSTATMAT $
+MATRIX; DELETE YSTATMAT $
+
+
+?===================================================================
+
+
+
+
+
+
+?===================================================================
+? 'True' Random Effects Model WITH TIME DUMMIES 
+?===================================================================
+EXEC; PROC = SAMPSEL(MINT,MAXT) $
+
+? Requires initial run for starting parameter values.
+? Surround with SILENT and NOSILENT to suppress output.
+
+
+  FRONTIER
+	;LHS=DEPVAR
+	;RHS=X
+      ;QUIETLY $
+
+
+? Actual model.
+FRONTIER
+	;LHS=DEPVAR
+	;RHS=X
+	;PDS=GRPSIZE
+	;HALTON
+	;PTS=10
+	;RPM
+	;FCN=ONE(n)
+	;EFF=UTRE  $
+
+
+CREATE;ETRE=EXP(-UTRE)$
+MATRIX;B_TRE = B$
+
+?----------------------------------------------------------
+? Procedures 
+?----------------------------------------------------------
+EXEC; PROC = MKRTS              $ Make RTS, EX,dYdX, d2YdX2. Also fills MONO and DMPROD 
+EXEC; PROC = TESTCRS            $ Wald test of hypothesis of CRS technology
+EXEC; PROC = REGPOINT           $ Check regularity conditions at point of approximation (mean)
+EXEC; PROC = REGCHECK; I=1,8752 $ Check regularity conditions at every data point
+SAMPLE; ALL$
+
+CREATE; MONO_TRE = MONO  
+      ; DMPR_TRE = DMPROD 
+      ; CONC_TRE = CONCAVE  $
+ 
+
+
+EXEC; PROC = SAMPSEL(MINT,MAXT) $
+
+?----------------------------------------------------------
+? Get the average elasticities for each year of the sample
+?----------------------------------------------------------
+
+? First create a list of the varnames (includes time index, 
+?   technical efficiency estimate, and logged primary vars)
+NAMELIST  ; elist = T, ETRE,ED,EC,EL,EA,CD $
+
+
+? Do the DSTATS for the first year and initialise matrix X
+EXEC; PROC = SAMPSEL(MINT,MINT) $
+DSTAT	;RHS=elist;WTS=W$
+MATRIX; YSTATMAT = LASTDSTA$
+
+
+? Use procedure for remaining years
+EXEC ;PROC = YSTATS(elist,i) ;i=MINT2,MAXT $
+
+
+? Copy EM for this model.Delete YSTATMAT in preparation for next model.
+MATRIX; EM_TRE = YSTATMAT $
+MATRIX; DELETE YSTATMAT $
+
+
+?===================================================================
+
+
+
+
+
+
+
+?===================================================================
+? 'True' Fixed Effects Model TIME DUMMIES
+?===================================================================
+
+EXEC; PROC = SAMPSEL(MINT,MAXT) $
+
+NAMELIST; X = CD,TL,TDV,CONTROLT$
+?NAMELIST; X = CD,TL,TDV, SZCLASS2, SZCLASS3, SZCLASS4, SZCLASS5 $
+
+
+EXEC; PROC = SAMPSEL(MINT,MAXT) $
+
+? Requires initial run for starting parameter values.
+  FRONTIER
+	;LHS=DEPVAR
+	;RHS=X
+      ;QUIETLY $
+
+
+
+? Actual model.
+FRONTIER
+	;LHS=DEPVAR
+	;RHS=X
+	;PDS=GRPSIZE
+	;FEM
+	;EFF=UTFE $
+
+
+
+CREATE;ETFE=EXP(-UTFE)$
+MATRIX;B_TFE = B$
+
+?----------------------------------------------------------
+? Procedures 
+?----------------------------------------------------------
+EXEC; PROC = MKRTS              $ Make RTS, EX,dYdX, d2YdX2. Also fills MONO and DMPROD 
+EXEC; PROC = TESTCRS            $ Wald test of hypothesis of CRS technology
+EXEC; PROC = REGPOINT           $ Check regularity conditions at point of approximation (mean)
+EXEC; PROC = REGCHECK; I=1,8752 $ Check regularity conditions at every data point
+SAMPLE; ALL$
+
+CREATE; MONO_TFE = MONO  
+      ; DMPR_TFE = DMPROD 
+      ; CONC_TFE = CONCAVE  $
+
+EXEC; PROC = SAMPSEL(MINT,MAXT) $
+
+
+?----------------------------------------------------------
+? Get the average elasticities for each year of the sample
+?----------------------------------------------------------
+
+? First create a list of the varnames (includes time index, 
+?   technical efficiency estimate, and logged primary vars)
+NAMELIST  ; elist = T,ETFE,ED,EC,EL,EA,CD $
+
+
+? Do the DSTATS for the first year and initialise matrix X
+EXEC; PROC = SAMPSEL(MINT,MINT) $
+DSTAT	;RHS=elist;WTS=W$
+MATRIX; YSTATMAT = LASTDSTA$
+
+
+? Use procedure for remaining years
+EXEC ;PROC = YSTATS(elist,i) ;i=MINT2,MAXT $
+
+
+? Copy EM for this model.Delete YSTATMAT in preparation for next model.
+MATRIX; EM_TFE = YSTATMAT $
+MATRIX; DELETE YSTATMAT $
+
+
+?===================================================================
+
+? ******************************************************************
+? --------------------- END OF ESTIMATION --------------------------
+? ******************************************************************
+
+
+
+
+
+? ******************************************************************
+? --------------------- MODEL COMPARISONS --------------------------
+? ******************************************************************
+
+
+?----------------------------------------------------------
+? CORRELATION MATRIX OF TE SCORES (ACROSS ALL YEARS)
+?----------------------------------------------------------
+DSTAT;Rhs=UPL,UBC,UTRE,UTFE;Wts=W;Output=2$
+
+
+
+/*?----------------------------------------------------------
+? CREATE RANKS AND COMPARE CORRELATIONS (ACROSS ALL YEARS)
+?----------------------------------------------------------
+CREATE	;RKPL=RNK(UPL)$
+CREATE	;RKBC=RNK(UBC)$
+CREATE	;RKTRE=RNK(UTRE)$
+CREATE	;RKTFE=RNK(UTFE)$
+DSTAT;Rhs=RKPL,RKBC,RKTRE,RKTFE;Wts=W;Output=2$
+
+
+?----------------------------------------------------------
+? CREATE RANKS AND COMPARE CORRELATIONS (BY YEAR)
+?----------------------------------------------------------
+EXEC    ;PROC = MKRNKS ;i=1,MAXT   ; SILENT $
+EXEC    ;PROC = SAMPSEL(MINT, MAXT); SILENT $
+DSTAT   ;Rhs=RKPL2,RKBC2,RKTRE2,RKTFE2;Wts=W;Output=2$
+
+
+?----------------------------------------------------------
+? PLOT (YEARLY) INEFFICIENCY RANKINGS 
+?----------------------------------------------------------
+PLOT    ;Lhs=RKPL2 ;Rhs=RKBC2$
+PLOT    ;Lhs=RKTFE2;Rhs=RKTRE2$
+PLOT    ;Lhs=RKTRE2;Rhs=RKPL2$
+
+
+
+?----------------------------------------------------------
+? Export farm-year specific inefficiency terms and rankings to .xls
+?----------------------------------------------------------
+WRITE
+  ;T,W,FC,
+   UPL,UBC,UTRE,UTFE,
+   RKPL,RKPL2,RKBC,RKBC2,
+   RKTRE,RKTRE2,RKTFE,RKTFE2
+  ;FILE="D:\Data\data_NFSPanelAnalysis\Do_Files\Quota\UITS_DY.xls"
+*/  ;Format=xls$
+
+? ******************************************************************
+? --------------------- END OF COMPARISONS -------------------------
+? ******************************************************************
+
+
+
+
+
+? ******************************************************************
+? --------------------- POST-ESTIMATION      -----------------------
+? ******************************************************************
+EXEC; PROC = SAMPSEL(MINT, MAXT) $
+
+
+
+? ------------------------------
+? Plot v to check for homoscedasticity and normality
+? ------------------------------
+PLOT  ; LHS = xbPL; RHS = VPL $ 
+PLOT  ; LHS = xbBC; RHS = VBC $ 
+KERNEL; RHS = VPL, VBC; normal $
+
+
+
+? ------------------------------
+? Correlations matrix of CD terms (multi-collinearity check)
+? ------------------------------
+DSTAT;Rhs=CD; Output=2$
+
+
+
+? ------------------------------
+? TEST TRANSLOG FUNCTIONAL FORM 
+? ------------------------------
+SILENT $
+FRONTIER
+      ;LHS=DEPVAR
+      ;RHS=CD
+      ;QUIETLY $
+FRONTIER
+      ;LHS=DEPVAR
+      ;RHS=CD
+      ;QUIETLY 
+      ;PANEL    $
+CALC; LR = LogL $
+
+
+FRONTIER
+      ;LHS=DEPVAR
+      ;RHS=CD, TL
+      ;QUIETLY  $
+
+FRONTIER
+      ;LHS=DEPVAR
+      ;RHS=CD, TL
+      ;QUIETLY
+      ;PANEL    $
+CALC; LU = LogL $
+NO SILENT $
+
+EXEC; PROC = LRTEST(0.99, 15)    $ Likelihood ratio test 
+
+
+
+? ------------------------------
+? TEST neutral technical change
+? ------------------------------
+SILENT $
+FRONTIER
+      ;LHS=DEPVAR
+      ;RHS=CD, TL
+      ;QUIETLY $
+FRONTIER
+      ;LHS=DEPVAR
+      ;RHS=CD, TL
+      ;QUIETLY 
+      ;PANEL    $
+CALC; LR = LogL $
+
+
+FRONTIER
+      ;LHS=DEPVAR
+      ;RHS=CD, TL, TDV
+      ;QUIETLY  $
+
+FRONTIER
+      ;LHS=DEPVAR
+      ;RHS=CD, TL, TDV
+      ;QUIETLY
+      ;PANEL    $
+CALC; LU = LogL $
+NO SILENT $
+
+EXEC; PROC = LRTEST(0.99, 33)    $ Likelihood ratio test 
+
+
+
+? ------------------------------
+? TEST sampling method change control vars
+? ------------------------------
+SILENT $
+FRONTIER
+      ;LHS=DEPVAR
+      ;RHS=CD, TL, TDV
+      ;QUIETLY $
+FRONTIER
+      ;LHS=DEPVAR
+      ;RHS=CD, TL, TDV
+      ;QUIETLY 
+      ;PANEL    $
+CALC; LR = LogL $
+
+
+FRONTIER
+      ;LHS=DEPVAR
+      ;RHS=CD, TL, TDV, CONTROLS
+      ;QUIETLY  $
+
+FRONTIER
+      ;LHS=DEPVAR
+      ;RHS=CD, TL, TDV, CONTROLS
+      ;QUIETLY
+      ;PANEL    
+      ;RES  = resPL
+      ;KEEP = xbPL  $
+
+CREATE; VPL = resPL - UPL $
+PLOT; LHS = xbPL; RHS = vPL $ 
+KERNEL; RHS = vPL $
+
+CALC; LU = LogL $
+NO SILENT $
+
+EXEC; PROC = LRTEST(0.99, 5)    $ Likelihood ratio test 
+
+
+
+? ------------------------------
+? HAUSMAN for FE vs RE (automatically included in output of normal panel regression)
+? ------------------------------
+REGRESS
+      ;LHS=DEPVAR
+      ;RHS=CD, TL, TDV, CONTROLS
+      ;PANEL $
+
+
+
+? ------------------------------
+? Report proportions of data points satisfying regularity conditions
+? ------------------------------
+CREATE; MODR_PL = 0 $
+CREATE; IF(MONO_PL = 1 & DMPR_PL = 1) MODR_PL = 1 $
+
+CREATE; MODR_BC = 0 $
+CREATE; IF(MONO_BC = 1 & DMPR_BC = 1) MODR_BC = 1 $
+
+CREATE; MODR_TRE = 0 $
+CREATE; IF(MONO_TRE = 1 & DMPR_TRE = 1) MODR_TRE = 1 $
+
+CREATE; MODR_TFE = 0 $
+CREATE; IF(MONO_TFE = 1 & DMPR_TFE = 1) MODR_TFE = 1 $
+
+
+
+DSTAT	; RHS = MONO_PL, MONO_BC, MONO_TRE, MONO_TFE $ 
+DSTAT	; RHS = DMPR_PL, DMPR_BC, DMPR_TRE, DMPR_TFE $
+DSTAT	; RHS = MODR_PL, MODR_BC, MODR_TRE, MODR_TFE $
+
+
+? ******************************************************************
+? --------------------- END POST-ESTIMATION ------------------------
+? ******************************************************************
+
+
+
+
+
+? ******************************************************************
+? -------------------------- END OF FILE ---------------------------
+? ******************************************************************

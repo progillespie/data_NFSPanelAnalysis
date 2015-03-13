@@ -185,3 +185,4 @@ destring year ct_lt_cat, replace
 
 
 sort ct_lt_cat year
+outsheet using `outdatadir'/ct_cat_gmlt.csv, comma replace
